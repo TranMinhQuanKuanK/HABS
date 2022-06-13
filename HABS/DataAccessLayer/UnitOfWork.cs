@@ -1,6 +1,5 @@
 ﻿using DataAccessLayer.Models;
 using DataAcessLayer.Interfaces;
-using DataAcessLayer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

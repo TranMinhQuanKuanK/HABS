@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HABS", "HABS\HABS.csproj", "{BD364ABC-6BA8-45C4-AEEE-790F2EEE0B17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HABS", "HABS\HABS.csproj", "{BD364ABC-6BA8-45C4-AEEE-790F2EEE0B17}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BusinessLayer", "BusinessLayer", "{814AE52C-EBC5-46A7-BA9F-FE7C025DCC2B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccessLayer", "DataAccessLayer", "{0E8F800D-BD81-4542-B383-4E72CE63D30C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{0CE09ED5-A432-43A2-9AE5-645B3D7DFC0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{0CE09ED5-A432-43A2-9AE5-645B3D7DFC0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{CD543EEA-8DD8-40DA-AF4E-F3F6F14D3270}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,12 +27,17 @@ Global
 		{0CE09ED5-A432-43A2-9AE5-645B3D7DFC0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CE09ED5-A432-43A2-9AE5-645B3D7DFC0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CE09ED5-A432-43A2-9AE5-645B3D7DFC0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD543EEA-8DD8-40DA-AF4E-F3F6F14D3270}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD543EEA-8DD8-40DA-AF4E-F3F6F14D3270}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD543EEA-8DD8-40DA-AF4E-F3F6F14D3270}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD543EEA-8DD8-40DA-AF4E-F3F6F14D3270}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0CE09ED5-A432-43A2-9AE5-645B3D7DFC0B} = {0E8F800D-BD81-4542-B383-4E72CE63D30C}
+		{CD543EEA-8DD8-40DA-AF4E-F3F6F14D3270} = {814AE52C-EBC5-46A7-BA9F-FE7C025DCC2B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3DE4797D-28FE-499E-AF1C-E4D92646DE52}

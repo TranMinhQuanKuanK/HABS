@@ -1,4 +1,4 @@
-﻿using DataAcessLayer.Models;
+﻿using DataAccessLayer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,24 +9,25 @@ namespace DataAcessLayer.Interfaces
 {
     public interface IUnitOfWork
     {
-        IGenericRepository<Product> ProductRepository { get; }
-        IGenericRepository<Category> CategoryRepository { get; }
+        IGenericRepository<Account> AccountRepository { get; }
         IGenericRepository<Bill> BillRepository { get; }
         IGenericRepository<BillDetail> BillDetailRepository { get; }
-        IGenericRepository<Brand> BrandRepository { get; }
         IGenericRepository<Cashier> CashierRepository { get; }
-        IGenericRepository<UserBrand> UserBrandRepository { get; }
-        IGenericRepository<DailyRevenue> DailyRevenueRepository { get; }
-        IGenericRepository<Event> EventRepository { get; }
-        IGenericRepository<EventDetail> EventDetailRepository { get; }
-        IGenericRepository<Receipt> ReceiptRepository { get; }
-        IGenericRepository<ReceiptDetail> ReceiptDetailRepository { get; }
-        IGenericRepository<Stock> StockRepository { get; }
-        IGenericRepository<Store> StoreRepository { get; }
-        IGenericRepository<User> UserRepository { get; }
-        IGenericRepository<FcmtokenMobile> FcmTokenMobileRepository { get; }
-        GroceryCloud18th2Context Context();
-
+        IGenericRepository<CheckupRecord> CheckupRecordRepository { get; }
+        IGenericRepository<Department> DepartmentRepository { get; }
+        IGenericRepository<Doctor> DoctorRepository { get; }
+        IGenericRepository<IcdDisease> IcdDiseaseRepository { get; }
+        IGenericRepository<Medicine> MedicineRepository { get; }
+        IGenericRepository<MedicineCategory> MedicineCategoryRepository { get; }
+        IGenericRepository<Operation> OperationRepository { get; }
+        IGenericRepository<Patient> PatientRepository { get; }
+        IGenericRepository<Prescription> PrescriptionRepository { get; }
+        IGenericRepository<PrescriptionDetail> PrescriptionDetailRepository { get; }
+        IGenericRepository<Room> RoomRepository { get; }
+        IGenericRepository<RoomType> RoomTypeRepository { get; }
+        IGenericRepository<Schedule> ScheduleRepository { get; }
+        IGenericRepository<TestRecord> TestRecordRepository { get; }
+        HospitalAppointmentBookingContext Context();
         Task SaveChangesAsync();
     }
 }
