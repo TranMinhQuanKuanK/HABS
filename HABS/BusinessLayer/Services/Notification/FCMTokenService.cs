@@ -1,7 +1,6 @@
-﻿using AutoMapper;
-using BusinessLayer.Interfaces.Notification;
+﻿using BusinessLayer.Interfaces.Notification;
+using DataAccessLayer.Models;
 using DataAcessLayer.Interfaces;
-using DataAcessLayer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,31 +11,31 @@ namespace BusinessLayer.Services.Notification
 {
     public class FCMTokenService:BaseService, IFCMTokenService
     {
-        public FCMTokenService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        public FCMTokenService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
         }
-        public List<string> GetTokenList(int userId)
+        public List<string> GetTokenList(long accountId)
         {
             return _unitOfWork.FcmTokenMobileRepository.Get()
-              .Where(x => x.UserId == userId).Select(x=>x.TokenId).ToList();
+              .Where(x => x.AccountId == accountId).Select(x=>x.TokenId).ToList();
         }
-        public async Task AddToken(string tokenId, int userId)
+        public async Task AddToken(string tokenId, long accountId)
         {
-                FcmtokenMobile token = new FcmtokenMobile()
+                FcmTokenMobile token = new FcmTokenMobile()
                 {
                     TokenId = tokenId,
-                    UserId = userId
+                    AccountId = accountId
                 };
                 await _unitOfWork.FcmTokenMobileRepository.Add(token);
                 await _unitOfWork.SaveChangesAsync();
         }
-        public async Task DeleteToken(string tokenId, int userId)
+        public async Task DeleteToken(string tokenId, long accountId)
         {
             try
             {
                 var token = _unitOfWork.FcmTokenMobileRepository.Get()
                .Where(x => x.TokenId == tokenId)
-               .Where(x => x.UserId == userId).FirstOrDefault();
+               .Where(x => x.AccountId == accountId).FirstOrDefault();
                 await _unitOfWork.FcmTokenMobileRepository.Delete(token.Id);
                 await _unitOfWork.SaveChangesAsync();
             } catch (Exception e)

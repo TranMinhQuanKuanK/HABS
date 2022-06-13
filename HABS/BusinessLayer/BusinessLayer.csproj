@@ -5,8 +5,41 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="RequestModels\SearchModels\" />
-    <Folder Include="ResponseModels\ErrorModels\" />
+    <Folder Include="Interfaces\Admin\" />
+    <Folder Include="Interfaces\Cashier\" />
+    <Folder Include="Interfaces\Doctor\" />
+    <Folder Include="Interfaces\Screen\" />
+    <Folder Include="RequestModels\CreateModels\Admin\" />
+    <Folder Include="RequestModels\CreateModels\Cashier\" />
+    <Folder Include="RequestModels\CreateModels\Doctor\" />
+    <Folder Include="RequestModels\CreateModels\Screen\" />
+    <Folder Include="RequestModels\CreateModels\User\" />
+    <Folder Include="RequestModels\SearchModels\Admin\" />
+    <Folder Include="RequestModels\SearchModels\Cashier\" />
+    <Folder Include="RequestModels\SearchModels\Doctor\" />
+    <Folder Include="RequestModels\SearchModels\Screen\" />
+    <Folder Include="ResponseModels\ErrorModels\Admin\" />
+    <Folder Include="ResponseModels\ErrorModels\Cashier\" />
+    <Folder Include="ResponseModels\ErrorModels\Doctor\" />
+    <Folder Include="ResponseModels\ErrorModels\Screen\" />
+    <Folder Include="ResponseModels\ErrorModels\User\" />
+    <Folder Include="ResponseModels\ViewModels\Admin\" />
+    <Folder Include="ResponseModels\ViewModels\Cashier\" />
+    <Folder Include="ResponseModels\ViewModels\Doctor\" />
+    <Folder Include="ResponseModels\ViewModels\Screen\" />
+    <Folder Include="Services\Doctor\" />
+    <Folder Include="Services\Cashier\" />
+    <Folder Include="Services\Admin\" />
+    <Folder Include="Services\Screen\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FirebaseAdmin" Version="2.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.csproj" />
   </ItemGroup>
 
 </Project>

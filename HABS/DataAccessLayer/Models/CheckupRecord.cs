@@ -27,6 +27,7 @@ namespace DataAccessLayer.Models
         public int? Temperature { get; set; }
         public string DoctorName { get; set; }
         public string PatientName { get; set; }
+        public string DepartmentName { get; set; }
         public long? PatientId { get; set; }
         public long? DoctorId { get; set; }
         public long? DepartmentId { get; set; }

@@ -24,6 +24,7 @@ namespace DataAccessLayer.Models
         public virtual DbSet<CheckupRecord> CheckupRecords { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Doctor> Doctors { get; set; }
+        public virtual DbSet<FcmTokenMobile> FcmTokenMobiles { get; set; }
         public virtual DbSet<IcdDisease> IcdDiseases { get; set; }
         public virtual DbSet<Medicine> Medicines { get; set; }
         public virtual DbSet<MedicineCategory> MedicineCategories { get; set; }
@@ -53,7 +54,7 @@ namespace DataAccessLayer.Models
             {
                 entity.ToTable("Account");
 
-                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E38839F8095")
+                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E38575B9871")
                     .IsUnique();
 
                 entity.Property(e => e.Email).IsRequired();
@@ -103,7 +104,7 @@ namespace DataAccessLayer.Models
             {
                 entity.ToTable("Cashier");
 
-                entity.HasIndex(e => e.Username, "UQ__Cashier__536C85E40036E18F")
+                entity.HasIndex(e => e.Username, "UQ__Cashier__536C85E4F0D3AAD6")
                     .IsUnique();
 
                 entity.Property(e => e.Name).IsRequired();
@@ -172,9 +173,24 @@ namespace DataAccessLayer.Models
                     .HasConstraintName("FK__Doctor__Departme__2C3393D0");
             });
 
+            modelBuilder.Entity<FcmTokenMobile>(entity =>
+            {
+                entity.ToTable("FcmTokenMobile");
+
+                entity.Property(e => e.TokenId).IsRequired();
+
+                entity.HasOne(d => d.Account)
+                    .WithMany(p => p.FcmTokenMobiles)
+                    .HasForeignKey(d => d.AccountId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__FcmTokenM__Accou__619B8048");
+            });
+
             modelBuilder.Entity<IcdDisease>(entity =>
             {
-                entity.HasIndex(e => e.IcdId, "UQ__IcdDisea__A7EA53A12F860E46")
+                entity.ToTable("IcdDisease");
+
+                entity.HasIndex(e => e.IcdId, "UQ__IcdDisea__A7EA53A1624547F8")
                     .IsUnique();
 
                 entity.Property(e => e.IcdId)
@@ -317,7 +333,11 @@ namespace DataAccessLayer.Models
 
                 entity.Property(e => e.EstimatedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.Floor).IsRequired();
+
                 entity.Property(e => e.RealDate).HasColumnType("datetime");
+
+                entity.Property(e => e.RoomNumber).IsRequired();
 
                 entity.HasOne(d => d.Bill)
                     .WithMany(p => p.TestRecords)

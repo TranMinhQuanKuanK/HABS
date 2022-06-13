@@ -25,7 +25,7 @@ namespace DataAcessLayer
             return _dbSet;
         }
 
-        public async Task<TEntity> GetById(int id)
+        public async Task<TEntity> GetById(long id)
         {
             var data = await _dbSet.FindAsync(id);
             return data;
@@ -42,7 +42,7 @@ namespace DataAcessLayer
             _dbContext.Entry(entity).State = EntityState.Modified;
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(long id)
         {
             var entity = await GetById(id);
             _dbSet.Remove(entity);

@@ -8,9 +8,9 @@ namespace BusinessLayer.Interfaces.Notification
 {
     public interface IFCMTokenService
     {
-        List<string> GetTokenList(int userId);
-        Task AddToken(string tokenId, int userId);
-        Task DeleteToken(string tokenId, int userId);
+        List<string> GetTokenList(long accountId);
+        Task AddToken(string tokenId, long accountId);
+        Task DeleteToken(string tokenId, long accountId);
 
     }
 }

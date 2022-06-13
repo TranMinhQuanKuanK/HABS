@@ -11,9 +11,9 @@ namespace Utilities
 {
     public class CreateAuthenToken
     {
-        public static string GetToken(string role)
+        public static string GetToken(string role, string secret)
         {
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("KeyForSignInSecret@1234"));
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
             var tokenOptions = new JwtSecurityToken(

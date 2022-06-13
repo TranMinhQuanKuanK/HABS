@@ -27,6 +27,8 @@ namespace DataAcessLayer.Interfaces
         IGenericRepository<RoomType> RoomTypeRepository { get; }
         IGenericRepository<Schedule> ScheduleRepository { get; }
         IGenericRepository<TestRecord> TestRecordRepository { get; }
+        IGenericRepository<FcmTokenMobile> FcmTokenMobileRepository { get; }
+
         HospitalAppointmentBookingContext Context();
         Task SaveChangesAsync();
     }

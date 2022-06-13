@@ -11,13 +11,13 @@ namespace DataAcessLayer.Interfaces
     {
         DbSet<TEntity> Get();
 
-        Task<TEntity> GetById(int id);
+        Task<TEntity> GetById(long id);
 
         Task Add(TEntity entity);
 
         void Update(TEntity entity);
 
-        Task Delete(int id);
+        Task Delete(long id);
         Task DeleteComplex(object firstKey, object secondKey);
     }
 }

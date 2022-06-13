@@ -9,6 +9,7 @@ namespace DataAccessLayer.Models
     {
         public Account()
         {
+            FcmTokenMobiles = new HashSet<FcmTokenMobile>();
             Patients = new HashSet<Patient>();
         }
 
@@ -18,6 +19,7 @@ namespace DataAccessLayer.Models
         public string Email { get; set; }
         public string Name { get; set; }
 
+        public virtual ICollection<FcmTokenMobile> FcmTokenMobiles { get; set; }
         public virtual ICollection<Patient> Patients { get; set; }
     }
 }

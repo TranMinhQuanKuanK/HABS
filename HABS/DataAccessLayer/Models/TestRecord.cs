@@ -18,6 +18,9 @@ namespace DataAccessLayer.Models
         public int? NumericalOrder { get; set; }
         public int Status { get; set; }
         public string ResultFileLink { get; set; }
+        public string PatientName { get; set; }
+        public string RoomNumber { get; set; }
+        public string Floor { get; set; }
         public long? RoomId { get; set; }
         public long? BillId { get; set; }
         public long? PatientId { get; set; }

@@ -32,7 +32,7 @@ namespace DataAcessLayer
         public IGenericRepository<RoomType> RoomTypeRepository { get; }
         public IGenericRepository<Schedule> ScheduleRepository { get; }
         public IGenericRepository<TestRecord> TestRecordRepository { get; }
-        //public IGenericRepository<FcmtokenMobile> FcmTokenMobileRepository { get; }
+        public IGenericRepository<FcmTokenMobile> FcmTokenMobileRepository { get; }
         public UnitOfWork(HospitalAppointmentBookingContext dbContext,
             IGenericRepository<Account> accountRepository,
             IGenericRepository<Bill> billRepository,
@@ -51,7 +51,8 @@ namespace DataAcessLayer
             IGenericRepository<Room> roomRepository,
             IGenericRepository<RoomType> roomTypeRepository,
             IGenericRepository<Schedule> scheduleRepository,
-            IGenericRepository<TestRecord> testRecordRepository
+            IGenericRepository<TestRecord> testRecordRepository,
+             IGenericRepository<FcmTokenMobile> fcmTokenMobileRepository
             )
         {
             _dbContext = dbContext;
@@ -72,6 +73,7 @@ namespace DataAcessLayer
             RoomRepository = roomRepository;
             ScheduleRepository = scheduleRepository;
             TestRecordRepository = testRecordRepository;
+            FcmTokenMobileRepository = fcmTokenMobileRepository;
         }
 
         public HospitalAppointmentBookingContext Context()
