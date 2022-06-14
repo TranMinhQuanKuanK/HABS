@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,12 +38,12 @@ namespace HASB_User
         public void ConfigureServices(IServiceCollection services)
         {
 
-            //services.AddDistributedMemoryCache();
-            //services.AddStackExchangeRedisCache(options =>
-            //{
-            //    options.Configuration = "redis-19822.c53.west-us.azure.cloud.redislabs.com:19822,password=2uAjtMUBLf8j4BQjzKG7L5EjtBqug0S6,ssl=False,abortConnect=False";
-            //    options.InstanceName = "SWDRedisCache";
-            //});
+            services.AddDistributedMemoryCache();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "redis-19822.c53.west-us.azure.cloud.redislabs.com:19822,password=2uAjtMUBLf8j4BQjzKG7L5EjtBqug0S6,ssl=False,abortConnect=False";
+                options.InstanceName = "SWDRedisCache";
+            });
             services.AddRouting(option =>
             {
                 option.ConstraintMap["slugify"] = typeof(SlugifyParameterTransformer);
@@ -130,7 +131,7 @@ namespace HASB_User
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            //user
+            //user app
             services.AddTransient<ICheckupRecordService, CheckupRecordService>();
 
             //Firebase messaging
@@ -145,6 +146,8 @@ namespace HASB_User
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HASB_User v1"));
 
+            app.UseRewriter(new RewriteOptions().Add(new PascalRule()));
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -154,6 +157,9 @@ namespace HASB_User
 
             app.UseRouting();
 
+            app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

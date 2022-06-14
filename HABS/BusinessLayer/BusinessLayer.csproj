@@ -25,7 +25,6 @@
     <Folder Include="ResponseModels\ErrorModels\User\" />
     <Folder Include="ResponseModels\ViewModels\Admin\" />
     <Folder Include="ResponseModels\ViewModels\Cashier\" />
-    <Folder Include="ResponseModels\ViewModels\Doctor\" />
     <Folder Include="ResponseModels\ViewModels\Screen\" />
     <Folder Include="Services\Doctor\" />
     <Folder Include="Services\Cashier\" />

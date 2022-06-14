@@ -71,8 +71,14 @@ I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HA
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\obj\Debug\net5.0\staticwebassets\HASB_User.StaticWebAssets.xml
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\obj\Debug\net5.0\scopedcss\bundle\HASB_User.styles.css
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\obj\Debug\net5.0\HASB_User.RazorTargetAssemblyInfo.cache
-I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\obj\Debug\net5.0\HASB_User.csproj.CopyComplete
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\obj\Debug\net5.0\HASB_User.dll
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\obj\Debug\net5.0\ref\HASB_User.dll
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\obj\Debug\net5.0\HASB_User.pdb
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\obj\Debug\net5.0\HASB_User.genruntimeconfig.cache
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\bin\Debug\net5.0\AppData\Firebase\SWD_GSM_storeowner_config.json
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\bin\Debug\net5.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\bin\Debug\net5.0\StackExchange.Redis.dll
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\bin\Debug\net5.0\System.Diagnostics.PerformanceCounter.dll
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\bin\Debug\net5.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\HASB_User\obj\Debug\net5.0\HASB_User.csproj.CopyComplete

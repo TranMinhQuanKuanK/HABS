@@ -15,25 +15,21 @@ namespace HASB_User.Controllers
     [ApiController]
     //[ApiExplorerSettings(GroupName = Role)]
     [Authorize(Roles = "User")]
-    public class CheckupRecordController : BaseUserController
+    public class PatientController : BaseUserController
     {
 
         private readonly ICheckupRecordService _checkupRecordService;
 
-        public CheckupRecordController(ICheckupRecordService service)
+        public PatientController(ICheckupRecordService service)
         {
             _checkupRecordService = service;
         }
 
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
+        //không cần search
+        public async Task<IActionResult> Get([FromQuery] long accountId)
         {
-            if (searchModel is null)
-            {
-                throw new ArgumentNullException(nameof(searchModel));
-            }
-
             try
             {
                 //paging = PagingUtil.checkDefaultPaging(paging);
@@ -49,22 +45,6 @@ namespace HASB_User.Controllers
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(long id)
-        {
-            try
-            {
-                //paging = PagingUtil.checkDefaultPaging(paging);
-                //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
-                //return Ok(products);
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-            //mock data
-        }
-        [HttpPost("{id}")]
-        public async Task<IActionResult> BookAppointment([FromBody] ProductCreateModel model)
         {
             try
             {

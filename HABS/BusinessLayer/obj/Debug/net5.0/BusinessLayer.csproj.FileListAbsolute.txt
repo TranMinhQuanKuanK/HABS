@@ -9,7 +9,6 @@ I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HA
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\BusinessLayer\obj\Debug\net5.0\BusinessLayer.AssemblyInfoInputs.cache
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\BusinessLayer\obj\Debug\net5.0\BusinessLayer.AssemblyInfo.cs
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\BusinessLayer\obj\Debug\net5.0\BusinessLayer.csproj.CoreCompileInputs.cache
-I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\BusinessLayer\obj\Debug\net5.0\BusinessLayer.csproj.CopyComplete
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\BusinessLayer\obj\Debug\net5.0\BusinessLayer.dll
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\BusinessLayer\obj\Debug\net5.0\ref\BusinessLayer.dll
 I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\BusinessLayer\obj\Debug\net5.0\BusinessLayer.pdb

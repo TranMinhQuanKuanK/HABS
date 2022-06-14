@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BusinessLayer.ResponseModels.SearchModels.Doctor
+{
+    //lịch khám của bệnh nhân trong tương lai
+    public class CheckupAppointmentResponseModel
+    {
+        public long Id { get; set; }
+        public int Status { get; set; }
+        public int? NumericalOrder { get; set; }
+        public DateTime? EstimatedStartTime { get; set; }
+        public string PatientName { get; set; }
+        public long? PatientId { get; set; }
+    }
+}
