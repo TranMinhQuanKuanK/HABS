@@ -133,6 +133,10 @@ namespace HASB_User
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             //user app
             services.AddTransient<ICheckupRecordService, CheckupRecordService>();
+            services.AddTransient<IDoctorService, DoctorService>();
+            services.AddTransient<IPatientService, PatientService>();
+            services.AddTransient<IScheduleService, ScheduleService>();
+
 
             //Firebase messaging
             services.AddTransient<INotificationService, NotificationService>();
