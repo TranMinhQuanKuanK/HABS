@@ -8,5 +8,6 @@ namespace BusinessLayer.Interfaces.User
 {
     public interface IScheduleService
     {
+
     }
 }

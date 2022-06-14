@@ -18,14 +18,15 @@ using BusinessLayer.Interfaces.User;
 
 namespace BusinessLayer.Services.User
 {
-    public class CheckupRecordService : BaseService, ICheckupRecordService
+    public class ScheduleService : BaseService, IScheduleService
     {
         private readonly IDistributedCache _distributedCache;
         private readonly RedisService _redisService;
-        public CheckupRecordService(IUnitOfWork unitOfWork,IDistributedCache distributedCache) : base(unitOfWork)
+        public ScheduleService(IUnitOfWork unitOfWork,IDistributedCache distributedCache) : base(unitOfWork)
         {
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
+
         }
     }
 }

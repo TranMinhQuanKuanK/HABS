@@ -1,0 +1,14 @@
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\bin\Debug\net5.0\DataAccessLayer.deps.json
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\bin\Debug\net5.0\DataAccessLayer.runtimeconfig.json
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\bin\Debug\net5.0\DataAccessLayer.runtimeconfig.dev.json
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\bin\Debug\net5.0\DataAccessLayer.dll
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\bin\Debug\net5.0\ref\DataAccessLayer.dll
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\bin\Debug\net5.0\DataAccessLayer.pdb
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\obj\Debug\net5.0\DataAccessLayer.GeneratedMSBuildEditorConfig.editorconfig
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\obj\Debug\net5.0\DataAccessLayer.AssemblyInfoInputs.cache
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\obj\Debug\net5.0\DataAccessLayer.AssemblyInfo.cs
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\obj\Debug\net5.0\DataAccessLayer.csproj.CoreCompileInputs.cache
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\obj\Debug\net5.0\DataAccessLayer.dll
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\obj\Debug\net5.0\ref\DataAccessLayer.dll
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\obj\Debug\net5.0\DataAccessLayer.pdb
+I:\ONEDRIVE\OneDrive - Đại học FPT- FPT University\FPT\DoAn\Code\Project\HABS\HABS\DataAccessLayer\obj\Debug\net5.0\DataAccessLayer.genruntimeconfig.cache
