@@ -14,6 +14,8 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public int Status { get; set; }
         public string ResultFileLink { get; set; }
         public string PatientName { get; set; }
+        public long OperationId { get; set; }
+        public string OperationName { get; set; }
         public string RoomNumber { get; set; }
         public string Floor { get; set; }
         public long? RoomId { get; set; }

@@ -60,7 +60,7 @@ namespace HASB_Doctor
 
             services.AddSwaggerGen(options =>
             {
-
+                options.EnableAnnotations();
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "User API - Hospital Appointment Booking", Version = "v1" });
                 options.DocumentFilter<KebabCaseDocumentFilter>();
 
@@ -135,6 +135,8 @@ namespace HASB_Doctor
             //doctor app
             services.AddTransient<IScheduleService, ScheduleService>();
             services.AddTransient<ICheckupRecordService, CheckupRecordService>();
+            services.AddTransient<IDepartmentService, DepartmentService>();
+            services.AddTransient<IOperationService, OperationService>();
 
 
             //Firebase messaging

@@ -1,6 +1,6 @@
 ﻿using BusinessLayer.Interfaces.Doctor;
-using BusinessLayer.ResponseModels.SearchModels.Doctor;
 using BusinessLayer.ResponseModels.ViewModels;
+using BusinessLayer.ResponseModels.ViewModels.Doctor;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
@@ -65,16 +65,111 @@ namespace HASB_Doctor.Controllers
             }
         }
         [SwaggerOperation(Summary = "Xác nhận khám cho bệnh nhân trong hàng đợi, trả về full dữ liệu để hiển thị (giả)")]
-        [HttpPut]
-        public async Task<IActionResult> ConfirmCheckup([FromQuery] long checkupRecordId)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ConfirmCheckup(long id)
         {
             try
             {
                 //paging = PagingUtil.checkDefaultPaging(paging);
                 //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
                 //return Ok(products);
-
-                return Ok(pagingmodel);
+                PatientRecordFullDataResponseModel model = new PatientRecordFullDataResponseModel()
+                {
+                    Id = 6,
+                    PatientData = new PatientResponseModel()
+                    {
+                        Id = 12,
+                        Address = "Quận 14, Tiểu vương quốc Thanh Hóa",
+                        Bhyt = "dfdf-d234-gd-fdf-df",
+                        DateOfBirth = DateTime.Now,
+                        Gender = 1,
+                        Name = "Bùi Khánh Toàn",
+                        PhoneNumber = "097861012102",
+                    },
+                    BloodPressure = 232,
+                    ClinicalSymptom = "Quá buồn bã",
+                    Diagnosis = "Tâm thần",
+                    DoctorAdvice = "Có bồ đi",
+                    IcdDiseaseId = 23,
+                    IcdDiseaseName = "Khùng nặng",
+                    NumericalOrder = 12,
+                    PatientName = "Bùi Khánh Toàn",
+                    Prescription = new PrescriptionResponseModel()
+                    {
+                        Id = 2,
+                        CheckupRecordId = 12,
+                        Details = new List<PrescriptionDetailResponseModel>()
+                          {
+                              new PrescriptionDetailResponseModel()
+                              {
+                                  Id = 2,
+                                  EveningDose = 1,
+                                  MorningDose = 2,
+                                  NightDose =1,
+                                  MedicineId = 23,
+                                  MedicineName = "Pararararar",
+                                  MiddayDose = 2,
+                                  PrescriptionId = 2,
+                                  Quantity = 15,
+                                  Unit = "Viên",
+                                  Usage = "Uống bằng mồm, đừng uống bằng đường nào khác",
+                              },
+                              new PrescriptionDetailResponseModel()
+                              {
+                                  Id = 3,
+                                  EveningDose = 1,
+                                  MorningDose = 2,
+                                  NightDose =1,
+                                  MedicineId = 23,
+                                  MedicineName = "C Sủi",
+                                  MiddayDose = 2,
+                                  PrescriptionId = 2,
+                                  Quantity = 15,
+                                  Unit = "Hũ",
+                                  Usage = "Uống hết một lần, đừng sợ",
+                              }
+                          }
+                    },
+                    Pulse = 23,
+                    Status = 0,
+                    Temperature = 27,
+                    TestRecords = new List<TestRecordResponseModel>()
+                    {
+                        new TestRecordResponseModel()
+                        {
+                            Id = 3,
+                            CheckupRecordId = 2,
+                            Floor = "12",
+                            NumericalOrder = 23,
+                            PatientId = 23,
+                            PatientName = "Bùi Khánh Toàn",
+                            RealDate = DateTime.Now,
+                            ResultFileLink = "tienganh123.com/",
+                            RoomId = 23,
+                            OperationId = 23,
+                            OperationName ="Chụp X-Quang dú",
+                            RoomNumber = "3",
+                            Status = 0
+                        },
+                          new TestRecordResponseModel()
+                        {
+                            Id = 3,
+                            CheckupRecordId = 2,
+                            Floor = "12",
+                            NumericalOrder = 23,
+                            PatientId = 23,
+                            OperationId = 23,
+                            OperationName = "Xét nghiệm HIV",
+                            PatientName = "Bùi Khánh Toàn",
+                            RealDate = DateTime.Now,
+                            ResultFileLink = "tienganh123.com/",
+                            RoomId = 23,
+                            RoomNumber = "3",
+                            Status = 0
+                        }
+                    },
+                };
+                return Ok(model);
             }
             catch (Exception)
             {

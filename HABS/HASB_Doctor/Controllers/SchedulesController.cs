@@ -17,11 +17,11 @@ namespace HASB_Doctor.Controllers
     public class SchedulesController : BaseDoctorController
     {
 
-        private readonly IScheduleService _scheduleService;
+        private readonly IOperationService _operationService;
 
-        public SchedulesController(IScheduleService service)
+        public SchedulesController(IOperationService service)
         {
-            _scheduleService = service;
+            _operationService = service;
         }
         
     }

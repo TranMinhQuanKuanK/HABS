@@ -14,7 +14,6 @@
     <Folder Include="RequestModels\CreateModels\Screen\" />
     <Folder Include="RequestModels\SearchModels\Admin\" />
     <Folder Include="RequestModels\SearchModels\Cashier\" />
-    <Folder Include="RequestModels\SearchModels\Doctor\" />
     <Folder Include="RequestModels\SearchModels\Screen\" />
     <Folder Include="ResponseModels\ErrorModels\Admin\" />
     <Folder Include="ResponseModels\ErrorModels\Cashier\" />

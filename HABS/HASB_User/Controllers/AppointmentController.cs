@@ -2,7 +2,7 @@
 using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.CreateModels.User;
 using BusinessLayer.RequestModels.SearchModels.User;
-using BusinessLayer.ResponseModels.SearchModels.Doctor;
+using BusinessLayer.ResponseModels.SearchModels.User;
 using BusinessLayer.ResponseModels.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
