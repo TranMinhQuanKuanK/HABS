@@ -2,11 +2,12 @@
 using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.CreateModels.User;
 using BusinessLayer.RequestModels.SearchModels.User;
-using BusinessLayer.ResponseModels.SearchModels.User;
+using BusinessLayer.ResponseModels.SearchModels.Doctor;
 using BusinessLayer.ResponseModels.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Prometheus;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
@@ -19,19 +20,20 @@ namespace HASB_User.Controllers
     [ApiController]
     //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "User")]
-    public class CheckupRecordsController : BaseUserController
+    public class AppointmentController : BaseUserController
     {
 
         private readonly ICheckupRecordService _checkupRecordService;
 
-        public CheckupRecordsController(ICheckupRecordService service)
+        public AppointmentController(ICheckupRecordService service)
         {
             _checkupRecordService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân từ thời điểm From trở đi (giả)")]
+        [SwaggerOperation(Summary = "Lấy lịch khám của bệnh nhân từ ngày From (giả)")]
         [HttpGet]
-        public async Task<IActionResult> GetCheckupRecord([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
+        //lấy lịch khám của bệnh nhân
+        public async Task<IActionResult> GetCheckupAppointment([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
         {
             if (searchModel is null)
             {
@@ -43,52 +45,26 @@ namespace HASB_User.Controllers
                 //paging = PagingUtil.checkDefaultPaging(paging);
                 //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
                 //return Ok(products);
-                List<CheckupDataResponseModel> data = new List<CheckupDataResponseModel>
+                List<CheckupAppointmentResponseModel> data = new List<CheckupAppointmentResponseModel>
                 {
-                    new CheckupDataResponseModel(){
+                    new CheckupAppointmentResponseModel(){
                     Id = 1,
                     EstimatedStartTime = DateTime.Now,
                     NumericalOrder = 15,
                     PatientId = 15,
                     PatientName = "Trần Thị Mock data",
                     Status = 0,
-                    BloodPressure = 232,
-                    ClinicalSymptom = "Đau đầu tột cùng",
-                    DepartmentId = 2,
-                    Diagnosis = "Ung thư vú",
-                    DoctorAdvice = "Đi ngủ sớm",
-                    DoctorName = "Nguyễn Trần Lang Băm",
-                    EstimatedDate = DateTime.Now,
-                    IcdDiseaseId = 34,
-                    IcdDiseaseName = "Ung thư cổ tử cung",
-                    DoctorId = 14,
-                    Pulse = 12323,
-                    Temperature = 23,
-                    BillId = 2
                     },
-                   new CheckupDataResponseModel(){
+                    new CheckupAppointmentResponseModel(){
                     Id = 1,
                     EstimatedStartTime = DateTime.Now,
-                    NumericalOrder = 15,
-                    PatientId = 15,
+                    NumericalOrder = 16,
+                    PatientId = 11,
                     PatientName = "Trần Thị Mock data 2",
                     Status = 0,
-                    BloodPressure = 232,
-                    ClinicalSymptom = "Đau đầu sơ sơ",
-                    DepartmentId = 2,
-                    Diagnosis = "Ung thư vú",
-                    DoctorAdvice = "Đi ngủ sớm",
-                    DoctorName = "Nguyễn Trần Lang Băm",
-                    EstimatedDate = DateTime.Now,
-                    IcdDiseaseId = 344,
-                    IcdDiseaseName = "Ung thư cổ tử cung",
-                    DoctorId = 14,
-                    Pulse = 12323,
-                    Temperature = 23,
-                    BillId = 2
                     },
                 };
-                var pagingmodel = new BasePagingViewModel<CheckupDataResponseModel>()
+                var pagingmodel = new BasePagingViewModel<CheckupAppointmentResponseModel>()
                 {
                     Data = data,
                     PageIndex = 1,
@@ -102,7 +78,7 @@ namespace HASB_User.Controllers
                 return BadRequest();
             }
         }
-        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id (giả)")]
+        [SwaggerOperation(Summary = "Lấy lịch khám của bệnh nhân theo id (giả)")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(long id)
         {
@@ -125,6 +101,19 @@ namespace HASB_User.Controllers
                 return BadRequest();
             }
         }
-       
+        [HttpPost("{id}")]
+        [SwaggerOperation(Summary = "Book lịch khám mới (giả)")]
+        public async Task<IActionResult> BookAppointment([FromBody] AppointmentCreateModel model)
+        {
+            try
+            {
+                //create new checkup record or return error
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

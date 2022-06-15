@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HASB_User.Controllers
+namespace HASB_Doctor.Controllers
 {
     public class BaseDoctorController : BaseController
     {

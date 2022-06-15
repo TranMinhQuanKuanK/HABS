@@ -1,9 +1,11 @@
 ﻿using BusinessLayer.Interfaces.User;
 using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.SearchModels.User;
+using BusinessLayer.ResponseModels.SearchModels.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +15,7 @@ namespace HASB_User.Controllers
 {
     [Route(UserRoute)]
     [ApiController]
-    [Authorize(Roles = "User")]
+    //[Authorize(Roles = "User")]
     public class SlotsController : BaseUserController
     {
 
@@ -24,21 +26,44 @@ namespace HASB_User.Controllers
             _checkupRecordService = service;
         }
 
-
+        [SwaggerOperation(Summary = "Lấy lịch khám theo ngày, phòng, session (giả)")]
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] SlotSearchModel searchModel, [FromQuery] PagingRequestModel paging)
+        //Lấy lịch khám theo filter
+        public async Task<IActionResult> GetCheckupSlot([FromQuery] SlotSearchModel model)
         {
-            if (searchModel is null)
-            {
-                throw new ArgumentNullException(nameof(searchModel));
-            }
-
             try
             {
                 //paging = PagingUtil.checkDefaultPaging(paging);
                 //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
                 //return Ok(products);
-                return Ok();
+                List<CheckupSlotResponseModel> result = new List<CheckupSlotResponseModel>
+                {
+                    new CheckupSlotResponseModel()
+                    {
+                        EstimatedStartTime = DateTime.Now,
+                        isAvailable = true,
+                        NumericalOrder = 1
+                    },
+                    new CheckupSlotResponseModel()
+                    {
+                        EstimatedStartTime = DateTime.Now,
+                        isAvailable = false,
+                        NumericalOrder = 2
+                    },
+                    new CheckupSlotResponseModel()
+                    {
+                        EstimatedStartTime = DateTime.Now,
+                        isAvailable = false,
+                        NumericalOrder = 3
+                    },
+                    new CheckupSlotResponseModel()
+                    {
+                        EstimatedStartTime = DateTime.Now,
+                        isAvailable = true,
+                        NumericalOrder = 4
+                    }
+                };
+                return Ok(result);
             }
             catch (Exception)
             {

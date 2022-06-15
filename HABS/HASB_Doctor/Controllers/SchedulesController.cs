@@ -1,23 +1,20 @@
-﻿using BusinessLayer.Interfaces.User;
+﻿using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.RequestModels;
-using BusinessLayer.RequestModels.SearchModels.User;
-using BusinessLayer.ResponseModels.SearchModels.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HASB_User.Controllers
+namespace HASB_Doctor.Controllers
 {
-    [Route(UserRoute)]
+    [Route(DoctorRoute)]
     [ApiController]
     //[ApiExplorerSettings(GroupName = Role)]
-    //[Authorize(Roles = "User")]
-    public class SchedulesController : BaseUserController
+    //[Authorize(Roles = "Doctor")]
+    public class SchedulesController : BaseDoctorController
     {
 
         private readonly IScheduleService _scheduleService;
@@ -26,6 +23,6 @@ namespace HASB_User.Controllers
         {
             _scheduleService = service;
         }
-
+        
     }
 }

@@ -1,9 +1,10 @@
-﻿using BusinessLayer.Interfaces.User;
+﻿using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.CreateModels.User;
 using BusinessLayer.RequestModels.SearchModels.User;
-using BusinessLayer.ResponseModels.SearchModels.User;
+using BusinessLayer.ResponseModels.SearchModels.Doctor;
 using BusinessLayer.ResponseModels.ViewModels;
+using HASB_Doctor.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HASB_User.Controllers
+namespace HASB_Doctor.Controllers
 {
-    [Route(UserRoute)]
+    [Route(DoctorRoute)]
     [ApiController]
     //[ApiExplorerSettings(GroupName = Role)]
-    //[Authorize(Roles = "User")]
-    public class CheckupRecordsController : BaseUserController
+    //[Authorize(Roles = "Doctor")
+    public class CheckupRecordsController : BaseDoctorController
     {
 
         private readonly ICheckupRecordService _checkupRecordService;
@@ -29,8 +30,8 @@ namespace HASB_User.Controllers
             _checkupRecordService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân từ thời điểm From trở đi (giả)")]
-        [HttpGet]
+        [SwaggerOperation(Summary = "Lấy lịch sử BỆNH ÁN của bệnh nhân (giả)")]
+        [HttpPost]
         public async Task<IActionResult> GetCheckupRecord([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
         {
             if (searchModel is null)
@@ -104,6 +105,7 @@ namespace HASB_User.Controllers
         }
         [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id (giả)")]
         [HttpGet("{id}")]
+        //Lấy lịch khám theo id
         public async Task<IActionResult> GetById(long id)
         {
             try
@@ -125,6 +127,5 @@ namespace HASB_User.Controllers
                 return BadRequest();
             }
         }
-       
     }
 }

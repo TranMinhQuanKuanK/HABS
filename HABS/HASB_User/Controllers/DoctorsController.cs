@@ -25,40 +25,5 @@ namespace HASB_User.Controllers
             _doctorService = service;
         }
 
-
-        [HttpGet]
-        //không cần search
-        public async Task<IActionResult> Get([FromQuery] long accountId)
-        {
-            try
-            {
-                //paging = PagingUtil.checkDefaultPaging(paging);
-                //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
-                //return Ok(products);
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-            //mock data
-        }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(long id)
-        {
-            try
-            {
-                //paging = PagingUtil.checkDefaultPaging(paging);
-                //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
-                //return Ok(products);
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-            //mock data
-        }
-
     }
 }

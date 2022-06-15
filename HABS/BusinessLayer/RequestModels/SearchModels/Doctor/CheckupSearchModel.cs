@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLayer.RequestModels.SearchModels.User
+namespace BusinessLayer.RequestModels.SearchModels.Doctor
 {
     public class CheckupSearchModel
     {

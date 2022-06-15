@@ -1,5 +1,6 @@
+using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.Interfaces.Notification;
-using BusinessLayer.Interfaces.User;
+using BusinessLayer.Services.Doctor;
 using BusinessLayer.Services.Notification;
 using DataAccessLayer.Models;
 using DataAcessLayer;
@@ -38,12 +39,12 @@ namespace HASB_Doctor
         public void ConfigureServices(IServiceCollection services)
         {
 
-            //services.AddDistributedMemoryCache();
-            //services.AddStackExchangeRedisCache(options =>
-            //{
-            //    options.Configuration = "redis-19822.c53.west-us.azure.cloud.redislabs.com:19822,password=2uAjtMUBLf8j4BQjzKG7L5EjtBqug0S6,ssl=False,abortConnect=False";
-            //    options.InstanceName = "SWDRedisCache";
-            //});
+            services.AddDistributedMemoryCache();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "redis-19822.c53.west-us.azure.cloud.redislabs.com:19822,password=2uAjtMUBLf8j4BQjzKG7L5EjtBqug0S6,ssl=False,abortConnect=False";
+                options.InstanceName = "SWDRedisCache";
+            });
             services.AddRouting(option =>
             {
                 option.ConstraintMap["slugify"] = typeof(SlugifyParameterTransformer);
@@ -132,6 +133,8 @@ namespace HASB_Doctor
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             //doctor app
+            services.AddTransient<IScheduleService, ScheduleService>();
+            services.AddTransient<ICheckupRecordService, CheckupRecordService>();
 
 
             //Firebase messaging

@@ -1,9 +1,11 @@
 ﻿using BusinessLayer.Interfaces.User;
 using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.SearchModels.User;
+using BusinessLayer.ResponseModels.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,7 @@ namespace HASB_User.Controllers
     [Route(UserRoute)]
     [ApiController]
     //[ApiExplorerSettings(GroupName = Role)]
-    [Authorize(Roles = "User")]
+    //[Authorize(Roles = "User")]
     public class PatientsController : BaseUserController
     {
 
@@ -25,17 +27,49 @@ namespace HASB_User.Controllers
             _patientService = service;
         }
 
-
+        [SwaggerOperation(Summary = "Lấy danh sách bệnh nhân của tài khoản (giả)")]
         [HttpGet]
-        //không cần search
-        public async Task<IActionResult> Get([FromQuery] long accountId)
+        public async Task<IActionResult> GetPatients([FromQuery] long accountId)
         {
             try
             {
                 //paging = PagingUtil.checkDefaultPaging(paging);
                 //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
                 //return Ok(products);
-                return Ok();
+                List<PatientResponseModel> result = new List<PatientResponseModel>()
+                {
+                   new PatientResponseModel()
+                   {
+                       Id = 12,
+                       Address = "Quận 19",
+                       Bhyt = "123123-dfdf-sf-df1-231",
+                       DateOfBirth = DateTime.Now,
+                       Gender = 0,
+                       Name = "Quốccc",
+                       PhoneNumber = "0978634119",
+                   },
+                    new PatientResponseModel()
+                   {
+                       Id = 21,
+                       Address = "Quận 9",
+                       Bhyt = "12vbfgffhf1-231",
+                       DateOfBirth = DateTime.Now,
+                       Gender = 0,
+                       Name = "Quân Dâu tây",
+                       PhoneNumber = "0923713623",
+                   },
+                     new PatientResponseModel()
+                   {
+                       Id = 2332,
+                       Address = "Sao hỏa",
+                       Bhyt = "1231dfdff-sf-df1-231",
+                       DateOfBirth = DateTime.Now,
+                       Gender = 0,
+                       Name = "Thành Phước",
+                       PhoneNumber = "0923789123",
+                   }
+                };
+                return Ok(result);
             }
             catch (Exception)
             {
@@ -43,15 +77,26 @@ namespace HASB_User.Controllers
             }
             //mock data
         }
+        [SwaggerOperation(Summary = "Lấy bệnh nhân theo id (giả)")]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(long id)
+        public async Task<IActionResult> GetPatientById([FromQuery] long accountId, [FromQuery] long patientId)
         {
             try
             {
                 //paging = PagingUtil.checkDefaultPaging(paging);
                 //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
                 //return Ok(products);
-                return Ok();
+                var result = new PatientResponseModel()
+                {
+                    Id = 12,
+                    Address = "Quận 19",
+                    Bhyt = "123123-dfdf-sf-df1-231",
+                    DateOfBirth = DateTime.Now,
+                    Gender = 0,
+                    Name = "Quốccc",
+                    PhoneNumber = "0978634119",
+                };
+                return Ok(result);
             }
             catch (Exception)
             {
