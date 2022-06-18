@@ -13,7 +13,7 @@ namespace DataAccessLayer.Models
         }
 
         public long Id { get; set; }
-        public string IcdId { get; set; }
+        public string Code { get; set; }
         public string Name { get; set; }
 
         public virtual ICollection<CheckupRecord> CheckupRecords { get; set; }

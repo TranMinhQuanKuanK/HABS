@@ -10,6 +10,7 @@ namespace DataAccessLayer.Models
         public Operation()
         {
             BillDetails = new HashSet<BillDetail>();
+            TestRecords = new HashSet<TestRecord>();
         }
 
         public long Id { get; set; }
@@ -25,5 +26,6 @@ namespace DataAccessLayer.Models
         public virtual Department Department { get; set; }
         public virtual RoomType RoomType { get; set; }
         public virtual ICollection<BillDetail> BillDetails { get; set; }
+        public virtual ICollection<TestRecord> TestRecords { get; set; }
     }
 }

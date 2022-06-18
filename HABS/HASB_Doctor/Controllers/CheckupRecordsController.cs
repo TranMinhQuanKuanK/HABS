@@ -98,6 +98,7 @@ namespace HASB_Doctor.Controllers
                     BloodPressure = 232,
                     ClinicalSymptom = "Quá buồn bã",
                     Diagnosis = "Tâm thần",
+                    IcdCode = "F102",
                     DoctorAdvice = "Có bồ đi",
                     IcdDiseaseId = 23,
                     IcdDiseaseName = "Khùng nặng",
@@ -152,7 +153,7 @@ namespace HASB_Doctor.Controllers
                             NumericalOrder = 23,
                             PatientId = 23,
                             PatientName = "Bùi Khánh Toàn",
-                            RealDate = DateTime.Now,
+                            Date = DateTime.Now,
                             ResultFileLink = "tienganh123.com/",
                             RoomId = 23,
                             OperationId = 23,
@@ -170,13 +171,21 @@ namespace HASB_Doctor.Controllers
                             OperationId = 23,
                             OperationName = "Xét nghiệm HIV",
                             PatientName = "Bùi Khánh Toàn",
-                            RealDate = DateTime.Now,
+                            Date = DateTime.Now,
                             ResultFileLink = "tienganh123.com/",
                             RoomId = 23,
                             RoomNumber = "3",
                             Status = 0
                         }
                     },
+                    Date = DateTime.Now,
+                    DepartmentId = 5,
+                    DepartmentName = "Khoa chấn chấn sang chấn",
+                    DoctorId = 5,
+                    DoctorName = "Trần Lang Băm",
+                    EstimatedStartTime = DateTime.Now,
+                    PatientId = 4,
+                    ReExamDate = DateTime.Now
                 };
                 return Ok(model);
             }

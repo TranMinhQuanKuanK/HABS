@@ -13,13 +13,13 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public int Status { get; set; }
         public int? NumericalOrder { get; set; }
         public DateTime? EstimatedStartTime { get; set; }
-        public DateTime? EstimatedDate { get; set; }
+        public DateTime? ReExamDate { get; set; }
         public string ClinicalSymptom { get; set; }
         public string Diagnosis { get; set; }
         public string DoctorAdvice { get; set; }
         public int? Pulse { get; set; }
         public int? BloodPressure { get; set; }
-        public int? Temperature { get; set; }
+        public double? Temperature { get; set; }
         public string DoctorName { get; set; }
         public string PatientName { get; set; }
         public long? PatientId { get; set; }
