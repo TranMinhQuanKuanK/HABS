@@ -64,14 +64,7 @@ namespace HASB_User.Controllers
                     Status = 0,
                     },
                 };
-                var pagingmodel = new BasePagingViewModel<CheckupAppointmentResponseModel>()
-                {
-                    Data = data,
-                    PageIndex = 1,
-                    PageSize = 5
-                };
-
-                return Ok(pagingmodel);
+                return Ok(data);
             }
             catch (Exception)
             {

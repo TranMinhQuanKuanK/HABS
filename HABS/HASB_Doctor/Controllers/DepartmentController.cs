@@ -31,9 +31,6 @@ namespace HASB_Doctor.Controllers
         {
             try
             {
-                //paging = PagingUtil.checkDefaultPaging(paging);
-                //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
-                //return Ok(products);
                 List<DepartmentResponseModel> data = new List<DepartmentResponseModel>()
                 {
                     new DepartmentResponseModel()

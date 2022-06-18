@@ -61,7 +61,7 @@ namespace HASB_Doctor
             services.AddSwaggerGen(options =>
             {
                 options.EnableAnnotations();
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "User API - Hospital Appointment Booking", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Doctor API - Hospital Appointment Booking", Version = "v1" });
                 options.DocumentFilter<KebabCaseDocumentFilter>();
 
                 options.TagActionsBy(api =>

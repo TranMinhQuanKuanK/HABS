@@ -30,7 +30,7 @@ namespace HASB_Doctor.Controllers
             _checkupRecordService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy lịch sử BỆNH ÁN của bệnh nhân (giả)")]
+        [SwaggerOperation(Summary = "Lấy lịch sử BỆNH ÁN của bệnh nhân, chỉ trả metadata (giả)")]
         [HttpGet]
         public async Task<IActionResult> GetCheckupRecord([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
         {
@@ -38,11 +38,11 @@ namespace HASB_Doctor.Controllers
             {
                 throw new ArgumentNullException(nameof(searchModel));
             }
-
             try
             {
-                PatientRecordMetadataResponseModel data = new PatientRecordMetadataResponseModel()
+                List<PatientRecordMetadataResponseModel> data = new List<PatientRecordMetadataResponseModel>
                 {
+                    new PatientRecordMetadataResponseModel(){
                     Id = 2,
                     Date = DateTime.Now,
                     DepartmentName = "Chấn thương chỉnh hình",
@@ -50,15 +50,33 @@ namespace HASB_Doctor.Controllers
                     NumericalOrder = 12,
                     PatientName = "Khánh Mai",
                     Status = 0
+                    },
+                   new PatientRecordMetadataResponseModel(){
+                    Id = 2,
+                    Date = DateTime.Now,
+                    DepartmentName = "Tim mạch",
+                    DoctorName = "Nguyễn Lang Thú",
+                    NumericalOrder = 12,
+                    PatientName = "Khánh Mai",
+                    Status = 0
+                    },
                 };
-                return Ok(data);
+                BasePagingViewModel<PatientRecordMetadataResponseModel> model = new BasePagingViewModel<PatientRecordMetadataResponseModel>()
+                {
+                    Data = data,
+                    PageIndex = 2,
+                    PageSize = 5,
+                    TotalItem = 7,
+                    TotalPage = 2
+                };
+                return Ok(model);
             }
             catch (Exception)
             {
                 return BadRequest();
             }
         }
-        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id (giả)")]
+        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id, đầy đủ thông tin (giả)")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(long id)
         {
