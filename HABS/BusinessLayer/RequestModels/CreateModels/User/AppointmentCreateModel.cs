@@ -11,7 +11,7 @@ namespace BusinessLayer.RequestModels.CreateModels.User
         public long PatientId { get; set; }
         public int NumericalOrder { get; set; }
         public DateTime Date { get; set; }
-        public long RoomId { get; set; }
+        public long DoctorId { get; set; }
         public string ClinicalSymptom { get; set; }
 
     }

@@ -25,31 +25,33 @@ namespace HASB_Doctor.Controllers
         {
             _departmentService = service;
         }
-        [SwaggerOperation(Summary = "Lấy khoa (để chuyển viện) (giả)")]
+        [SwaggerOperation(Summary = "Lấy khoa (để chuyển viện)")]
         [HttpGet]
-        public async Task<IActionResult> GetDepartments([FromQuery] long roomId)
+        public IActionResult GetDepartments()
         {
             try
             {
-                List<DepartmentResponseModel> data = new List<DepartmentResponseModel>()
-                {
-                    new DepartmentResponseModel()
-                    {
-                          Id = 2,
-                    Name = "Khoa tim mạch"
-                    },
-                   new DepartmentResponseModel()
-                    {
-                          Id = 3,
-                    Name = "Khoa chấn thương chỉnh hình",
-                    },
-                   new DepartmentResponseModel()
-                    {
-                          Id = 4,
-                    Name = "Khoa phổi",
-                    },
-                };
-                return Ok(data);
+                
+                //List<DepartmentResponseModel> data = new List<DepartmentResponseModel>()
+                //{
+                //    new DepartmentResponseModel()
+                //    {
+                //          Id = 2,
+                //    Name = "Khoa tim mạch"
+                //    },
+                //   new DepartmentResponseModel()
+                //    {
+                //          Id = 3,
+                //    Name = "Khoa chấn thương chỉnh hình",
+                //    },
+                //   new DepartmentResponseModel()
+                //    {
+                //          Id = 4,
+                //    Name = "Khoa phổi",
+                //    },
+                //};
+
+                return Ok(_departmentService.GetDepartments());
             }
             catch (Exception)
             {

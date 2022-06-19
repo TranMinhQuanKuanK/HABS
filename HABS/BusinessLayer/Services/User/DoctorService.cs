@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using BusinessLayer.Services.Redis;
 using Newtonsoft.Json;
 using BusinessLayer.Interfaces.User;
+using BusinessLayer.ResponseModels.ViewModels.User;
 
 namespace BusinessLayer.Services.User
 {
@@ -27,6 +28,22 @@ namespace BusinessLayer.Services.User
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
 
+        }
+        public List<DoctorResponseModel> GetDoctors(DateTime? date, long departmentId)
+        {
+            List<DoctorResponseModel> data = new List<DoctorResponseModel>();
+            data = _unitOfWork.ScheduleRepository.Get()
+                .Include(x=>x.Doctor)
+                .Include(x => x.Room)
+                .ThenInclude(x => x.Department)
+                .Where(x => x.Weekday == ((DateTime)date).DayOfWeek)
+                .Where(x => x.Room.Department.Id == departmentId).Select(x=>new DoctorResponseModel()
+                {
+                    Id = x.DoctorId,
+                    Name = x.Doctor.Name
+                })
+                .ToList();
+            return data;
         }
     }
 }

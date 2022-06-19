@@ -7,6 +7,12 @@ namespace DataAccessLayer.Models
 {
     public partial class Doctor
     {
+        public enum DoctorType
+        {
+            BS_DA_KHOA,
+            BS_CHUYEN_KHOA,
+            BS_XET_NGHIEM
+        }
         public Doctor()
         {
             CheckupRecords = new HashSet<CheckupRecord>();
@@ -16,13 +22,11 @@ namespace DataAccessLayer.Models
         public long Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public int Type { get; set; }
+        public DoctorType Type { get; set; }
         public string Name { get; set; }
         public string Note { get; set; }
-        public int AverageCheckupDuration { get; set; }
-        public long? DepartmentId { get; set; }
+        public int? AverageCheckupDuration { get; set; }
 
-        public virtual Department Department { get; set; }
         public virtual ICollection<CheckupRecord> CheckupRecords { get; set; }
         public virtual ICollection<Schedule> Schedules { get; set; }
     }

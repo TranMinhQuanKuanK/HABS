@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using BusinessLayer.Services.Redis;
 using Newtonsoft.Json;
 using BusinessLayer.Interfaces.Doctor;
+using BusinessLayer.ResponseModels.ViewModels.Doctor;
 
 namespace BusinessLayer.Services.Doctor
 {
@@ -22,10 +23,22 @@ namespace BusinessLayer.Services.Doctor
     {
         private readonly IDistributedCache _distributedCache;
         private readonly RedisService _redisService;
-        public DepartmentService(IUnitOfWork unitOfWork,IDistributedCache distributedCache) : base(unitOfWork)
+        public DepartmentService(IUnitOfWork unitOfWork, IDistributedCache distributedCache) : base(unitOfWork)
         {
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
+        }
+        public List<DepartmentResponseModel> GetDepartments()
+        {
+            List<DepartmentResponseModel> departmentsData = new List<DepartmentResponseModel>();
+            departmentsData = _unitOfWork.DepartmentRepository.Get().Select
+               (x => new DepartmentResponseModel()
+               {
+                   Id = x.Id,
+                   Name = x.Name
+               }
+               ).ToList();
+            return departmentsData;
         }
     }
 }

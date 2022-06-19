@@ -24,13 +24,10 @@ namespace HASB_Doctor.Controllers
         }
         [SwaggerOperation(Summary = "Lấy hàng chờ khám của bệnh nhân trong ngày (giả)")]
         [HttpGet]
-        public async Task<IActionResult> GetCheckupQueue([FromQuery] long roomId)
+        public IActionResult GetCheckupQueue([FromQuery]long RoomId)
         {
             try
             {
-                //paging = PagingUtil.checkDefaultPaging(paging);
-                //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
-                //return Ok(products);
                 List<CheckupAppointmentResponseModel> data = new List<CheckupAppointmentResponseModel>
                 {
                     new CheckupAppointmentResponseModel(){
@@ -57,7 +54,12 @@ namespace HASB_Doctor.Controllers
                     PageSize = 5
                 };
 
+
+
                 return Ok(pagingmodel);
+
+
+
             }
             catch (Exception)
             {

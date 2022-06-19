@@ -10,7 +10,6 @@ namespace DataAccessLayer.Models
         public Department()
         {
             CheckupRecords = new HashSet<CheckupRecord>();
-            Doctors = new HashSet<Doctor>();
             Operations = new HashSet<Operation>();
             Rooms = new HashSet<Room>();
         }
@@ -19,7 +18,6 @@ namespace DataAccessLayer.Models
         public string Name { get; set; }
 
         public virtual ICollection<CheckupRecord> CheckupRecords { get; set; }
-        public virtual ICollection<Doctor> Doctors { get; set; }
         public virtual ICollection<Operation> Operations { get; set; }
         public virtual ICollection<Room> Rooms { get; set; }
     }

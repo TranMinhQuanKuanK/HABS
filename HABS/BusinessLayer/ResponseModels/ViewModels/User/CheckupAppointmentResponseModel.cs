@@ -19,5 +19,8 @@ namespace BusinessLayer.ResponseModels.SearchModels.User
         public long? PatientId { get; set; }
         public long? DoctorId { get; set; }
         public long? DepartmentId { get; set; }
+        public string DepartmentName { get; set; }
+        public bool IsReExam { get; set; }
+
     }
 }

@@ -30,10 +30,10 @@ namespace HASB_User.Controllers
             _checkupRecordService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy lịch khám của bệnh nhân từ ngày From (giả)")]
+        [SwaggerOperation(Summary = "Lấy lịch khám của bệnh nhân từ ngày fromTime, đến ngày toTime (giả)")]
         [HttpGet]
         //lấy lịch khám của bệnh nhân
-        public async Task<IActionResult> GetCheckupAppointment([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
+        public IActionResult GetCheckupAppointment([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
         {
             if (searchModel is null)
             {
@@ -54,6 +54,12 @@ namespace HASB_User.Controllers
                     PatientId = 15,
                     PatientName = "Trần Thị Mock data",
                     Status = 0,
+                    DepartmentId = 3,
+                    DoctorId = 3,
+                    DoctorName = "Ai dị",
+                    EstimatedDate = DateTime.Now,
+                    DepartmentName = "Suyễn",
+                    IsReExam = true,
                     },
                     new CheckupAppointmentResponseModel(){
                     Id = 1,
@@ -62,6 +68,12 @@ namespace HASB_User.Controllers
                     PatientId = 11,
                     PatientName = "Trần Thị Mock data 2",
                     Status = 0,
+                    DepartmentId = 3,
+                    DoctorId = 3,
+                    DoctorName = "Ai dị",
+                    EstimatedDate = DateTime.Now,
+                     DepartmentName = "Chấn thương chỉnh hình",
+                    IsReExam = false,
                     },
                 };
                 return Ok(data);

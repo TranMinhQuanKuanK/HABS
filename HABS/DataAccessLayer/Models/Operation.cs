@@ -7,6 +7,11 @@ namespace DataAccessLayer.Models
 {
     public partial class Operation
     {
+        public enum OperationType
+        {
+            KHAM_BENH,
+            XET_NGHIEM
+        }
         public Operation()
         {
             BillDetails = new HashSet<BillDetail>();
@@ -18,7 +23,7 @@ namespace DataAccessLayer.Models
         public int Price { get; set; }
         public int InsuranceStatus { get; set; }
         public int Status { get; set; }
-        public int Type { get; set; }
+        public OperationType Type { get; set; }
         public string Note { get; set; }
         public long? RoomTypeId { get; set; }
         public long? DepartmentId { get; set; }

@@ -5,6 +5,20 @@ using System.Collections.Generic;
 
 namespace DataAccessLayer.Models
 {
+    public enum CheckupRecordStatus
+    {
+        CHO_TAI_KHAM,
+        DA_DAT_LICH,
+        DA_THANH_TOAN,
+        DANG_KHAM,
+        CHO_KQXN,
+        DA_CO_KQXN,
+        KET_THUC,
+        CHUYEN_KHOA,
+        NHAP_VIEN,
+        DA_HUY,
+        DA_XOA
+    }
     public partial class CheckupRecord
     {
         public CheckupRecord()
@@ -15,7 +29,7 @@ namespace DataAccessLayer.Models
         }
 
         public long Id { get; set; }
-        public int Status { get; set; }
+        public CheckupRecordStatus Status { get; set; }
         public int? NumericalOrder { get; set; }
         public DateTime? EstimatedStartTime { get; set; }
         public DateTime? ReExamDate { get; set; }
@@ -35,7 +49,8 @@ namespace DataAccessLayer.Models
         public string IcdDiseaseCode { get; set; }
         public string IcdDiseaseName { get; set; }
         public long? BillId { get; set; }
-        public DateTime? Time { get; set; }
+        public DateTime? Date { get; set; }
+        public bool? IsReExam { get; set; }
 
         public virtual Bill Bill { get; set; }
         public virtual Department Department { get; set; }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessLayer.ResponseModels.ViewModels.Doctor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace BusinessLayer.Interfaces.Doctor
 {
     public interface IOperationService
     {
+        List<OperationResponseModel> GetOperations();
     }
 }

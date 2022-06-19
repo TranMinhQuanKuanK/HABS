@@ -9,6 +9,6 @@ namespace BusinessLayer.RequestModels.CreateModels
     public class FcmTokenModel
     {
         public string TokenId { get; set; }
-        public int UserId { get; set; }
+        public int AccountId { get; set; }
     }
 }

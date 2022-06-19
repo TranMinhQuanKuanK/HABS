@@ -9,7 +9,6 @@ namespace BusinessLayer.RequestModels.SearchModels.User
     public class SlotSearchModel
     {
         public DateTime Date { get; set; }
-        public long RoomId { get; set; }
-        public int? Session { get; set; }
+        public long DoctorId { get; set; }
     }
 }

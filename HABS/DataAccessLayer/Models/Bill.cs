@@ -7,6 +7,12 @@ namespace DataAccessLayer.Models
 {
     public partial class Bill
     {
+        public enum BillStatus
+        {
+            CHUA_TT,
+            TT_EBANKING,
+            TT_TIEN_MAT
+        }
         public Bill()
         {
             CheckupRecords = new HashSet<CheckupRecord>();
@@ -17,7 +23,7 @@ namespace DataAccessLayer.Models
         public DateTime? TimeCreated { get; set; }
         public int Total { get; set; }
         public string TotalInWord { get; set; }
-        public int Status { get; set; }
+        public BillStatus Status { get; set; }
         public string Content { get; set; }
         public string PatientName { get; set; }
         public string CashierName { get; set; }

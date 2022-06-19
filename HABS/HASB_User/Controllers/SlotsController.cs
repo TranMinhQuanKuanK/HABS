@@ -26,7 +26,7 @@ namespace HASB_User.Controllers
             _checkupRecordService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy lịch khám theo ngày, phòng, session (giả)")]
+        [SwaggerOperation(Summary = "Lấy lịch khám theo ngày, bác sĩ (giả)")]
         [HttpGet]
         //Lấy lịch khám theo filter
         public async Task<IActionResult> GetCheckupSlot([FromQuery] SlotSearchModel model)
