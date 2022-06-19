@@ -23,7 +23,7 @@ namespace BusinessLayer.Services.User
     {
         private readonly IDistributedCache _distributedCache;
         private readonly RedisService _redisService;
-        public DoctorService(IUnitOfWork unitOfWork,IDistributedCache distributedCache) : base(unitOfWork)
+        public DoctorService(IUnitOfWork unitOfWork, IDistributedCache distributedCache) : base(unitOfWork)
         {
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
@@ -33,15 +33,16 @@ namespace BusinessLayer.Services.User
         {
             List<DoctorResponseModel> data = new List<DoctorResponseModel>();
             data = _unitOfWork.ScheduleRepository.Get()
-                .Include(x=>x.Doctor)
+                .Include(x => x.Doctor)
                 .Include(x => x.Room)
                 .ThenInclude(x => x.Department)
                 .Where(x => x.Weekday == ((DateTime)date).DayOfWeek)
-                .Where(x => x.Room.Department.Id == departmentId).Select(x=>new DoctorResponseModel()
+                .Where(x => x.Room.Department.Id == departmentId).Select(x => new DoctorResponseModel()
                 {
                     Id = x.DoctorId,
                     Name = x.Doctor.Name
                 })
+                .Distinct()
                 .ToList();
             return data;
         }

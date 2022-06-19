@@ -31,7 +31,7 @@ namespace HASB_Doctor.Controllers
             _checkupRecordService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy lịch sử BỆNH ÁN của bệnh nhân, chỉ trả metadata")]
+        [SwaggerOperation(Summary = "Lấy lịch sử BỆNH ÁN của bệnh nhân, chỉ trả metadata ")]
         [HttpGet]
         public IActionResult GetCheckupRecord([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
         {
@@ -42,7 +42,8 @@ namespace HASB_Doctor.Controllers
             }
             try
             {
-                var data = _checkupRecordService.GetCheckupRecordMetadata(searchModel.PatientId, searchModel.FromTime, searchModel.ToTime, searchModel.DepartmentId);
+               
+                var data = _checkupRecordService.GetCheckupRecordMetadata(null, searchModel.FromTime, searchModel.ToTime, searchModel.DepartmentId);
                 
                 int totalItem = data.Count;
                 if (totalItem == 0)
@@ -68,7 +69,7 @@ namespace HASB_Doctor.Controllers
                 return BadRequest();
             }
         }
-        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id, đầy đủ thông tin")]
+        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id, đầy đủ thông tin (chưa check được patientId có hợp lệ ko)")]
         [HttpGet("{id}")]
         public IActionResult GetById(long id)
         {

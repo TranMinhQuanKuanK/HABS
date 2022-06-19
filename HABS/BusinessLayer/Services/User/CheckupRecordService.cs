@@ -29,22 +29,26 @@ namespace BusinessLayer.Services.User
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
-        public List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime)
+        public List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId)
         {
             List<PatientRecordMetadataResponseModel> data = new List<PatientRecordMetadataResponseModel>();
             var dbSetData = _unitOfWork.CheckupRecordRepository.Get();
             IQueryable<CheckupRecord> queryableData = dbSetData;
             if (patientId != null)
             {
-                queryableData = dbSetData.Where(x => x.PatientId == patientId);
+                queryableData = queryableData.Where(x => x.PatientId == patientId);
             }
             if (fromTime != null)
             {
-                queryableData = dbSetData.Where(x => x.Date >= fromTime);
+                queryableData = queryableData.Where(x => x.Date >= fromTime);
             }
             if (toTime != null)
             {
-                queryableData = dbSetData.Where(x => x.Date <= toTime);
+                queryableData = queryableData.Where(x => x.Date <= toTime);
+            }
+            if (departmentId != null)
+            {
+                queryableData = dbSetData.Where(x => x.DepartmentId == departmentId);
             }
             data = queryableData.Select
                (x => new PatientRecordMetadataResponseModel()

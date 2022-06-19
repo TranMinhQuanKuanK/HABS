@@ -27,48 +27,19 @@ namespace HASB_User.Controllers
             _patientService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy danh sách bệnh nhân của tài khoản (giả)")]
+        [SwaggerOperation(Summary = "Lấy danh sách bệnh nhân của tài khoản")]
         [HttpGet]
-        public async Task<IActionResult> GetPatients([FromQuery] long accountId)
+        public IActionResult GetPatients()
         {
             try
             {
-                //paging = PagingUtil.checkDefaultPaging(paging);
-                //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
-                //return Ok(products);
-                List<PatientResponseModel> result = new List<PatientResponseModel>()
+                //Lấy accountId
+                long accountId = 10001;
+                var result = _patientService.GetPatients(accountId);
+                if (result.Count==0)
                 {
-                   new PatientResponseModel()
-                   {
-                       Id = 12,
-                       Address = "Quận 19",
-                       Bhyt = "123123-dfdf-sf-df1-231",
-                       DateOfBirth = DateTime.Now,
-                       Gender = 0,
-                       Name = "Quốccc",
-                       PhoneNumber = "0978634119",
-                   },
-                    new PatientResponseModel()
-                   {
-                       Id = 21,
-                       Address = "Quận 9",
-                       Bhyt = "12vbfgffhf1-231",
-                       DateOfBirth = DateTime.Now,
-                       Gender = 0,
-                       Name = "Quân Dâu tây",
-                       PhoneNumber = "0923713623",
-                   },
-                     new PatientResponseModel()
-                   {
-                       Id = 2332,
-                       Address = "Sao hỏa",
-                       Bhyt = "1231dfdff-sf-df1-231",
-                       DateOfBirth = DateTime.Now,
-                       Gender = 0,
-                       Name = "Thành Phước",
-                       PhoneNumber = "0923789123",
-                   }
-                };
+                    return NotFound();
+                }
                 return Ok(result);
             }
             catch (Exception)

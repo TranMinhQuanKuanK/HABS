@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using BusinessLayer.Services.Redis;
 using Newtonsoft.Json;
 using BusinessLayer.Interfaces.User;
+using BusinessLayer.ResponseModels.ViewModels.User;
 
 namespace BusinessLayer.Services.User
 {
@@ -27,6 +28,24 @@ namespace BusinessLayer.Services.User
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
 
+        }
+        public List<PatientResponseModel> GetPatients(long accountId)
+        {
+            List<PatientResponseModel> data = new List<PatientResponseModel>();
+            data = _unitOfWork.PatientRepository.Get()
+                .Where(x => x.AccountId == accountId)
+                .Select(x => new PatientResponseModel()
+                {
+                    Id = x.Id,
+                    Address = x.Address,
+                    Bhyt = x.Bhyt,
+                    DateOfBirth = x.DateOfBirth,
+                    Gender = x.Gender,
+                    Name = x.Name,
+                    PhoneNumber = x.PhoneNumber
+                })
+                .ToList();
+            return data;
         }
     }
 }
