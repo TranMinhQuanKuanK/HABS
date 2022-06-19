@@ -8,11 +8,24 @@ namespace BusinessLayer.Constants
 {
     public class WorkingShiftConstant
     {
-        public readonly DateTime BeginMorningShift = new DateTime(0, 0, 0, 7, 0, 0);
-        public readonly DateTime EndMorningShift = new DateTime(0, 0, 0, 11, 0, 0);
-        public readonly DateTime BeginAfternoonShift = new DateTime(0, 0, 0, 13, 0, 0);
-        public readonly DateTime EndAfternoonShift = new DateTime(0, 0, 0, 16, 0, 0);
-        public readonly DateTime BeginEveningShift = new DateTime(0, 0, 0, 19, 0, 0);
-        public readonly DateTime EndEveningShift = new DateTime(0, 0, 0, 21, 0, 0);
+        public const int BeginMorningShiftHour = 7;
+        public const int BeginMorningShiftMinute = 0;
+
+        public const int EndMorningShiftHour = 13;
+        public const int EndMorningShiftMinute = 0;
+
+        public const int BeginAfternoonShiftHour = 13;
+        public const int BeginAfternoonShiftMinute = 0;
+
+        public const int EndAfternoonShiftHour = 16;
+        public const int EndAfternoonShiftMinute = 0;
+
+
+        public const int BeginEveningShiftHour = 19;
+        public const int BeginEveningShiftMinute = 0;
+
+        public const int EndEveningShiftHour = 21;
+        public const int EndEveningShiftMinute = 0;
+
     }
 }

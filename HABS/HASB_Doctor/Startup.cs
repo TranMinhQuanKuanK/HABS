@@ -120,7 +120,7 @@ namespace HASB_Doctor
                   ValidateIssuerSigningKey = true,
                   ValidIssuer = "http://localhost:2000",
                   ValidAudience = "http://localhost:2000",
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("KeyForSignInSecret@1234"))
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Secretttttt@#$@#$@#$@#$23423423423$@#$@#$@#$"))
               };
           });
 
@@ -137,6 +137,10 @@ namespace HASB_Doctor
             services.AddTransient<ICheckupRecordService, CheckupRecordService>();
             services.AddTransient<IDepartmentService, DepartmentService>();
             services.AddTransient<IOperationService, OperationService>();
+            services.AddTransient<ILoginService, LoginService>();
+            services.AddTransient<IIcdService, IcdService>();
+            services.AddTransient<IMedicineService, MedicineService>();
+
 
 
             //Firebase messaging

@@ -46,34 +46,25 @@ namespace HASB_User.Controllers
             {
                 return BadRequest();
             }
-            //mock data
         }
-        [SwaggerOperation(Summary = "Lấy bệnh nhân theo id (giả)")]
+        [SwaggerOperation(Summary = "Lấy bệnh nhân theo id")]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPatientById([FromQuery] long accountId, [FromQuery] long patientId)
+        public IActionResult GetPatientById(long id)
         {
             try
             {
-                //paging = PagingUtil.checkDefaultPaging(paging);
-                //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
-                //return Ok(products);
-                var result = new PatientResponseModel()
+                //Kiểm tra patient có thuộc user hay không?
+                var result = _patientService.GetPatientById(id);
+                if (result == null)
                 {
-                    Id = 12,
-                    Address = "Quận 19",
-                    Bhyt = "123123-dfdf-sf-df1-231",
-                    DateOfBirth = DateTime.Now,
-                    Gender = 0,
-                    Name = "Quốccc",
-                    PhoneNumber = "0978634119",
-                };
+                    return NotFound();
+                }
                 return Ok(result);
             }
             catch (Exception)
             {
                 return BadRequest();
             }
-            //mock data
         }
 
     }

@@ -119,7 +119,7 @@ namespace HASB_User
                   ValidateIssuerSigningKey = true,
                   ValidIssuer = "http://localhost:2000",
                   ValidAudience = "http://localhost:2000",
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("KeyForSignInSecret@1234"))
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Secretttttt%123123123123!@#!@#"))
               };
           });
 
@@ -136,6 +136,7 @@ namespace HASB_User
             services.AddTransient<IDoctorService, DoctorService>();
             services.AddTransient<IPatientService, PatientService>();
             services.AddTransient<IScheduleService, ScheduleService>();
+            services.AddTransient<ILoginService, LoginService>();
 
 
             //Firebase messaging

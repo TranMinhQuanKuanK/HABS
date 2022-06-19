@@ -8,9 +8,6 @@
     <Folder Include="Interfaces\Admin\" />
     <Folder Include="Interfaces\Cashier\" />
     <Folder Include="Interfaces\Screen\" />
-    <Folder Include="RequestModels\CreateModels\Admin\" />
-    <Folder Include="RequestModels\CreateModels\Cashier\" />
-    <Folder Include="RequestModels\CreateModels\Doctor\" />
     <Folder Include="RequestModels\CreateModels\Screen\" />
     <Folder Include="RequestModels\SearchModels\Admin\" />
     <Folder Include="RequestModels\SearchModels\Cashier\" />

@@ -54,7 +54,7 @@ namespace HASB_Doctor.Controllers
                 data = data.Skip((paging.PageIndex - 1) * paging.PageSize)
                     .Take(paging.PageSize).ToList();
 
-                var result = new BasePagingViewModel<PatientRecordMetadataResponseModel>()
+                var result = new BasePagingViewModel<PatientRecordMetadataViewModel>()
                 {
                     PageIndex = paging.PageIndex,
                     PageSize = paging.PageSize,

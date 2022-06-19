@@ -29,9 +29,9 @@ namespace BusinessLayer.Services.Doctor
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
-        public List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId)
+        public List<PatientRecordMetadataViewModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId)
         {
-            List<PatientRecordMetadataResponseModel> data = new List<PatientRecordMetadataResponseModel>();
+            List<PatientRecordMetadataViewModel> data = new List<PatientRecordMetadataViewModel>();
             var dbSetData = _unitOfWork.CheckupRecordRepository.Get();
             IQueryable<CheckupRecord> queryableData = dbSetData;
             if (patientId != null)
@@ -51,7 +51,7 @@ namespace BusinessLayer.Services.Doctor
                 queryableData = dbSetData.Where(x => x.DepartmentId == departmentId);
             }
             data = queryableData.Select
-               (x => new PatientRecordMetadataResponseModel()
+               (x => new PatientRecordMetadataViewModel()
                {
                    Id = x.Id,
                    Status = (int)x.Status,
@@ -64,9 +64,9 @@ namespace BusinessLayer.Services.Doctor
                ).ToList();
             return data;
         }
-        public PatientRecordFullDataResponseModel GetCheckupRecordFullData(long patientId)
+        public PatientRecordFullDataViewModel GetCheckupRecordFullData(long patientId)
         {
-            PatientRecordFullDataResponseModel data = new PatientRecordFullDataResponseModel();
+            PatientRecordFullDataViewModel data = new PatientRecordFullDataViewModel();
             data = _unitOfWork.CheckupRecordRepository.Get()
                 .Include(x => x.Patient)
                 .Include(x => x.Prescriptions)
@@ -76,7 +76,7 @@ namespace BusinessLayer.Services.Doctor
                 (x =>
                 {
                     var _prescription = x.Prescriptions.ToArray()[0];
-                    return new PatientRecordFullDataResponseModel()
+                    return new PatientRecordFullDataViewModel()
                     {
                         Id = x.Id,
                         Status = (int)x.Status,
@@ -95,7 +95,7 @@ namespace BusinessLayer.Services.Doctor
                         IcdCode = x.IcdDiseaseCode,
                         IcdDiseaseId = x.IcdDiseaseId,
                         IcdDiseaseName = x.IcdDiseaseName,
-                        PatientData = new PatientResponseModel()
+                        PatientData = new PatientViewModel()
                         {
                             Id = x.Patient.Id,
                             Address = x.Patient.Address,
@@ -106,13 +106,13 @@ namespace BusinessLayer.Services.Doctor
                             Name = x.Patient.Name,
                         },
                         PatientId = x.PatientId,
-                        Prescription = new PrescriptionResponseModel()
+                        Prescription = new PrescriptionViewModel()
                         {
                             CheckupRecordId = _prescription.CheckupRecordId,
                             Id = _prescription.Id,
                             TimeCreated = _prescription.TimeCreated,
                             Note = _prescription.Note,
-                            Details = _prescription.PrescriptionDetails.Select(dt => new PrescriptionDetailResponseModel()
+                            Details = _prescription.PrescriptionDetails.Select(dt => new PrescriptionDetailViewModel()
                             {
                                 Id = dt.Id,
                                 EveningDose = dt.EveningDose,
@@ -130,7 +130,7 @@ namespace BusinessLayer.Services.Doctor
                         Pulse = x.Pulse,
                         ReExamDate = x.ReExamDate,
                         Temperature = x.Temperature,
-                        TestRecords = x.TestRecords.Select(tr => new TestRecordResponseModel()
+                        TestRecords = x.TestRecords.Select(tr => new TestRecordViewModel()
                         {
                             Id = tr.Id,
                             CheckupRecordId = tr.CheckupRecordId,

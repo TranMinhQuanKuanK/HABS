@@ -10,5 +10,6 @@ namespace BusinessLayer.Interfaces.User
     public interface IPatientService
     {
         List<PatientResponseModel> GetPatients(long accountId);
+        PatientResponseModel GetPatientById(long patientId);
     }
 }

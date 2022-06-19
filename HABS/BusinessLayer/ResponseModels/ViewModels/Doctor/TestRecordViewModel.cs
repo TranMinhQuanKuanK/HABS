@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.ResponseModels.ViewModels.Doctor
 {
-    public class TestRecordResponseModel
+    public class TestRecordViewModel
     {
         public long Id { get; set; }
         public DateTime? Date { get; set; }

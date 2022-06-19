@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessLayer.ResponseModels.ViewModels.Doctor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.ResponseModels.ViewModels.Doctor
 {
-    public class PrescriptionResponseModel
+    public class DoctorLoginViewModel
     {
         public long Id { get; set; }
-        public DateTime? TimeCreated { get; set; }
+        public string Username { get; set; }
+        public int Type { get; set; }
+        public string Name { get; set; }
         public string Note { get; set; }
-        public long? CheckupRecordId { get; set; }
-        public List<PrescriptionDetailResponseModel> Details { get; set; }
     }
 }

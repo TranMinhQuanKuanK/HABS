@@ -9,6 +9,6 @@ namespace BusinessLayer.Interfaces.Doctor
 {
     public interface IOperationService
     {
-        List<OperationResponseModel> GetOperations();
+        List<OperationViewModel> GetOperations();
     }
 }

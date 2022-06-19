@@ -9,7 +9,7 @@ namespace BusinessLayer.Interfaces.Doctor
 {
     public interface ICheckupRecordService
     {
-        List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId);
-        PatientRecordFullDataResponseModel GetCheckupRecordFullData(long patientId);
+        List<PatientRecordMetadataViewModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId);
+        PatientRecordFullDataViewModel GetCheckupRecordFullData(long patientId);
     }
 }

@@ -17,35 +17,41 @@ using Newtonsoft.Json;
 using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.ResponseModels.ViewModels.Doctor;
 using static DataAccessLayer.Models.Operation;
+using BusinessLayer.RequestModels.SearchModels.Doctor;
+using DataAccessLayer.Models;
 
 namespace BusinessLayer.Services.Doctor
 {
-    public class OperationService : BaseService, IOperationService
+    public class IcdService : BaseService, IIcdService
     {
         private readonly IDistributedCache _distributedCache;
         private readonly RedisService _redisService;
-        public OperationService(IUnitOfWork unitOfWork,IDistributedCache distributedCache) : base(unitOfWork)
+        public IcdService(IUnitOfWork unitOfWork, IDistributedCache distributedCache) : base(unitOfWork)
         {
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
-        public List<OperationViewModel> GetOperations()
+        public List<IcdViewModel> GetIcdList(IcdSearchModel search)
         {
-            List<OperationViewModel> data = new List<OperationViewModel>();
-            data = _unitOfWork.OperationRepository.Get()
-                .Where(x=>x.Status==(int)OperationType.XET_NGHIEM)
+            //Search???
+            List<IcdViewModel> data = new List<IcdViewModel>();
+            IQueryable<IcdDisease> tempData;
+            tempData = _unitOfWork.IcdDiseaseRepository.Get();
+            if (!string.IsNullOrEmpty(search.Code))
+            {
+                tempData = tempData.Where(x => x.Code.Contains(search.Code));
+            }
+            if (!string.IsNullOrEmpty(search.Name))
+            {
+                tempData = tempData.Where(x => x.Name.Contains(search.Name));
+            }
+            data = tempData
                 .Select
-               (x => new OperationViewModel()
+               (x => new IcdViewModel()
                {
                    Id = x.Id,
-                   DepartmentId = x.DepartmentId,
-                   InsuranceStatus = x.InsuranceStatus,
                    Name = x.Name,
-                   Note = x.Note,
-                   Price = x.Price,
-                   RoomTypeId = x.RoomTypeId,
-                   Status = x.Status,
-                   Type = (int)x.Type
+                   Code = x.Code
                }
                ).ToList();
             return data;

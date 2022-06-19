@@ -27,7 +27,7 @@ namespace HASB_User.Controllers
         {
             _doctorService = service;
         }
-        [SwaggerOperation(Summary = "Lấy danh sách bác sĩ ĐA KHOA làm việc trong ngày date (giả)")]
+        [SwaggerOperation(Summary = "Lấy danh sách bác sĩ ĐA KHOA làm việc trong ngày date")]
         [HttpGet]
         public IActionResult GetDoctors([FromQuery] DateTime? Date)
         {
@@ -44,7 +44,6 @@ namespace HASB_User.Controllers
             {
                 return BadRequest();
             }
-            //mock data
         }
     }
 }

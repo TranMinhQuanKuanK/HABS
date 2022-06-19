@@ -16,12 +16,12 @@ namespace HASB_Doctor.Controllers
     [ApiController]
     //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "Doctor")]
-    public class OperationController : BaseDoctorController
+    public class OperationsController : BaseDoctorController
     {
 
         private readonly IOperationService _operationService;
 
-        public OperationController(IOperationService service)
+        public OperationsController(IOperationService service)
         {
             _operationService = service;
         }

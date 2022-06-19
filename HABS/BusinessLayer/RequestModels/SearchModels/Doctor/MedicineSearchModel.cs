@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLayer.ResponseModels.ViewModels.Doctor
+namespace BusinessLayer.RequestModels.SearchModels.Doctor
 {
-    public class DepartmentResponseModel
+    public class MedicineSearchModel
     {
-        public long Id { get; set; }
         public string Name { get; set; }
+        public long? CategoryId { get; set; }
     }
 }

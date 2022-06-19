@@ -28,9 +28,9 @@ namespace HASB_Doctor.Controllers
         {
             try
             {
-                List<CheckupAppointmentResponseModel> data = new List<CheckupAppointmentResponseModel>
+                List<CheckupAppointmentViewModel> data = new List<CheckupAppointmentViewModel>
                 {
-                    new CheckupAppointmentResponseModel(){
+                    new CheckupAppointmentViewModel(){
                     Id = 1,
                     EstimatedStartTime = DateTime.Now,
                     NumericalOrder = 15,
@@ -38,7 +38,7 @@ namespace HASB_Doctor.Controllers
                     PatientName = "Bệnh nhân này là khám trước",
                     Status = 0,
                     },
-                    new CheckupAppointmentResponseModel(){
+                    new CheckupAppointmentViewModel(){
                     Id = 1,
                     EstimatedStartTime = DateTime.Now,
                     NumericalOrder = 16,
@@ -47,7 +47,7 @@ namespace HASB_Doctor.Controllers
                     Status = 0,
                     },
                 };
-                var pagingmodel = new BasePagingViewModel<CheckupAppointmentResponseModel>()
+                var pagingmodel = new BasePagingViewModel<CheckupAppointmentViewModel>()
                 {
                     Data = data,
                     PageIndex = 1,
@@ -75,10 +75,10 @@ namespace HASB_Doctor.Controllers
                 //paging = PagingUtil.checkDefaultPaging(paging);
                 //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
                 //return Ok(products);
-                PatientRecordFullDataResponseModel model = new PatientRecordFullDataResponseModel()
+                PatientRecordFullDataViewModel model = new PatientRecordFullDataViewModel()
                 {
                     Id = 6,
-                    PatientData = new PatientResponseModel()
+                    PatientData = new PatientViewModel()
                     {
                         Id = 12,
                         Address = "Quận 14, Tiểu vương quốc Thanh Hóa",
@@ -96,13 +96,13 @@ namespace HASB_Doctor.Controllers
                     IcdDiseaseName = "Khùng nặng",
                     NumericalOrder = 12,
                     PatientName = "Bùi Khánh Toàn",
-                    Prescription = new PrescriptionResponseModel()
+                    Prescription = new PrescriptionViewModel()
                     {
                         Id = 2,
                         CheckupRecordId = 12,
-                        Details = new List<PrescriptionDetailResponseModel>()
+                        Details = new List<PrescriptionDetailViewModel>()
                           {
-                              new PrescriptionDetailResponseModel()
+                              new PrescriptionDetailViewModel()
                               {
                                   Id = 2,
                                   EveningDose = 1,
@@ -116,7 +116,7 @@ namespace HASB_Doctor.Controllers
                                   Unit = "Viên",
                                   Usage = "Uống bằng mồm, đừng uống bằng đường nào khác",
                               },
-                              new PrescriptionDetailResponseModel()
+                              new PrescriptionDetailViewModel()
                               {
                                   Id = 3,
                                   EveningDose = 1,
@@ -135,9 +135,9 @@ namespace HASB_Doctor.Controllers
                     Pulse = 23,
                     Status = 0,
                     Temperature = 27,
-                    TestRecords = new List<TestRecordResponseModel>()
+                    TestRecords = new List<TestRecordViewModel>()
                     {
-                        new TestRecordResponseModel()
+                        new TestRecordViewModel()
                         {
                             Id = 3,
                             CheckupRecordId = 2,
@@ -153,7 +153,7 @@ namespace HASB_Doctor.Controllers
                             RoomNumber = "3",
                             Status = 0
                         },
-                          new TestRecordResponseModel()
+                          new TestRecordViewModel()
                         {
                             Id = 3,
                             CheckupRecordId = 2,

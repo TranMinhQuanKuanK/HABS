@@ -9,6 +9,6 @@ namespace BusinessLayer.Interfaces.Doctor
 {
     public interface IDepartmentService
     {
-        List<DepartmentResponseModel> GetDepartments();
+        List<DepartmentViewModel> GetDepartments();
     }
 }

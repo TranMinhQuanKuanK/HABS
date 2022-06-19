@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.ResponseModels.ViewModels.Doctor
 {
-    public class PrescriptionDetailResponseModel
+    public class PrescriptionDetailViewModel
     {
         public long Id { get; set; }
         public int Quantity { get; set; }

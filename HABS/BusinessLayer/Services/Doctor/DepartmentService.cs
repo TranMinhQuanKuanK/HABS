@@ -28,11 +28,11 @@ namespace BusinessLayer.Services.Doctor
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
-        public List<DepartmentResponseModel> GetDepartments()
+        public List<DepartmentViewModel> GetDepartments()
         {
-            List<DepartmentResponseModel> departmentsData = new List<DepartmentResponseModel>();
+            List<DepartmentViewModel> departmentsData = new List<DepartmentViewModel>();
             departmentsData = _unitOfWork.DepartmentRepository.Get().Select
-               (x => new DepartmentResponseModel()
+               (x => new DepartmentViewModel()
                {
                    Id = x.Id,
                    Name = x.Name

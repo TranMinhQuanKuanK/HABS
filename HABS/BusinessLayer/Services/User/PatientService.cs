@@ -47,5 +47,21 @@ namespace BusinessLayer.Services.User
                 .ToList();
             return data;
         }
+        public PatientResponseModel GetPatientById(long patientId)
+        {
+            var data = _unitOfWork.PatientRepository.Get()
+                .Where(x => x.Id == patientId)
+                .Select(x => new PatientResponseModel()
+                {
+                    Id = x.Id,
+                    Address = x.Address,
+                    Bhyt = x.Bhyt,
+                    DateOfBirth = x.DateOfBirth,
+                    Gender = x.Gender,
+                    Name = x.Name,
+                    PhoneNumber = x.PhoneNumber
+                }).FirstOrDefault();
+            return data;
+        }
     }
 }

@@ -16,12 +16,12 @@ namespace HASB_Doctor.Controllers
     [ApiController]
     //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "Doctor")]
-    public class DepartmentController : BaseDoctorController
+    public class DepartmentsController : BaseDoctorController
     {
 
         private readonly IDepartmentService _departmentService;
 
-        public DepartmentController(IDepartmentService service)
+        public DepartmentsController(IDepartmentService service)
         {
             _departmentService = service;
         }
