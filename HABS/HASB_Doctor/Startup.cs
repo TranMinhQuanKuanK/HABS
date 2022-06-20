@@ -169,7 +169,10 @@ namespace HASB_Doctor
             app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
             app.UseAuthentication();
-            app.UseAuthorization();
+            if (!env.IsDevelopment())
+            {
+                app.UseAuthorization();
+            }
 
             app.UseEndpoints(endpoints =>
             {

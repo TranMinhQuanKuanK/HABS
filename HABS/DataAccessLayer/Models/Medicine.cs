@@ -7,13 +7,6 @@ namespace DataAccessLayer.Models
 {
     public partial class Medicine
     {
-        public enum MedicineStatus
-        {
-           BINH_THUONG,
-           DA_HET_THUOC,
-           DA_XOA,
-           KHAC
-        }
         public Medicine()
         {
             PrescriptionDetails = new HashSet<PrescriptionDetail>();
@@ -22,7 +15,7 @@ namespace DataAccessLayer.Models
         public long Id { get; set; }
         public string Name { get; set; }
         public string Usage { get; set; }
-        public MedicineStatus Status { get; set; }
+        public int Status { get; set; }
         public string Unit { get; set; }
         public string Note { get; set; }
         public string Manufacturer { get; set; }

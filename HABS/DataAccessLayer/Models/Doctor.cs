@@ -24,7 +24,7 @@ namespace DataAccessLayer.Models
         public string Password { get; set; }
         public DoctorType Type { get; set; }
         public string Name { get; set; }
-        public string Note { get; set; }
+        public string PhoneNo { get; set; }
         public int? AverageCheckupDuration { get; set; }
 
         public virtual ICollection<CheckupRecord> CheckupRecords { get; set; }

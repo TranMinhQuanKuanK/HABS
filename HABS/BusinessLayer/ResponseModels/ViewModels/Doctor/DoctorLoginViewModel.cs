@@ -13,6 +13,6 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public string Username { get; set; }
         public int Type { get; set; }
         public string Name { get; set; }
-        public string Note { get; set; }
+        public string PhoneNo { get; set; }
     }
 }

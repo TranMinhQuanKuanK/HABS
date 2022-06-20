@@ -54,7 +54,7 @@ namespace DataAccessLayer.Models
             {
                 entity.ToTable("Account");
 
-                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E380326E59C")
+                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E385DFFB1CF")
                     .IsUnique();
 
                 entity.Property(e => e.Email).IsRequired();
@@ -125,30 +125,25 @@ namespace DataAccessLayer.Models
 
                 entity.Property(e => e.ReExamDate).HasColumnType("datetime");
 
-                entity.HasOne(d => d.Bill)
-                    .WithMany(p => p.CheckupRecords)
-                    .HasForeignKey(d => d.BillId)
-                    .HasConstraintName("FK__CheckupRe__BillI__4BAC3F29");
-
                 entity.HasOne(d => d.Department)
                     .WithMany(p => p.CheckupRecords)
                     .HasForeignKey(d => d.DepartmentId)
-                    .HasConstraintName("FK__CheckupRe__Depar__4CA06362");
+                    .HasConstraintName("FK__CheckupRe__Depar__4BAC3F29");
 
                 entity.HasOne(d => d.Doctor)
                     .WithMany(p => p.CheckupRecords)
                     .HasForeignKey(d => d.DoctorId)
-                    .HasConstraintName("FK__CheckupRe__Docto__4D94879B");
+                    .HasConstraintName("FK__CheckupRe__Docto__4CA06362");
 
                 entity.HasOne(d => d.IcdDisease)
                     .WithMany(p => p.CheckupRecords)
                     .HasForeignKey(d => d.IcdDiseaseId)
-                    .HasConstraintName("FK__CheckupRe__IcdDi__4E88ABD4");
+                    .HasConstraintName("FK__CheckupRe__IcdDi__4D94879B");
 
                 entity.HasOne(d => d.Patient)
                     .WithMany(p => p.CheckupRecords)
                     .HasForeignKey(d => d.PatientId)
-                    .HasConstraintName("FK__CheckupRe__Patie__4F7CD00D");
+                    .HasConstraintName("FK__CheckupRe__Patie__4E88ABD4");
             });
 
             modelBuilder.Entity<Department>(entity =>
@@ -179,7 +174,7 @@ namespace DataAccessLayer.Models
                     .WithMany(p => p.FcmTokenMobiles)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FcmTokenM__Accou__5070F446");
+                    .HasConstraintName("FK__FcmTokenM__Accou__4F7CD00D");
             });
 
             modelBuilder.Entity<IcdDisease>(entity =>
@@ -204,7 +199,7 @@ namespace DataAccessLayer.Models
                 entity.HasOne(d => d.MedicineCategory)
                     .WithMany(p => p.Medicines)
                     .HasForeignKey(d => d.MedicineCategoryId)
-                    .HasConstraintName("FK__Medicine__Medici__5165187F");
+                    .HasConstraintName("FK__Medicine__Medici__5070F446");
             });
 
             modelBuilder.Entity<MedicineCategory>(entity =>
@@ -223,12 +218,12 @@ namespace DataAccessLayer.Models
                 entity.HasOne(d => d.Department)
                     .WithMany(p => p.Operations)
                     .HasForeignKey(d => d.DepartmentId)
-                    .HasConstraintName("FK__Operation__Depar__52593CB8");
+                    .HasConstraintName("FK__Operation__Depar__5165187F");
 
                 entity.HasOne(d => d.RoomType)
                     .WithMany(p => p.Operations)
                     .HasForeignKey(d => d.RoomTypeId)
-                    .HasConstraintName("FK__Operation__RoomT__534D60F1");
+                    .HasConstraintName("FK__Operation__RoomT__52593CB8");
             });
 
             modelBuilder.Entity<Patient>(entity =>
@@ -247,7 +242,7 @@ namespace DataAccessLayer.Models
                     .WithMany(p => p.Patients)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Patient__Account__5441852A");
+                    .HasConstraintName("FK__Patient__Account__534D60F1");
             });
 
             modelBuilder.Entity<Prescription>(entity =>
@@ -259,7 +254,7 @@ namespace DataAccessLayer.Models
                 entity.HasOne(d => d.CheckupRecord)
                     .WithMany(p => p.Prescriptions)
                     .HasForeignKey(d => d.CheckupRecordId)
-                    .HasConstraintName("FK__Prescript__Check__5535A963");
+                    .HasConstraintName("FK__Prescript__Check__5441852A");
             });
 
             modelBuilder.Entity<PrescriptionDetail>(entity =>
@@ -269,12 +264,12 @@ namespace DataAccessLayer.Models
                 entity.HasOne(d => d.Medicine)
                     .WithMany(p => p.PrescriptionDetails)
                     .HasForeignKey(d => d.MedicineId)
-                    .HasConstraintName("FK__Prescript__Medic__5629CD9C");
+                    .HasConstraintName("FK__Prescript__Medic__5535A963");
 
                 entity.HasOne(d => d.Prescription)
                     .WithMany(p => p.PrescriptionDetails)
                     .HasForeignKey(d => d.PrescriptionId)
-                    .HasConstraintName("FK__Prescript__Presc__571DF1D5");
+                    .HasConstraintName("FK__Prescript__Presc__5629CD9C");
             });
 
             modelBuilder.Entity<Room>(entity =>
@@ -288,12 +283,12 @@ namespace DataAccessLayer.Models
                 entity.HasOne(d => d.Department)
                     .WithMany(p => p.Rooms)
                     .HasForeignKey(d => d.DepartmentId)
-                    .HasConstraintName("FK__Room__Department__5812160E");
+                    .HasConstraintName("FK__Room__Department__571DF1D5");
 
                 entity.HasOne(d => d.RoomType)
                     .WithMany(p => p.Rooms)
                     .HasForeignKey(d => d.RoomTypeId)
-                    .HasConstraintName("FK__Room__RoomTypeId__59063A47");
+                    .HasConstraintName("FK__Room__RoomTypeId__5812160E");
             });
 
             modelBuilder.Entity<RoomType>(entity =>
@@ -311,13 +306,13 @@ namespace DataAccessLayer.Models
                     .WithMany(p => p.Schedules)
                     .HasForeignKey(d => d.DoctorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Schedule__Doctor__59FA5E80");
+                    .HasConstraintName("FK__Schedule__Doctor__59063A47");
 
                 entity.HasOne(d => d.Room)
                     .WithMany(p => p.Schedules)
                     .HasForeignKey(d => d.RoomId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Schedule__RoomId__5AEE82B9");
+                    .HasConstraintName("FK__Schedule__RoomId__59FA5E80");
             });
 
             modelBuilder.Entity<TestRecord>(entity =>
@@ -332,30 +327,25 @@ namespace DataAccessLayer.Models
 
                 entity.Property(e => e.RoomNumber).IsRequired();
 
-                entity.HasOne(d => d.Bill)
-                    .WithMany(p => p.TestRecords)
-                    .HasForeignKey(d => d.BillId)
-                    .HasConstraintName("FK__TestRecor__BillI__5BE2A6F2");
-
                 entity.HasOne(d => d.CheckupRecord)
                     .WithMany(p => p.TestRecords)
                     .HasForeignKey(d => d.CheckupRecordId)
-                    .HasConstraintName("FK__TestRecor__Check__5CD6CB2B");
+                    .HasConstraintName("FK__TestRecor__Check__5AEE82B9");
 
                 entity.HasOne(d => d.Operation)
                     .WithMany(p => p.TestRecords)
                     .HasForeignKey(d => d.OperationId)
-                    .HasConstraintName("FK__TestRecor__Opera__5DCAEF64");
+                    .HasConstraintName("FK__TestRecor__Opera__5BE2A6F2");
 
                 entity.HasOne(d => d.Patient)
                     .WithMany(p => p.TestRecords)
                     .HasForeignKey(d => d.PatientId)
-                    .HasConstraintName("FK__TestRecor__Patie__5EBF139D");
+                    .HasConstraintName("FK__TestRecor__Patie__5CD6CB2B");
 
                 entity.HasOne(d => d.Room)
                     .WithMany(p => p.TestRecords)
                     .HasForeignKey(d => d.RoomId)
-                    .HasConstraintName("FK__TestRecor__RoomI__5FB337D6");
+                    .HasConstraintName("FK__TestRecor__RoomI__5DCAEF64");
             });
 
             OnModelCreatingPartial(modelBuilder);

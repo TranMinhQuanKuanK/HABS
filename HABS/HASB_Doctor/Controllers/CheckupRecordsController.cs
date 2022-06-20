@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.RequestModels;
+using BusinessLayer.RequestModels.CreateModels.Doctor;
 using BusinessLayer.RequestModels.CreateModels.User;
 using BusinessLayer.RequestModels.SearchModels.User;
 using BusinessLayer.ResponseModels.ViewModels;
@@ -69,6 +70,7 @@ namespace HASB_Doctor.Controllers
                 return BadRequest();
             }
         }
+        
         [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id, đầy đủ thông tin (chưa check được patientId có hợp lệ ko)")]
         [HttpGet("{id}")]
         public IActionResult GetById(long id)
@@ -77,6 +79,21 @@ namespace HASB_Doctor.Controllers
             {
                 var data = _checkupRecordService.GetCheckupRecordFullData(id);
                 return Ok(data);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [SwaggerOperation(Summary = "Chỉnh sửa bệnh án của bệnh nhân (chỉ gửi những field cần edit)")]
+        [HttpPost("{id}")]
+        public IActionResult GetById([FromBody]CheckupRecordEditModel model)
+        {
+            try
+            {
+                //var data = _checkupRecordService.GetCheckupRecordFullData(id);
+                return Ok();
             }
             catch (Exception)
             {

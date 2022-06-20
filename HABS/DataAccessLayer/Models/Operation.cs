@@ -12,6 +12,12 @@ namespace DataAccessLayer.Models
             KHAM_BENH,
             XET_NGHIEM
         }
+        public enum InsuranceSupportStatus
+        {
+            KHONG_HO_TRO,
+            HO_TRO_MOT_PHAN,
+            HO_TRO_TOAN_PHAN
+        }
         public Operation()
         {
             BillDetails = new HashSet<BillDetail>();
@@ -21,7 +27,7 @@ namespace DataAccessLayer.Models
         public long Id { get; set; }
         public string Name { get; set; }
         public int Price { get; set; }
-        public int InsuranceStatus { get; set; }
+        public InsuranceSupportStatus InsuranceStatus { get; set; }
         public int Status { get; set; }
         public OperationType Type { get; set; }
         public string Note { get; set; }

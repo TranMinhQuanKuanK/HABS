@@ -75,7 +75,7 @@ namespace BusinessLayer.Services.Doctor
                 {
                     Id = x.Id,
                     Name = x.Name,
-                    Note = x.Note,
+                    PhoneNo = x.PhoneNo,
                     Username = x.Username,
                     Type = (int) x.Type
                 })

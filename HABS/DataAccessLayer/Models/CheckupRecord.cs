@@ -5,22 +5,22 @@ using System.Collections.Generic;
 
 namespace DataAccessLayer.Models
 {
-    public enum CheckupRecordStatus
-    {
-        CHO_TAI_KHAM,
-        DA_DAT_LICH,
-        DA_THANH_TOAN,
-        DANG_KHAM,
-        CHO_KQXN,
-        DA_CO_KQXN,
-        KET_THUC,
-        CHUYEN_KHOA,
-        NHAP_VIEN,
-        DA_HUY,
-        DA_XOA
-    }
     public partial class CheckupRecord
     {
+        public enum CheckupRecordStatus
+        {
+            CHO_TAI_KHAM,
+            DA_DAT_LICH,
+            DA_THANH_TOAN,
+            DANG_KHAM,
+            CHO_KQXN,
+            DA_CO_KQXN,
+            KET_THUC,
+            CHUYEN_KHOA,
+            NHAP_VIEN,
+            DA_HUY,
+            DA_XOA
+        }
         public CheckupRecord()
         {
             BillDetails = new HashSet<BillDetail>();
@@ -48,11 +48,9 @@ namespace DataAccessLayer.Models
         public long? IcdDiseaseId { get; set; }
         public string IcdDiseaseCode { get; set; }
         public string IcdDiseaseName { get; set; }
-        public long? BillId { get; set; }
         public DateTime? Date { get; set; }
         public bool? IsReExam { get; set; }
 
-        public virtual Bill Bill { get; set; }
         public virtual Department Department { get; set; }
         public virtual Doctor Doctor { get; set; }
         public virtual IcdDisease IcdDisease { get; set; }

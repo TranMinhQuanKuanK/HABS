@@ -17,15 +17,21 @@ using Newtonsoft.Json;
 using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.ResponseModels.ViewModels.Doctor;
 using DataAccessLayer.Models;
+using BusinessLayer.RequestModels.CreateModels.Doctor;
+using static DataAccessLayer.Models.CheckupRecord;
+using BusinessLayer.Interfaces.User;
+using static DataAccessLayer.Models.Bill;
 
 namespace BusinessLayer.Services.Doctor
 {
-    public class CheckupRecordService : BaseService, ICheckupRecordService
+    public class CheckupRecordService : BaseService, Interfaces.Doctor.ICheckupRecordService
     {
         private readonly IDistributedCache _distributedCache;
+        private readonly IPatientService _patientService;
         private readonly RedisService _redisService;
-        public CheckupRecordService(IUnitOfWork unitOfWork,IDistributedCache distributedCache) : base(unitOfWork)
+        public CheckupRecordService(IUnitOfWork unitOfWork,IDistributedCache distributedCache, IPatientService patientService) : base(unitOfWork)
         {
+            _patientService = patientService;
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
@@ -148,6 +154,117 @@ namespace BusinessLayer.Services.Doctor
                         }).ToList(),
                     };
                 }).FirstOrDefault();
+            return data;
+        }
+        public async Task EditCheckupRecord(CheckupRecordEditModel model)
+        {
+            CheckupRecord data = _unitOfWork.CheckupRecordRepository.Get()
+                 .Where(x => x.Id == model.Id).FirstOrDefault();
+            var opList = _unitOfWork.OperationRepository
+                .Get()
+                .Where(x=> model.OperationIds.Contains(x.Id))
+                .ToList();
+            var patient = _patientService.GetPatientById(model.PatientId);
+            if (data==null)
+            {
+                throw new Exception("Invalid checkup record id");
+            }
+            if (opList.Count != model.OperationIds.Count)
+            {
+                throw new Exception("Invalid operation ids");
+            }
+
+            if (model.Pulse != null)
+            {
+                data.Pulse = model.Pulse;
+            }
+            if (model.Status != null)
+            {
+                data.Status = (CheckupRecordStatus)model.Status;
+            }
+            if (model.Temperature != null)
+            {
+                data.Temperature = model.Temperature;
+            }
+            if (model.ReExamDate != null)
+            {
+                data.ReExamDate = model.ReExamDate;
+            }
+            if (model.BloodPressure != null)
+            {
+                data.BloodPressure = model.BloodPressure;
+            }
+            if (model.DoctorAdvice != null)
+            {
+                data.DoctorAdvice = model.DoctorAdvice;
+            }
+            if (model.IcdDiseaseId != null)
+            {
+                //Kiểm tra Id chính xác không
+                data.IcdDiseaseId = model.IcdDiseaseId;
+            }
+            if (model.OperationIds.Count > 0)
+            {
+                //tạo bill
+                Bill bill = new Bill()
+                {
+                    Status = BillStatus.CHUA_TT,
+                    Content = "Hóa đơn thanh toán viện phí cho bệnh nhân " + patient.Name,
+                    TimeCreated = DateTime.Now.AddHours(7),
+                    PatientName = patient.Name,
+                };
+                foreach (var opId in model.OperationIds)
+                {
+                    Operation _op = null;
+                    foreach (var op in opList)
+                    {
+                        if (op.Id == opId)
+                        {
+                            _op = op;
+                        }
+                    }
+                    //tạo record
+                    TestRecord tc = new TestRecord()
+                    {
+                        OperationId = opId,
+
+                        OperationName = _op.Name,
+                        PatientId = model.PatientId,
+                        PatientName = patient.Name,
+                        CheckupRecordId = model.Id,
+                        EstimatedDate = null,
+                        ResultFileLink = null,
+                        //tự gán tùy vào phòng operation available tùy theo, lưu ROOM_AVAILABLE_xxx lên cache
+                        RoomId = 0,
+                        Floor = "Later",
+                        RoomNumber = "A???",
+
+                        Status = TestRecord.TestRecordStatus.DA_DAT_LICH,
+                        //Gọi service lấy số, nhớ lock lại, để singleton
+                        NumericalOrder = 0,
+                        Date = DateTime.Now.AddHours(7),
+                    };
+                    await _unitOfWork.TestRecordRepository.Add(tc);
+                    await _unitOfWork.SaveChangesAsync();
+                    //tạo bill detail
+                    BillDetail bd = new BillDetail()
+                    {
+                        InsuranceStatus = _op.InsuranceStatus,
+                        OperationId = opId,
+                        OperationName = _op.Name,
+                        Price = _op.Price,
+                        Quantity = 1,
+                        SubTotal = _op.Price,
+                        TestRecordId = tc.Id,
+                        CheckupRecordId = model.Id,
+                        
+                        
+                    }
+                }
+                //Tạo thêm test record cho bệnh nhân
+
+            }
+
             return data;
         }
     }
