@@ -50,11 +50,15 @@ namespace DataAccessLayer.Models
         public string IcdDiseaseName { get; set; }
         public DateTime? Date { get; set; }
         public bool? IsReExam { get; set; }
+        public long? RoomId { get; set; }
+        public string RoomNumber { get; set; }
+        public string Floor { get; set; }
 
         public virtual Department Department { get; set; }
         public virtual Doctor Doctor { get; set; }
         public virtual IcdDisease IcdDisease { get; set; }
         public virtual Patient Patient { get; set; }
+        public virtual Room Room { get; set; }
         public virtual ICollection<BillDetail> BillDetails { get; set; }
         public virtual ICollection<Prescription> Prescriptions { get; set; }
         public virtual ICollection<TestRecord> TestRecords { get; set; }

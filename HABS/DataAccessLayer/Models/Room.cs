@@ -9,6 +9,7 @@ namespace DataAccessLayer.Models
     {
         public Room()
         {
+            CheckupRecords = new HashSet<CheckupRecord>();
             Schedules = new HashSet<Schedule>();
             TestRecords = new HashSet<TestRecord>();
         }
@@ -22,6 +23,7 @@ namespace DataAccessLayer.Models
 
         public virtual Department Department { get; set; }
         public virtual RoomType RoomType { get; set; }
+        public virtual ICollection<CheckupRecord> CheckupRecords { get; set; }
         public virtual ICollection<Schedule> Schedules { get; set; }
         public virtual ICollection<TestRecord> TestRecords { get; set; }
     }
