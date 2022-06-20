@@ -13,6 +13,8 @@ namespace DataAccessLayer.Models
             TT_EBANKING,
             TT_TIEN_MAT
         }
+        public Bill()
+        {
             BillDetails = new HashSet<BillDetail>();
         }
 
