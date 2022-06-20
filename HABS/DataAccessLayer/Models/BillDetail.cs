@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static DataAccessLayer.Models.Bill;
 using static DataAccessLayer.Models.Operation;
 
 #nullable disable
@@ -17,7 +18,9 @@ namespace DataAccessLayer.Models
         public long? TestRecordId { get; set; }
         public long? OperationId { get; set; }
         public string OperationName { get; set; }
+        public long? BillId { get; set; }
 
+        public virtual Bill Bill { get; set; }
         public virtual CheckupRecord CheckupRecord { get; set; }
         public virtual Operation Operation { get; set; }
         public virtual TestRecord TestRecord { get; set; }

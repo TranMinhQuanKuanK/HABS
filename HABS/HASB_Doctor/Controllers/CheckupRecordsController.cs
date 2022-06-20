@@ -93,6 +93,7 @@ namespace HASB_Doctor.Controllers
             try
             {
                 //var data = _checkupRecordService.GetCheckupRecordFullData(id);
+
                 return Ok();
             }
             catch (Exception)

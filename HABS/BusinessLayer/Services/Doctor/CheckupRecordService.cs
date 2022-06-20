@@ -21,6 +21,8 @@ using BusinessLayer.RequestModels.CreateModels.Doctor;
 using static DataAccessLayer.Models.CheckupRecord;
 using BusinessLayer.Interfaces.User;
 using static DataAccessLayer.Models.Bill;
+using BusinessLayer.ResponseModels.ViewModels.User;
+using BusinessLayer.Interfaces.Common;
 
 namespace BusinessLayer.Services.Doctor
 {
@@ -28,9 +30,14 @@ namespace BusinessLayer.Services.Doctor
     {
         private readonly IDistributedCache _distributedCache;
         private readonly IPatientService _patientService;
+        private readonly INumercialOrderService _numService;
         private readonly RedisService _redisService;
-        public CheckupRecordService(IUnitOfWork unitOfWork,IDistributedCache distributedCache, IPatientService patientService) : base(unitOfWork)
+        public CheckupRecordService(IUnitOfWork unitOfWork, 
+            IDistributedCache distributedCache, 
+            IPatientService patientService,
+            INumercialOrderService numService) : base(unitOfWork)
         {
+            _numService = numService;
             _patientService = patientService;
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
@@ -158,14 +165,23 @@ namespace BusinessLayer.Services.Doctor
         }
         public async Task EditCheckupRecord(CheckupRecordEditModel model)
         {
-            CheckupRecord data = _unitOfWork.CheckupRecordRepository.Get()
+            var cr = _unitOfWork.CheckupRecordRepository.Get()
                  .Where(x => x.Id == model.Id).FirstOrDefault();
             var opList = _unitOfWork.OperationRepository
                 .Get()
-                .Where(x=> model.OperationIds.Contains(x.Id))
+                .Where(x => model.OperationIds.Contains(x.Id))
                 .ToList();
             var patient = _patientService.GetPatientById(model.PatientId);
-            if (data==null)
+            if (cr == null
+                || cr.Status == CheckupRecordStatus.CHO_TAI_KHAM
+                || cr.Status == CheckupRecordStatus.DA_DAT_LICH
+                || cr.Status == CheckupRecordStatus.DA_XOA
+                || cr.Status == CheckupRecordStatus.CHO_TAI_KHAM
+                || cr.Status == CheckupRecordStatus.KET_THUC
+                || cr.Status == CheckupRecordStatus.CHO_KQXN
+                || cr.Status == CheckupRecordStatus.CHUYEN_KHOA
+                || cr.Status == CheckupRecordStatus.DA_HUY
+                )
             {
                 throw new Exception("Invalid checkup record id");
             }
@@ -176,96 +192,156 @@ namespace BusinessLayer.Services.Doctor
 
             if (model.Pulse != null)
             {
-                data.Pulse = model.Pulse;
+                cr.Pulse = model.Pulse;
             }
             if (model.Status != null)
             {
-                data.Status = (CheckupRecordStatus)model.Status;
+                cr.Status = (CheckupRecordStatus)model.Status;
             }
             if (model.Temperature != null)
             {
-                data.Temperature = model.Temperature;
+                cr.Temperature = model.Temperature;
             }
             if (model.ReExamDate != null)
             {
-                data.ReExamDate = model.ReExamDate;
+                cr.ReExamDate = model.ReExamDate;
             }
             if (model.BloodPressure != null)
             {
-                data.BloodPressure = model.BloodPressure;
+                cr.BloodPressure = model.BloodPressure;
             }
             if (model.DoctorAdvice != null)
             {
-                data.DoctorAdvice = model.DoctorAdvice;
+                cr.DoctorAdvice = model.DoctorAdvice;
             }
             if (model.IcdDiseaseId != null)
             {
                 //Kiểm tra Id chính xác không
-                data.IcdDiseaseId = model.IcdDiseaseId;
+                var icd = _unitOfWork.IcdDiseaseRepository.Get().Where(x => x.Id == model.IcdDiseaseId).FirstOrDefault();
+                if (icd==null)
+                {
+                    throw new Exception("Invalid ICD with id" + model.IcdDiseaseId);
+                }
+                cr.IcdDiseaseId = model.IcdDiseaseId;
             }
             if (model.OperationIds.Count > 0)
             {
-                //tạo bill
-                Bill bill = new Bill()
+                await addTestRecords(model, patient, opList);
+            }
+            if (model.Prescription != null)
+            {
+                await addPrescription(model);
+            }
+        }
+        private async Task addTestRecords(
+            CheckupRecordEditModel model, 
+            PatientResponseModel patient,
+            List<Operation> opList
+            )
+        {
+            //tạo bill
+            Bill bill = new Bill()
+            {
+                Status = BillStatus.CHUA_TT,
+                Content = "Hóa đơn thanh toán viện phí cho bệnh nhân " + patient.Name + "cho " + model.OperationIds.Count + "mục.",
+                TimeCreated = DateTime.Now.AddHours(7),
+                PatientName = patient.Name,
+            };
+            foreach (var opId in model.OperationIds)
+            {
+                Operation _op = null;
+                foreach (var op in opList)
                 {
-                    Status = BillStatus.CHUA_TT,
-                    Content = "Hóa đơn thanh toán viện phí cho bệnh nhân " + patient.Name,
-                    TimeCreated = DateTime.Now.AddHours(7),
-                    PatientName = patient.Name,
-                };
-                foreach (var opId in model.OperationIds)
-                {
-                    Operation _op = null;
-                    foreach (var op in opList)
+                    if (op.Id == opId)
                     {
-                        if (op.Id == opId)
-                        {
-                            _op = op;
-                        }
-                    }
-                    //tạo record
-                    TestRecord tc = new TestRecord()
-                    {
-                        OperationId = opId,
-
-                        OperationName = _op.Name,
-                        PatientId = model.PatientId,
-                        PatientName = patient.Name,
-                        CheckupRecordId = model.Id,
-                        EstimatedDate = null,
-                        ResultFileLink = null,
-                        //tự gán tùy vào phòng operation available tùy theo, lưu ROOM_AVAILABLE_xxx lên cache
-                        RoomId = 0,
-                        Floor = "Later",
-                        RoomNumber = "A???",
-
-                        Status = TestRecord.TestRecordStatus.DA_DAT_LICH,
-                        //Gọi service lấy số, nhớ lock lại, để singleton
-                        NumericalOrder = 0,
-                        Date = DateTime.Now.AddHours(7),
-                    };
-                    await _unitOfWork.TestRecordRepository.Add(tc);
-                    await _unitOfWork.SaveChangesAsync();
-                    //tạo bill detail
-                    BillDetail bd = new BillDetail()
-                    {
-                        InsuranceStatus = _op.InsuranceStatus,
-                        OperationId = opId,
-                        OperationName = _op.Name,
-                        Price = _op.Price,
-                        Quantity = 1,
-                        SubTotal = _op.Price,
-                        TestRecordId = tc.Id,
-                        CheckupRecordId = model.Id,
-                        
-                        
+                        _op = op;
                     }
                 }
-                //Tạo thêm test record cho bệnh nhân
+                //tạo record
+                TestRecord tc = new TestRecord()
+                {
+                    OperationId = opId,
 
+                    OperationName = _op.Name,
+                    PatientId = model.PatientId,
+                    PatientName = patient.Name,
+                    CheckupRecordId = model.Id,
+                    EstimatedDate = null,
+                    ResultFileLink = null,
+                    //tự gán tùy vào phòng operation available tùy theo, lưu ROOM_AVAILABLE_xxx lên cache
+                    Status = TestRecord.TestRecordStatus.DA_DAT_LICH,
+                    //Gọi service lấy số, nhớ lock lại, để singleton
+                    Date = DateTime.Now.AddHours(7),
+                };
+                await _unitOfWork.TestRecordRepository.Add(tc);
+                await _unitOfWork.SaveChangesAsync();
+                //tạo bill detail
+                BillDetail bd = new BillDetail()
+                {
+                    InsuranceStatus = _op.InsuranceStatus,
+                    OperationId = opId,
+                    OperationName = _op.Name,
+                    Price = _op.Price,
+                    Quantity = 1,
+                    SubTotal = _op.Price,
+                    TestRecordId = tc.Id,
+                    CheckupRecordId = model.Id,
+                    BillId = bill.Id,
+                };
+                bill.Total = bill.Total += _op.Price;
+                await _unitOfWork.BillDetailRepository.Add(bd);
+                await _unitOfWork.SaveChangesAsync();
             }
+            //Tạo thêm test record cho bệnh nhân
+            await _unitOfWork.SaveChangesAsync();
+        }
 
-            return data;
+        private async Task addPrescription(CheckupRecordEditModel model)
+        {
+            //query xem presc có chưa
+            Prescription presc = null;
+            presc = _unitOfWork.PrescriptionRepository
+               .Get()
+               .Where(x => x.CheckupRecordId == model.Id)
+               .FirstOrDefault();
+            //chưa có thì tạo một cái mới
+            if (presc == null)
+            {
+                presc = new Prescription()
+                {
+                    Note = "Đơn thuốc cho bệnh nhân ",
+                    CheckupRecordId = model.Id,
+                    TimeCreated = DateTime.Now.AddHours(7),
+                };
+                await _unitOfWork.PrescriptionRepository.Add(presc);
+            }
+            //clear hết presc detail
+            presc.PrescriptionDetails = new List<PrescriptionDetail>();
+            await _unitOfWork.SaveChangesAsync();
+            //tạo từng cái presc detail add vào presc
+            foreach (var detail in model.Prescription.Details)
+            {
+                var med = _unitOfWork.MedicineRepository.Get()
+                    .Where(x => x.Id == detail.MedicineId).FirstOrDefault();
+                if (med == null)
+                {
+                    throw new Exception("Invalid medicine with id" + detail.MedicineId);
+                }
+                presc.PrescriptionDetails.Add(new PrescriptionDetail()
+                {
+                    MedicineId = detail.MedicineId,
+                    MedicineName = med.Name,
+                    EveningDose = detail.EveningDose,
+                    MiddayDose = detail.MiddayDose,
+                    MorningDose = detail.MorningDose,
+                    NightDose = detail.NightDose,
+                    Quantity = detail.Quantity,
+                    Unit = med.Unit,
+                    Usage = detail.Usage,
+                    PrescriptionId = presc.Id,
+                });
+            }
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 
