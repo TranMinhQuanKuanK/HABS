@@ -20,8 +20,9 @@ using static DataAccessLayer.Models.Operation;
 using BusinessLayer.RequestModels.SearchModels.Doctor;
 using DataAccessLayer.Models;
 using BusinessLayer.Interfaces.Common;
+using BusinessLayer.Constants;
 
-namespace BusinessLayer.Services.Doctor
+namespace BusinessLayer.Services.Common
 {
     public class NumercialOrderService : BaseService, INumercialOrderService
     {
@@ -33,56 +34,93 @@ namespace BusinessLayer.Services.Doctor
             _redisService = new RedisService(_distributedCache);
         }
         private static readonly object padlock = new object();
+        //Lấy phòng available cho PK chuyên khoa hoặc phòng xét nghiệm
         public Room GetAppropriateRoomForOperation(Operation op)
         {
-            ////tìm các phòng có roomType = operationRoomType
-            //var roomList = _unitOfWork.RoomRepository
-            //    .Get()
-            //    .Include(x => x.TestRecords)
-            //    .Where(x => x.RoomTypeId == op.RoomTypeId).ToList();
-            //Room roomWithLeastPeople = null;
-            //int max = 0;
-            //if (op.RoomTypeId != 10002)
-            //{
-            //    foreach (var room in roomList)
-            //    {
-            //        //
-
-            //        int cur = room.TestRecords.Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
-            //         .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN)
-            //         .ToList().Count;
-            //        if (cur > max)
-            //        {
-            //            roomWithLeastPeople = room;
-            //            max = cur;
-            //        }
-            //    }
-            //} else
-            //{
-            //    foreach (var room in roomList)
-            //    {
-            //        //
-            //        int cur = room.Check.Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
-            //         .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN)
-            //         .ToList().Count;
-            //        if (cur > max)
-            //        {
-            //            roomWithLeastPeople = room;
-            //            max = cur;
-            //        }
-            //    }
-            //}
-            //return roomWithLeastPeople
-            return null;
+            //tìm các phòng có roomType = operationRoomType
+            var roomList = _unitOfWork.RoomRepository
+                .Get()
+                .Include(x => x.TestRecords)
+                .Where(x => x.RoomTypeId == op.RoomTypeId).ToList();
+            Room roomWithLeastPeople = null;
+            int max = 0;
+            //Nhớ: Để constant "Id của Loại phòng khám"
+            if (op.RoomTypeId != IdConstant.ID_ROOMTYPE_PHONG_KHAM)
+            {
+                //Flow cho phòng xét nghiệm
+                foreach (var room in roomList)
+                {
+                    int cur = room.TestRecords.Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
+                     .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
+                      || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
+                      || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
+                      )
+                     .ToList().Count;
+                    if (cur > max)
+                    {
+                        roomWithLeastPeople = room;
+                        max = cur;
+                    }
+                }
+            }
+            else
+            {
+                //Flow cho phòng khám chuyên khoa
+                foreach (var room in roomList)
+                {
+                    //
+                    int cur = room.CheckupRecords
+                        .Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
+                     .Where(x => x.Status == CheckupRecord.CheckupRecordStatus.CHO_KQXN
+                      || x.Status == CheckupRecord.CheckupRecordStatus.CHUYEN_KHOA
+                      || x.Status == CheckupRecord.CheckupRecordStatus.DANG_KHAM
+                      || x.Status == CheckupRecord.CheckupRecordStatus.DA_CO_KQXN
+                      || x.Status == CheckupRecord.CheckupRecordStatus.DA_THANH_TOAN
+                      || x.Status == CheckupRecord.CheckupRecordStatus.KET_THUC
+                      || x.Status == CheckupRecord.CheckupRecordStatus.NHAP_VIEN
+                      || x.Status == CheckupRecord.CheckupRecordStatus.DA_DAT_LICH
+                      )
+                     .ToList().Count;
+                    if (cur > max)
+                    {
+                        roomWithLeastPeople = room;
+                        max = cur;
+                    }
+                }
+            }
+            return roomWithLeastPeople;
         }
         //lấy số thứ tự cho phòng xét nghiệm
-        public int GetNumOrderForExaminationRoom(Room room)
+        public int GetNumOrderForAutoIncreaseRoom(Room room)
         {
             lock (padlock)
             {
-                return room.TestRecords.Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
-                   .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN)
-                   .ToList().Count;
+                int curNumOfPeople = 0;
+                if (room.RoomTypeId != IdConstant.ID_ROOMTYPE_PHONG_KHAM)
+                {
+                    curNumOfPeople = room.TestRecords.Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
+                     .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
+                      || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
+                      || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
+                      )
+                     .ToList().Count;
+                }
+                else
+                {
+                    curNumOfPeople = room.CheckupRecords
+                       .Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
+                    .Where(x => x.Status == CheckupRecord.CheckupRecordStatus.CHO_KQXN
+                     || x.Status == CheckupRecord.CheckupRecordStatus.CHUYEN_KHOA
+                     || x.Status == CheckupRecord.CheckupRecordStatus.DANG_KHAM
+                     || x.Status == CheckupRecord.CheckupRecordStatus.DA_CO_KQXN
+                     || x.Status == CheckupRecord.CheckupRecordStatus.DA_THANH_TOAN
+                     || x.Status == CheckupRecord.CheckupRecordStatus.KET_THUC
+                     || x.Status == CheckupRecord.CheckupRecordStatus.NHAP_VIEN
+                     || x.Status == CheckupRecord.CheckupRecordStatus.DA_DAT_LICH
+                     )
+                    .ToList().Count;
+                }
+                return curNumOfPeople + 1;
             }
         }
     }

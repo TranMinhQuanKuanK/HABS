@@ -17,35 +17,35 @@ using Newtonsoft.Json;
 using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.ResponseModels.ViewModels.Doctor;
 using static DataAccessLayer.Models.Operation;
+using BusinessLayer.RequestModels.SearchModels.Doctor;
+using DataAccessLayer.Models;
+using BusinessLayer.Interfaces.Common;
+using BusinessLayer.Constants;
 
-namespace BusinessLayer.Services.Doctor
+namespace BusinessLayer.Services.Common
 {
-    public class OperationService : BaseService, IOperationService
+    public class RoomService : BaseService, IRoomService
     {
         private readonly IDistributedCache _distributedCache;
         private readonly RedisService _redisService;
-        public OperationService(IUnitOfWork unitOfWork,IDistributedCache distributedCache) : base(unitOfWork)
+        public RoomService(IUnitOfWork unitOfWork, IDistributedCache distributedCache) : base(unitOfWork)
         {
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
-        public List<OperationViewModel> GetOperations()
+        public List<RoomViewModel> GetRooms(bool isTestRoom)
         {
-            List<OperationViewModel> data = new List<OperationViewModel>();
-            data = _unitOfWork.OperationRepository.Get()
-                .Where(x=>x.Status==(int)OperationType.XET_NGHIEM)
+            List<RoomViewModel> data = new List<RoomViewModel>();
+            data = _unitOfWork.RoomRepository
+                .Get()
+                .Where(x => isTestRoom || x.RoomTypeId == IdConstant.ID_ROOMTYPE_PHONG_KHAM)
                 .Select
-               (x => new OperationViewModel()
+               (x => new RoomViewModel()
                {
                    Id = x.Id,
-                   DepartmentId = x.DepartmentId,
-                   InsuranceStatus = (int)x.InsuranceStatus,
-                   Name = x.Name,
+                   Floor = x.Floor,
                    Note = x.Note,
-                   Price = x.Price,
-                   RoomTypeId = x.RoomTypeId,
-                   Status = x.Status,
-                   Type = (int)x.Type
+                   RoomNumber = x.RoomNumber,
                }
                ).ToList();
             return data;

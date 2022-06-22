@@ -54,7 +54,7 @@ namespace DataAccessLayer.Models
             {
                 entity.ToTable("Account");
 
-                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E3841CC3929")
+                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E38C8127B61")
                     .IsUnique();
 
                 entity.Property(e => e.Email).IsRequired();

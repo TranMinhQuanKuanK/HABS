@@ -10,8 +10,6 @@ namespace BusinessLayer.RequestModels.CreateModels.Doctor
     {
         public long Id { get; set; }
         public long PatientId { get; set; }
-        public List<long> OperationIds { get; set; }
-        public PrescriptionCreateModel Prescription { get; set; }
         public int? Status { get; set; }
         public DateTime? ReExamDate { get; set; }
         public string Diagnosis { get; set; }

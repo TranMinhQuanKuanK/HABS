@@ -53,13 +53,7 @@ namespace HASB_Doctor.Controllers
                     PageIndex = 1,
                     PageSize = 5
                 };
-
-
-
                 return Ok(pagingmodel);
-
-
-
             }
             catch (Exception)
             {
@@ -72,9 +66,6 @@ namespace HASB_Doctor.Controllers
         {
             try
             {
-                //paging = PagingUtil.checkDefaultPaging(paging);
-                //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
-                //return Ok(products);
                 PatientRecordFullDataViewModel model = new PatientRecordFullDataViewModel()
                 {
                     Id = 6,
@@ -170,6 +161,15 @@ namespace HASB_Doctor.Controllers
                             Status = 0
                         }
                     },
+                    DoctorName = "DFDFD",
+                    Date = DateTime.Now,
+                    DepartmentId = 2,
+                    DepartmentName = "Khoa khoa khoa chấn chấn thương",
+                     DoctorId = 3,
+                      EstimatedStartTime = DateTime.Now,
+                      IcdCode = "A2323",
+                      PatientId = 3,
+                      ReExamDate = DateTime.Now,
                 };
                 return Ok(model);
             }

@@ -1,5 +1,7 @@
+using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.Interfaces.Notification;
+using BusinessLayer.Services.Common;
 using BusinessLayer.Services.Doctor;
 using BusinessLayer.Services.Notification;
 using DataAccessLayer.Models;
@@ -140,6 +142,10 @@ namespace HASB_Doctor
             services.AddTransient<ILoginService, LoginService>();
             services.AddTransient<IIcdService, IcdService>();
             services.AddTransient<IMedicineService, MedicineService>();
+            services.AddTransient<BusinessLayer.Interfaces.User.IPatientService,
+                BusinessLayer.Services.User.PatientService>();
+            services.AddTransient<INumercialOrderService, NumercialOrderService>();
+            services.AddTransient<IRoomService, RoomService>();
 
 
 

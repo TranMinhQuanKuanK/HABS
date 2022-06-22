@@ -86,14 +86,55 @@ namespace HASB_Doctor.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Chỉnh sửa bệnh án của bệnh nhân (chỉ gửi những field cần edit)")]
-        [HttpPost("{id}")]
-        public IActionResult GetById([FromBody]CheckupRecordEditModel model)
+        [SwaggerOperation(Summary = "Chỉnh sửa bệnh án của bệnh nhân (chỉ gửi những field cần edit) (giả)")]
+        [HttpPut("{id}")]
+        public IActionResult ChangeCheckupRecord([FromBody]CheckupRecordEditModel model)
         {
             try
             {
                 //var data = _checkupRecordService.GetCheckupRecordFullData(id);
-
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        [SwaggerOperation(Summary = "Đặt thêm lịch xét ngiệm cho bệnh nhân (giả)")]
+        [HttpPost("{id}/tests")]
+        public IActionResult ArrangeTest([FromBody] TestRequestCreateModel model)
+        {
+            try
+            {
+                //var data = _checkupRecordService.GetCheckupRecordFullData(id);
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        [SwaggerOperation(Summary = "Chuyển khoa cho bệnh nhân (giả)")]
+        [HttpPost("{id}/redirect")]
+        public IActionResult RedirectPatient([FromBody] RedirectCreateModel model)
+        {
+            try
+            {
+                //var data = _checkupRecordService.GetCheckupRecordFullData(id);
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        [SwaggerOperation(Summary = "Tạo đơn thuốc cho bệnh nhân (giả)")]
+        [HttpPost("{id}/prescription")]
+        public IActionResult CreatePrescriptin([FromBody] PrescriptionCreateModel model)
+        {
+            try
+            {
+                //var data = _checkupRecordService.GetCheckupRecordFullData(id);
                 return Ok();
             }
             catch (Exception)

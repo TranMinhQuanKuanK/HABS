@@ -23,6 +23,7 @@ using BusinessLayer.Interfaces.User;
 using static DataAccessLayer.Models.Bill;
 using BusinessLayer.ResponseModels.ViewModels.User;
 using BusinessLayer.Interfaces.Common;
+using Utilities;
 
 namespace BusinessLayer.Services.Doctor
 {
@@ -32,8 +33,8 @@ namespace BusinessLayer.Services.Doctor
         private readonly IPatientService _patientService;
         private readonly INumercialOrderService _numService;
         private readonly RedisService _redisService;
-        public CheckupRecordService(IUnitOfWork unitOfWork, 
-            IDistributedCache distributedCache, 
+        public CheckupRecordService(IUnitOfWork unitOfWork,
+            IDistributedCache distributedCache,
             IPatientService patientService,
             INumercialOrderService numService) : base(unitOfWork)
         {
@@ -163,14 +164,206 @@ namespace BusinessLayer.Services.Doctor
                 }).FirstOrDefault();
             return data;
         }
+        public async Task CreatePrescription(long recordId, PrescriptionCreateModel model)
+        {  //query xem presc có chưa
+            Prescription presc = null;
+            presc = _unitOfWork.PrescriptionRepository
+               .Get()
+               .Where(x => x.CheckupRecordId == recordId)
+               .FirstOrDefault();
+            //chưa có thì tạo một cái mới
+            if (presc == null)
+            {
+                presc = new Prescription()
+                {
+                    Note = "",
+                    CheckupRecordId = recordId,
+                    TimeCreated = DateTime.Now.AddHours(7),
+                };
+                await _unitOfWork.PrescriptionRepository.Add(presc);
+            }
+            //clear hết presc detail
+            presc.PrescriptionDetails = new List<PrescriptionDetail>();
+            await _unitOfWork.SaveChangesAsync();
+            //tạo từng cái presc detail add vào presc
+            foreach (var detail in model.Details)
+            {
+                var med = _unitOfWork.MedicineRepository.Get()
+                    .Where(x => x.Id == detail.MedicineId).FirstOrDefault();
+                if (med == null)
+                {
+                    throw new Exception("Invalid medicine with id" + detail.MedicineId);
+                }
+                presc.PrescriptionDetails.Add(new PrescriptionDetail()
+                {
+                    MedicineId = detail.MedicineId,
+                    MedicineName = med.Name,
+                    EveningDose = detail.EveningDose,
+                    MiddayDose = detail.MiddayDose,
+                    MorningDose = detail.MorningDose,
+                    NightDose = detail.NightDose,
+                    Quantity = detail.Quantity,
+                    Unit = med.Unit,
+                    Usage = detail.Usage,
+                    PrescriptionId = presc.Id,
+                });
+            }
+            await _unitOfWork.SaveChangesAsync();
+        }
+        public async Task RedirectPatient(RedirectCreateModel model, long patientID)
+        {
+            //kiểm tra patient
+            var patient = _unitOfWork.PatientRepository.Get().Where(x => x.Id == patientID).FirstOrDefault();
+            if (patient == null)
+            {
+                throw new Exception("Patient invalid");
+            }
+            //kiểm tra khoa có mở khám không
+            var validDeps = _unitOfWork.DepartmentRepository.Get()
+                .Where(x => model.RedirectDepartmentIds.Contains(x.Id))
+                .Where(x => x.Status == Department.DepartmentStatus.CO_MO_KHAM)
+                .ToList();
+            if (validDeps.Count < model.RedirectDepartmentIds.Count)
+            {
+                throw new Exception("Invalid department id list");
+            }
+
+            //lấy các operation khám tương ứng và tạo thành một bill
+            var checkupOpList = _unitOfWork.OperationRepository.Get()
+                .Where(x => model.RedirectDepartmentIds.Contains((long)x.DepartmentId))
+                .ToList();
+            Bill bill = new Bill()
+            {
+                Content = "Thu tiền cho các khoảng khám chuyển khoa",
+                Status = BillStatus.CHUA_TT,
+                TimeCreated = DateTime.Now.AddHours(7),
+                PatientName = patient.Name,
+                Total = 0
+            };
+            await _unitOfWork.BillRepository.Add(bill);
+            await _unitOfWork.SaveChangesAsync();
+            //tạo các checkup record tương ứng
+            foreach (var checkup in checkupOpList)
+            {
+                //lấy department tương úng của checkup thay vì include
+                var dep = validDeps.Where(x => x.Id == checkup.DepartmentId).FirstOrDefault();
+                //lấy lịch và phòng
+                var room = _numService.GetAppropriateRoomForOperation(checkup);
+                var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room);
+                //lấy bác sĩ làm việc tương ứng trong khung giờ + phòng
+
+                //tạo record
+                CheckupRecord cr = new CheckupRecord()
+                {
+                    DepartmentId = checkup.DepartmentId,
+                    Date = DateTime.Now.AddHours(7),
+                    Status = CheckupRecordStatus.DA_DAT_LICH,
+                    IsReExam = false,
+                    Floor = room.Floor,
+                    RoomNumber = room.RoomNumber,
+                    RoomId = room.Id,
+                    PatientId = patientID,
+                    PatientName = patient.Name,
+                    NumericalOrder = numOrd,
+                    ClinicalSymptom = "Chuyển khoa từ đa khoa sang. Xem các kết quả của đa khoa để xem thêm chi tiết.",
+                    DepartmentName = dep.Name,
+                    //NHỚ BỔ SUNG
+                    DoctorId = null,
+                    DoctorName = "Nhớ nhắc Quân bổ sung DoctorName trong trường hợp tụi mày vẫn thấy cái này",
+                };
+                await _unitOfWork.CheckupRecordRepository.Add(cr);
+                await _unitOfWork.SaveChangesAsync();
+
+                //tạo bill detail tương ứng
+                BillDetail detail = new BillDetail()
+                {
+                    BillId = bill.Id,
+                    InsuranceStatus = checkup.InsuranceStatus,
+                    OperationId = checkup.Id,
+                    Price = checkup.Price,
+                    OperationName = checkup.Name,
+                    Quantity = 1,
+                    SubTotal = checkup.Price,
+                    CheckupRecordId = cr.Id,
+                };
+                await _unitOfWork.BillDetailRepository.Add(detail);
+            }
+            bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
+            await _unitOfWork.SaveChangesAsync();
+        }
+        public async Task RequestExamination(long recordId, long patientId, TestRequestCreateModel testReqModel)
+        {
+            var cr = _unitOfWork.CheckupRecordRepository.Get()
+               .Where(x => x.Id == recordId).FirstOrDefault();
+            var opList = _unitOfWork.OperationRepository
+                .Get()
+                .Where(x => testReqModel.ExamOperationIds.Contains(x.Id))
+                .ToList();
+            var patient = _patientService.GetPatientById(patientId);
+            //tạo bill
+            Bill bill = new Bill()
+            {
+                Status = BillStatus.CHUA_TT,
+                Content = "Hóa đơn thanh toán viện phí cho bệnh nhân " + patient.Name + "cho " + testReqModel.ExamOperationIds.Count + "mục.",
+                TimeCreated = DateTime.Now.AddHours(7),
+                PatientName = patient.Name,
+            };
+            foreach (var opId in testReqModel.ExamOperationIds)
+            {
+                Operation _op = null;
+                foreach (var op in opList)
+                {
+                    if (op.Id == opId)
+                    {
+                        _op = op;
+                    }
+                }
+                //Tìm phòng tương ứng cho bệnh nhân
+                var room = _numService.GetAppropriateRoomForOperation(_op);
+                var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room);
+                //tạo record mới 
+                TestRecord tc = new TestRecord()
+                {
+                    OperationId = opId,
+                    OperationName = _op.Name,
+                    PatientId = patient.Id,
+                    PatientName = patient.Name,
+                    CheckupRecordId = recordId,
+                    EstimatedDate = null,
+                    ResultFileLink = null,
+                    Status = TestRecord.TestRecordStatus.DA_DAT_LICH,
+                    Date = DateTime.Now.AddHours(7),
+                    NumericalOrder = numOrd,
+                    RoomId = room.Id,
+                    RoomNumber = room.RoomNumber,
+                    Floor = room.Floor
+                };
+                await _unitOfWork.TestRecordRepository.Add(tc);
+                await _unitOfWork.SaveChangesAsync();
+                //tạo bill detail
+                BillDetail bd = new BillDetail()
+                {
+                    InsuranceStatus = _op.InsuranceStatus,
+                    OperationId = opId,
+                    OperationName = _op.Name,
+                    Price = _op.Price,
+                    Quantity = 1,
+                    SubTotal = _op.Price,
+                    TestRecordId = tc.Id,
+                    CheckupRecordId = recordId,
+                    BillId = bill.Id,
+                };
+                bill.Total = bill.Total += _op.Price;
+                await _unitOfWork.BillDetailRepository.Add(bd);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
+            await _unitOfWork.SaveChangesAsync();
+        }
         public async Task EditCheckupRecord(CheckupRecordEditModel model)
         {
             var cr = _unitOfWork.CheckupRecordRepository.Get()
                  .Where(x => x.Id == model.Id).FirstOrDefault();
-            var opList = _unitOfWork.OperationRepository
-                .Get()
-                .Where(x => model.OperationIds.Contains(x.Id))
-                .ToList();
             var patient = _patientService.GetPatientById(model.PatientId);
             if (cr == null
                 || cr.Status == CheckupRecordStatus.CHO_TAI_KHAM
@@ -184,10 +377,6 @@ namespace BusinessLayer.Services.Doctor
                 )
             {
                 throw new Exception("Invalid checkup record id");
-            }
-            if (opList.Count != model.OperationIds.Count)
-            {
-                throw new Exception("Invalid operation ids");
             }
 
             if (model.Pulse != null)
@@ -216,130 +405,12 @@ namespace BusinessLayer.Services.Doctor
             }
             if (model.IcdDiseaseId != null)
             {
-                //Kiểm tra Id chính xác không
                 var icd = _unitOfWork.IcdDiseaseRepository.Get().Where(x => x.Id == model.IcdDiseaseId).FirstOrDefault();
-                if (icd==null)
+                if (icd == null)
                 {
                     throw new Exception("Invalid ICD with id" + model.IcdDiseaseId);
                 }
                 cr.IcdDiseaseId = model.IcdDiseaseId;
-            }
-            if (model.OperationIds.Count > 0)
-            {
-                await addTestRecords(model, patient, opList);
-            }
-            if (model.Prescription != null)
-            {
-                await addPrescription(model);
-            }
-        }
-        private async Task addTestRecords(
-            CheckupRecordEditModel model, 
-            PatientResponseModel patient,
-            List<Operation> opList
-            )
-        {
-            //tạo bill
-            Bill bill = new Bill()
-            {
-                Status = BillStatus.CHUA_TT,
-                Content = "Hóa đơn thanh toán viện phí cho bệnh nhân " + patient.Name + "cho " + model.OperationIds.Count + "mục.",
-                TimeCreated = DateTime.Now.AddHours(7),
-                PatientName = patient.Name,
-            };
-            foreach (var opId in model.OperationIds)
-            {
-                Operation _op = null;
-                foreach (var op in opList)
-                {
-                    if (op.Id == opId)
-                    {
-                        _op = op;
-                    }
-                }
-                //tạo record
-                TestRecord tc = new TestRecord()
-                {
-                    OperationId = opId,
-
-                    OperationName = _op.Name,
-                    PatientId = model.PatientId,
-                    PatientName = patient.Name,
-                    CheckupRecordId = model.Id,
-                    EstimatedDate = null,
-                    ResultFileLink = null,
-                    //tự gán tùy vào phòng operation available tùy theo, lưu ROOM_AVAILABLE_xxx lên cache
-                    Status = TestRecord.TestRecordStatus.DA_DAT_LICH,
-                    //Gọi service lấy số, nhớ lock lại, để singleton
-                    Date = DateTime.Now.AddHours(7),
-                };
-                await _unitOfWork.TestRecordRepository.Add(tc);
-                await _unitOfWork.SaveChangesAsync();
-                //tạo bill detail
-                BillDetail bd = new BillDetail()
-                {
-                    InsuranceStatus = _op.InsuranceStatus,
-                    OperationId = opId,
-                    OperationName = _op.Name,
-                    Price = _op.Price,
-                    Quantity = 1,
-                    SubTotal = _op.Price,
-                    TestRecordId = tc.Id,
-                    CheckupRecordId = model.Id,
-                    BillId = bill.Id,
-                };
-                bill.Total = bill.Total += _op.Price;
-                await _unitOfWork.BillDetailRepository.Add(bd);
-                await _unitOfWork.SaveChangesAsync();
-            }
-            //Tạo thêm test record cho bệnh nhân
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        private async Task addPrescription(CheckupRecordEditModel model)
-        {
-            //query xem presc có chưa
-            Prescription presc = null;
-            presc = _unitOfWork.PrescriptionRepository
-               .Get()
-               .Where(x => x.CheckupRecordId == model.Id)
-               .FirstOrDefault();
-            //chưa có thì tạo một cái mới
-            if (presc == null)
-            {
-                presc = new Prescription()
-                {
-                    Note = "Đơn thuốc cho bệnh nhân ",
-                    CheckupRecordId = model.Id,
-                    TimeCreated = DateTime.Now.AddHours(7),
-                };
-                await _unitOfWork.PrescriptionRepository.Add(presc);
-            }
-            //clear hết presc detail
-            presc.PrescriptionDetails = new List<PrescriptionDetail>();
-            await _unitOfWork.SaveChangesAsync();
-            //tạo từng cái presc detail add vào presc
-            foreach (var detail in model.Prescription.Details)
-            {
-                var med = _unitOfWork.MedicineRepository.Get()
-                    .Where(x => x.Id == detail.MedicineId).FirstOrDefault();
-                if (med == null)
-                {
-                    throw new Exception("Invalid medicine with id" + detail.MedicineId);
-                }
-                presc.PrescriptionDetails.Add(new PrescriptionDetail()
-                {
-                    MedicineId = detail.MedicineId,
-                    MedicineName = med.Name,
-                    EveningDose = detail.EveningDose,
-                    MiddayDose = detail.MiddayDose,
-                    MorningDose = detail.MorningDose,
-                    NightDose = detail.NightDose,
-                    Quantity = detail.Quantity,
-                    Unit = med.Unit,
-                    Usage = detail.Usage,
-                    PrescriptionId = presc.Id,
-                });
             }
             await _unitOfWork.SaveChangesAsync();
         }
