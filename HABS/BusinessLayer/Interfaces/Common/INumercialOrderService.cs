@@ -13,6 +13,6 @@ namespace BusinessLayer.Interfaces.Common
     public interface INumercialOrderService
     {
         Room GetAppropriateRoomForOperation(Operation op);
-        int GetNumOrderForExaminationRoom(Room room);
+        int GetNumOrderForAutoIncreaseRoom(Room room);
     }
 }
