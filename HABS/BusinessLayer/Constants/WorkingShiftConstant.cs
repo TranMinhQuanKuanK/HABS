@@ -11,7 +11,7 @@ namespace BusinessLayer.Constants
         public const int BeginMorningShiftHour = 7;
         public const int BeginMorningShiftMinute = 0;
 
-        public const int EndMorningShiftHour = 13;
+        public const int EndMorningShiftHour = 11;
         public const int EndMorningShiftMinute = 0;
 
         public const int BeginAfternoonShiftHour = 13;

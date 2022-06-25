@@ -163,6 +163,7 @@ namespace BusinessLayer.Services.User
                             RoomId = tr.RoomId,
                             RoomNumber = tr.RoomNumber,
                             Status = (int)tr.Status,
+                            //bổ sung doctor
                         }).ToList(),
                     };
                 }).FirstOrDefault();
@@ -200,7 +201,7 @@ namespace BusinessLayer.Services.User
                 .Where(x => x.Weekday == date.DayOfWeek)
                 .Include(x => x.Room)
                 .FirstOrDefault();
-            if (schedule != null)
+            if (schedule == null)
             {
                 throw new Exception("No working schedule for doctor");
             }
@@ -235,6 +236,7 @@ namespace BusinessLayer.Services.User
                         if (slot.IsAvailable)
                         {
                             estimatedStartTime = (DateTime)slot.EstimatedStartTime;
+                            break;
                         }
                         else
                         {

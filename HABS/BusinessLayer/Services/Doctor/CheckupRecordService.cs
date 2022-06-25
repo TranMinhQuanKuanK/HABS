@@ -87,7 +87,7 @@ namespace BusinessLayer.Services.Doctor
             data = _unitOfWork.CheckupRecordRepository.Get()
                 .Include(x => x.Patient)
                 .Include(x => x.Prescriptions)
-                    .ThenInclude(x => x.PrescriptionDetails)
+                .ThenInclude(x => x.PrescriptionDetails)
                 .Include(x => x.TestRecords)
                 .Where(x => x.Id == recordId).AsEnumerable().Select
                 (x =>
@@ -162,6 +162,7 @@ namespace BusinessLayer.Services.Doctor
                             RoomId = tr.RoomId,
                             RoomNumber = tr.RoomNumber,
                             Status = (int)tr.Status,
+                            
                         }).ToList(),
                     };
                 }).FirstOrDefault();

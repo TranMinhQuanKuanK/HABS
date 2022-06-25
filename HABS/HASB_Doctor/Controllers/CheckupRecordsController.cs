@@ -43,8 +43,7 @@ namespace HASB_Doctor.Controllers
             }
             try
             {
-               
-                var data = _checkupRecordService.GetCheckupRecordMetadata(null, searchModel.FromTime, searchModel.ToTime, searchModel.DepartmentId);
+                var data = _checkupRecordService.GetCheckupRecordMetadata(searchModel.PatientId, searchModel.FromTime, searchModel.ToTime, searchModel.DepartmentId);
                 
                 int totalItem = data.Count;
                 if (totalItem == 0)

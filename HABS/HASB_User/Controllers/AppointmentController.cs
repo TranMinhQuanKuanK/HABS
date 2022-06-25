@@ -106,13 +106,17 @@ namespace HASB_User.Controllers
                 return BadRequest();
             }
         }
-        [HttpPost("{id}")]
+        [HttpPost()]
         [SwaggerOperation(Summary = "Book lịch khám mới (giả)")]
         public async Task<IActionResult> BookAppointment([FromBody] AppointmentCreateModel model)
         {
             try
             {
+                //kiểm tra patientId có thuộc account không
+
                 //create new checkup record or return error
+                await _checkupRecordService.CreatNewAppointment(model.PatientId, model.Date, model.DoctorId, 
+                    model.NumericalOrder, model.ClinicalSymptom);
                 return Ok();
             }
             catch (Exception)

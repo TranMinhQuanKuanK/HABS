@@ -137,7 +137,10 @@ namespace HASB_User
             services.AddTransient<IPatientService, PatientService>();
             services.AddTransient<IScheduleService, ScheduleService>();
             services.AddTransient<ILoginService, LoginService>();
-
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.IDepartmentService, 
+                BusinessLayer.Services.Doctor.DepartmentService>();
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.IOperationService,
+               BusinessLayer.Services.Doctor.OperationService>();
 
             //Firebase messaging
             services.AddTransient<INotificationService, NotificationService>();

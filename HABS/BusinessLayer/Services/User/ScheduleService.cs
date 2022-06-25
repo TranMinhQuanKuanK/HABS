@@ -101,7 +101,7 @@ namespace BusinessLayer.Services.User
                     };
                     result.Add(slot);
                     _curSlot++;
-                    temp.AddMinutes((int)doctor.AverageCheckupDuration);
+                    temp = temp = temp.AddMinutes((int)doctor.AverageCheckupDuration);
                 }
             }
 
@@ -131,7 +131,7 @@ namespace BusinessLayer.Services.User
                     };
                     result.Add(slot);
                     _curSlot++;
-                    temp.AddMinutes((int)doctor.AverageCheckupDuration);
+                    temp = temp.AddMinutes((int)doctor.AverageCheckupDuration);
                 }
             }
             //thêm lịch buổi tối
@@ -160,7 +160,7 @@ namespace BusinessLayer.Services.User
                     };
                     result.Add(slot);
                     _curSlot++;
-                    temp.AddMinutes((int)doctor.AverageCheckupDuration);
+                    temp = temp.AddMinutes((int)doctor.AverageCheckupDuration);
                 }
             }
 

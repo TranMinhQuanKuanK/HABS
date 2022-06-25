@@ -21,5 +21,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
         public long? RoomId { get; set; }
         public long? PatientId { get; set; }
         public long? CheckupRecordId { get; set; }
+        public long? DoctorId { get; set; }
+        public string DoctorName { get; set; }
     }
 }

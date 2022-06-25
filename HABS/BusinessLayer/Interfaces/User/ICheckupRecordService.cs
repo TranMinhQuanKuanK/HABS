@@ -11,5 +11,6 @@ namespace BusinessLayer.Interfaces.User
     {
         List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId);
         PatientRecordFullDataResponseModel GetCheckupRecordFullData(long patientId);
+        Task CreatNewAppointment(long patientId, DateTime date, long doctorId, int? numericalOrder, string clinicalSymptom);
     }
 }
