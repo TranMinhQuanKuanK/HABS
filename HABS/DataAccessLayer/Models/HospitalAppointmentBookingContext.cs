@@ -54,7 +54,7 @@ namespace DataAccessLayer.Models
             {
                 entity.ToTable("Account");
 
-                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E38481CF2F0")
+                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E386A59CCCD")
                     .IsUnique();
 
                 entity.Property(e => e.Email).IsRequired();
@@ -341,6 +341,11 @@ namespace DataAccessLayer.Models
                     .WithMany(p => p.TestRecords)
                     .HasForeignKey(d => d.CheckupRecordId)
                     .HasConstraintName("FK__TestRecor__Check__5CD6CB2B");
+
+                entity.HasOne(d => d.Doctor)
+                    .WithMany(p => p.TestRecords)
+                    .HasForeignKey(d => d.DoctorId)
+                    .HasConstraintName("FK__TestRecor__Docto__60A75C0F");
 
                 entity.HasOne(d => d.Operation)
                     .WithMany(p => p.TestRecords)

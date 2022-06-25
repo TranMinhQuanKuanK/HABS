@@ -36,8 +36,11 @@ namespace DataAccessLayer.Models
         public long? CheckupRecordId { get; set; }
         public long? OperationId { get; set; }
         public string OperationName { get; set; }
+        public long? DoctorId { get; set; }
+        public string DoctorName { get; set; }
 
         public virtual CheckupRecord CheckupRecord { get; set; }
+        public virtual Doctor Doctor { get; set; }
         public virtual Operation Operation { get; set; }
         public virtual Patient Patient { get; set; }
         public virtual Room Room { get; set; }

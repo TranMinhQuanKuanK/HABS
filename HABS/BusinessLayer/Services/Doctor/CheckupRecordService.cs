@@ -162,7 +162,8 @@ namespace BusinessLayer.Services.Doctor
                             RoomId = tr.RoomId,
                             RoomNumber = tr.RoomNumber,
                             Status = (int)tr.Status,
-                            
+                            DoctorId = tr.DoctorId,
+                            DoctorName = tr.DoctorName
                         }).ToList(),
                     };
                 }).FirstOrDefault();
