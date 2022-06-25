@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.RequestModels.SearchModels.User
 {
-    public class CheckupSearchModel
+    public class CheckupAppointmentSearchModel
     {
         public DateTime? FromTime { get; set; }
         public DateTime? ToTime { get; set; }
         public long? DepartmentId { get; set; }
+        public long? PatientId { get; set; }
     }
 }

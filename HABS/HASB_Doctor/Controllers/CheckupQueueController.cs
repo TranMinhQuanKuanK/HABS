@@ -24,7 +24,7 @@ namespace HASB_Doctor.Controllers
         }
         [SwaggerOperation(Summary = "Lấy hàng chờ khám của bệnh nhân trong ngày (giả)")]
         [HttpGet]
-        public IActionResult GetCheckupQueue([FromQuery]long RoomId)
+        public IActionResult GetCheckupQueue([FromQuery] long RoomId)
         {
             try
             {
@@ -142,7 +142,9 @@ namespace HASB_Doctor.Controllers
                             OperationId = 23,
                             OperationName ="Chụp X-Quang dú",
                             RoomNumber = "3",
-                            Status = 0
+                            Status = 0,
+                            DoctorId = 2,
+                            DoctorName = "Nguyễn Lang Băm"
                         },
                           new TestRecordViewModel()
                         {
@@ -158,18 +160,20 @@ namespace HASB_Doctor.Controllers
                             ResultFileLink = "tienganh123.com/",
                             RoomId = 23,
                             RoomNumber = "3",
-                            Status = 0
+                            Status = 0,
+                            DoctorId = 2,
+                            DoctorName = "Nguyễn Lang Băm"
                         }
                     },
                     DoctorName = "DFDFD",
                     Date = DateTime.Now,
                     DepartmentId = 2,
                     DepartmentName = "Khoa khoa khoa chấn chấn thương",
-                     DoctorId = 3,
-                      EstimatedStartTime = DateTime.Now,
-                      IcdCode = "A2323",
-                      PatientId = 3,
-                      ReExamDate = DateTime.Now,
+                    DoctorId = 3,
+                    EstimatedStartTime = DateTime.Now,
+                    IcdCode = "A2323",
+                    PatientId = 3,
+                    EstimatedDate = DateTime.Now,
                 };
                 return Ok(model);
             }

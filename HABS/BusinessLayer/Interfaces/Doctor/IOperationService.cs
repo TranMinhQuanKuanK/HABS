@@ -10,5 +10,6 @@ namespace BusinessLayer.Interfaces.Doctor
     public interface IOperationService
     {
         List<OperationViewModel> GetOperations();
+        OperationViewModel GetOperationForDepartment(long depId);
     }
 }

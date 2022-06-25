@@ -31,16 +31,19 @@ namespace BusinessLayer.Services.Doctor
     {
         private readonly IDistributedCache _distributedCache;
         private readonly IPatientService _patientService;
+        private readonly IDepartmentService _departmentService;
         private readonly INumercialOrderService _numService;
         private readonly RedisService _redisService;
         public CheckupRecordService(IUnitOfWork unitOfWork,
             IDistributedCache distributedCache,
             IPatientService patientService,
+             IDepartmentService departmentService,
             INumercialOrderService numService) : base(unitOfWork)
         {
             _numService = numService;
             _patientService = patientService;
             _distributedCache = distributedCache;
+            _departmentService = departmentService;
             _redisService = new RedisService(_distributedCache);
         }
         public List<PatientRecordMetadataViewModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId)
@@ -78,7 +81,7 @@ namespace BusinessLayer.Services.Doctor
                ).ToList();
             return data;
         }
-        public PatientRecordFullDataViewModel GetCheckupRecordFullData(long patientId)
+        public PatientRecordFullDataViewModel GetCheckupRecordFullData(long recordId)
         {
             PatientRecordFullDataViewModel data = new PatientRecordFullDataViewModel();
             data = _unitOfWork.CheckupRecordRepository.Get()
@@ -86,7 +89,7 @@ namespace BusinessLayer.Services.Doctor
                 .Include(x => x.Prescriptions)
                     .ThenInclude(x => x.PrescriptionDetails)
                 .Include(x => x.TestRecords)
-                .Where(x => x.PatientId == patientId).AsEnumerable().Select
+                .Where(x => x.Id == recordId).AsEnumerable().Select
                 (x =>
                 {
                     var _prescription = x.Prescriptions.ToArray()[0];
@@ -142,7 +145,7 @@ namespace BusinessLayer.Services.Doctor
                             }).ToList()
                         },
                         Pulse = x.Pulse,
-                        ReExamDate = x.ReExamDate,
+                        EstimatedDate = x.EstimatedDate,
                         Temperature = x.Temperature,
                         TestRecords = x.TestRecords.Select(tr => new TestRecordViewModel()
                         {
@@ -218,7 +221,7 @@ namespace BusinessLayer.Services.Doctor
             {
                 throw new Exception("Patient invalid");
             }
-            //kiểm tra khoa có mở khám không
+            //kiểm tra khoa có mở khám không 
             var validDeps = _unitOfWork.DepartmentRepository.Get()
                 .Where(x => model.RedirectDepartmentIds.Contains(x.Id))
                 .Where(x => x.Status == Department.DepartmentStatus.CO_MO_KHAM)
@@ -230,6 +233,7 @@ namespace BusinessLayer.Services.Doctor
 
             //lấy các operation khám tương ứng và tạo thành một bill
             var checkupOpList = _unitOfWork.OperationRepository.Get()
+                .Where(x=>x.DepartmentId!=null)
                 .Where(x => model.RedirectDepartmentIds.Contains((long)x.DepartmentId))
                 .ToList();
             Bill bill = new Bill()
@@ -246,7 +250,7 @@ namespace BusinessLayer.Services.Doctor
             foreach (var checkup in checkupOpList)
             {
                 //lấy department tương úng của checkup thay vì include
-                var dep = validDeps.Where(x => x.Id == checkup.DepartmentId).FirstOrDefault();
+                var dep = _departmentService.GetDepartmentById((long)checkup.DepartmentId);
                 //lấy lịch và phòng
                 var room = _numService.GetAppropriateRoomForOperation(checkup);
                 var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room);
@@ -391,9 +395,9 @@ namespace BusinessLayer.Services.Doctor
             {
                 cr.Temperature = model.Temperature;
             }
-            if (model.ReExamDate != null)
+            if (model.EstimatedDate != null)
             {
-                cr.ReExamDate = model.ReExamDate;
+                cr.EstimatedDate = model.EstimatedDate;
             }
             if (model.BloodPressure != null)
             {

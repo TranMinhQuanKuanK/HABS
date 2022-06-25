@@ -16,7 +16,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public int Status { get; set; }
         public int? NumericalOrder { get; set; }
         public DateTime? EstimatedStartTime { get; set; }
-        public DateTime? ReExamDate { get; set; }
+        public DateTime? EstimatedDate { get; set; }
         public DateTime? Date { get; set; }
 
         public string ClinicalSymptom { get; set; }

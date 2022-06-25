@@ -5,11 +5,13 @@ using BusinessLayer.RequestModels.CreateModels;
 using BusinessLayer.RequestModels.CreateModels.User;
 using BusinessLayer.ResponseModels.ViewModels;
 using BusinessLayer.ResponseModels.ViewModels.User;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
 
@@ -39,6 +41,27 @@ namespace HASB_User.Controllers
             {
                 await _fcmService.AddToken(model.TokenId, model.AccountId);
                 return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        [SwaggerOperation(Summary = "Lấy thông tin tài khoản cá nhân")]
+        [HttpGet("info")]
+        public IActionResult GetMyAccountInfo()
+        {
+            try
+            {
+                int accountId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                //lấy accountId từ claim
+                var user = _loginService.GetAccountInfo(accountId);
+                return Ok(user);
             }
             catch (Exception)
             {

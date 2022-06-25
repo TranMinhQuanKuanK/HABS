@@ -32,7 +32,7 @@ namespace HASB_User.Controllers
 
         [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân, chỉ trả metadata (chưa check được patientId có hợp lệ ko)")]
         [HttpGet]
-        public IActionResult GetCheckupRecord([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
+        public IActionResult GetCheckupRecord([FromQuery] CheckupAppointmentSearchModel searchModel, [FromQuery] PagingRequestModel paging)
         {
             paging = PagingUtil.checkDefaultPaging(paging);
             if (searchModel is null)

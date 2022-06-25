@@ -67,17 +67,17 @@ namespace BusinessLayer.Services.Doctor
         public DoctorLoginViewModel Login(LoginModel login)
         {
            
-
+            
             var doctor = _unitOfWork.DoctorRepository
                 .Get()
-                .Where(x => x.Username == login.Username && x.Password == login.Password)
-                .Select(x=>new DoctorLoginViewModel()
+                .Where(_doc => _doc.Username == login.Username && _doc.Password == login.Password)
+                .Select(_doc => new DoctorLoginViewModel()
                 {
-                    Id = x.Id,
-                    Name = x.Name,
-                    PhoneNo = x.PhoneNo,
-                    Username = x.Username,
-                    Type = (int) x.Type
+                    Id = _doc.Id,
+                    Name = _doc.Name,
+                    PhoneNo = _doc.PhoneNo,
+                    Username = _doc.Username,
+                    Type = (int) _doc.Type
                 })
                 .FirstOrDefault();
             if (doctor == null) return null;

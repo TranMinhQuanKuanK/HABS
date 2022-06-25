@@ -32,7 +32,7 @@ namespace DataAccessLayer.Models
         public CheckupRecordStatus Status { get; set; }
         public int? NumericalOrder { get; set; }
         public DateTime? EstimatedStartTime { get; set; }
-        public DateTime? ReExamDate { get; set; }
+        public DateTime? EstimatedDate { get; set; }
         public string ClinicalSymptom { get; set; }
         public string Diagnosis { get; set; }
         public string DoctorAdvice { get; set; }

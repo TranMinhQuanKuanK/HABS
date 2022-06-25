@@ -10,5 +10,7 @@ namespace BusinessLayer.Constants
     public class IdConstant
     {
         public const long ID_ROOMTYPE_PHONG_KHAM = 10002;
+        public const long ID_DEPARTMENT_DA_KHOA = 10000;
+
     }
 }

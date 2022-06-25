@@ -29,11 +29,12 @@ namespace BusinessLayer.Services.Doctor
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
+        //Chỉ xét nghiệm
         public List<OperationViewModel> GetOperations()
         {
             List<OperationViewModel> data = new List<OperationViewModel>();
             data = _unitOfWork.OperationRepository.Get()
-                .Where(x=>x.Status==(int)OperationType.XET_NGHIEM)
+                .Where(x=>x.Type==OperationType.XET_NGHIEM)
                 .Select
                (x => new OperationViewModel()
                {
@@ -44,11 +45,32 @@ namespace BusinessLayer.Services.Doctor
                    Note = x.Note,
                    Price = x.Price,
                    RoomTypeId = x.RoomTypeId,
-                   Status = x.Status,
+                   Status = (int)x.Status,
                    Type = (int)x.Type
                }
                ).ToList();
             return data;
+        }
+        public OperationViewModel GetOperationForDepartment(long depId)
+        {
+            //sau này cache lại
+            var op = _unitOfWork.OperationRepository.Get()
+                .Where(x => x.DepartmentId == depId)
+            .Select
+               (x => new OperationViewModel()
+               {
+                   Id = x.Id,
+                   Name = x.Name,
+                   DepartmentId = depId,
+                   InsuranceStatus = (int)x.InsuranceStatus,
+                   Price = x.Price,
+                   RoomTypeId = x.RoomTypeId,
+                   Note = x.Note,
+                   Type = (int)x.Type,
+                   Status = (int)x.Status
+               }
+               ).FirstOrDefault();
+            return op;
         }
     }
 }

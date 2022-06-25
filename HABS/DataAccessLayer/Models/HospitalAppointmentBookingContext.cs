@@ -54,7 +54,7 @@ namespace DataAccessLayer.Models
             {
                 entity.ToTable("Account");
 
-                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E38C8127B61")
+                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E38481CF2F0")
                     .IsUnique();
 
                 entity.Property(e => e.Email).IsRequired();
@@ -124,11 +124,11 @@ namespace DataAccessLayer.Models
 
                 entity.Property(e => e.Date).HasColumnType("datetime");
 
+                entity.Property(e => e.EstimatedDate).HasColumnType("datetime");
+
                 entity.Property(e => e.EstimatedStartTime).HasColumnType("datetime");
 
                 entity.Property(e => e.IcdDiseaseCode).HasMaxLength(20);
-
-                entity.Property(e => e.ReExamDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Department)
                     .WithMany(p => p.CheckupRecords)

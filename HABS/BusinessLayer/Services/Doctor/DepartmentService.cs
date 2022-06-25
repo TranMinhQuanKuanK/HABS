@@ -16,6 +16,7 @@ using BusinessLayer.Services.Redis;
 using Newtonsoft.Json;
 using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.ResponseModels.ViewModels.Doctor;
+using BusinessLayer.Constants;
 
 namespace BusinessLayer.Services.Doctor
 {
@@ -28,10 +29,13 @@ namespace BusinessLayer.Services.Doctor
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
-        public List<DepartmentViewModel> GetDepartments()
+        public List<DepartmentViewModel> GetDepartmentsChuyenKhoa()
         {
             List<DepartmentViewModel> departmentsData = new List<DepartmentViewModel>();
-            departmentsData = _unitOfWork.DepartmentRepository.Get().Select
+            departmentsData = _unitOfWork.DepartmentRepository.Get()
+                .Where(x=>x.Id != IdConstant.ID_DEPARTMENT_DA_KHOA)
+                .Where(x=>x.Status == DataAccessLayer.Models.Department.DepartmentStatus.CO_MO_KHAM)
+            .Select
                (x => new DepartmentViewModel()
                {
                    Id = x.Id,
@@ -39,6 +43,20 @@ namespace BusinessLayer.Services.Doctor
                }
                ).ToList();
             return departmentsData;
+        }
+        public DepartmentViewModel GetDepartmentById(long id)
+        {
+            //sau này cache lại
+            var dep = _unitOfWork.DepartmentRepository.Get()
+                .Where(x => x.Id == id)
+            .Select
+               (x => new DepartmentViewModel()
+               {
+                   Id = x.Id,
+                   Name = x.Name
+               }
+               ).FirstOrDefault();
+            return dep;
         }
     }
 }

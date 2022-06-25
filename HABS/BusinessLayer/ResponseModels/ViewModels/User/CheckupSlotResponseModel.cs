@@ -10,6 +10,9 @@ namespace BusinessLayer.ResponseModels.SearchModels.User
     {
         public int? NumericalOrder { get; set; }
         public DateTime? EstimatedStartTime { get; set; }
-        public bool isAvailable { get; set; }
+        public bool IsAvailable { get; set; }
+        public long RoomId { get; set; }
+        public string RoomNumber { get; set; }
+        public string Floor { get; set; }
     }
 }

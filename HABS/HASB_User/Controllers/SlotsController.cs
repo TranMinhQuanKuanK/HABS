@@ -29,38 +29,47 @@ namespace HASB_User.Controllers
         [SwaggerOperation(Summary = "Lấy lịch khám theo ngày, bác sĩ (giả)")]
         [HttpGet]
         //Lấy lịch khám theo filter
-        public async Task<IActionResult> GetCheckupSlot([FromQuery] SlotSearchModel model)
+        public IActionResult GetCheckupSlot([FromQuery] SlotSearchModel model)
         {
             try
             {
-                //paging = PagingUtil.checkDefaultPaging(paging);
-                //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
-                //return Ok(products);
                 List<CheckupSlotResponseModel> result = new List<CheckupSlotResponseModel>
                 {
                     new CheckupSlotResponseModel()
                     {
                         EstimatedStartTime = DateTime.Now,
-                        isAvailable = true,
-                        NumericalOrder = 1
+                        IsAvailable = true,
+                        NumericalOrder = 1,
+                        Floor = "sdsd",
+                        RoomNumber = "SD33",
+                        RoomId = 2,
                     },
                     new CheckupSlotResponseModel()
                     {
                         EstimatedStartTime = DateTime.Now,
-                        isAvailable = false,
-                        NumericalOrder = 2
+                        IsAvailable = false,
+                        NumericalOrder = 2,
+                            Floor = "sdsd",
+                        RoomNumber = "SD33",
+                        RoomId = 2,
                     },
                     new CheckupSlotResponseModel()
                     {
                         EstimatedStartTime = DateTime.Now,
-                        isAvailable = false,
-                        NumericalOrder = 3
+                        IsAvailable = false,
+                        NumericalOrder = 3,
+                        Floor = "sdsd",
+                        RoomNumber = "SD33",
+                        RoomId = 2,
                     },
                     new CheckupSlotResponseModel()
                     {
                         EstimatedStartTime = DateTime.Now,
-                        isAvailable = true,
-                        NumericalOrder = 4
+                        IsAvailable = true,
+                        NumericalOrder = 4,
+                            Floor = "sdsd",
+                        RoomNumber = "SD33",
+                        RoomId = 2,
                     }
                 };
                 return Ok(result);

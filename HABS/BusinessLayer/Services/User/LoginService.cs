@@ -46,6 +46,21 @@ namespace BusinessLayer.Services.User
                 .FirstOrDefault();
             return user;
         }
+        public UserLoginViewModel GetAccountInfo(long accountId)
+        {
+            var user = _unitOfWork.AccountRepository
+                .Get()
+                .Where(x => x.Id == accountId)
+                .Select(x => new UserLoginViewModel()
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    PhoneNumber = x.PhoneNumber,
+                    Email = x.Email
+                })
+                .FirstOrDefault();
+            return user;
+        }
     }
 
 }

@@ -33,7 +33,7 @@ namespace HASB_User.Controllers
         [SwaggerOperation(Summary = "Lấy lịch khám của bệnh nhân từ ngày fromTime, đến ngày toTime (giả)")]
         [HttpGet]
         //lấy lịch khám của bệnh nhân
-        public IActionResult GetCheckupAppointment([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
+        public IActionResult GetCheckupAppointment([FromQuery] CheckupAppointmentSearchModel searchModel, [FromQuery] PagingRequestModel paging)
         {
             if (searchModel is null)
             {

@@ -34,7 +34,7 @@ namespace HASB_Doctor.Controllers
 
         [SwaggerOperation(Summary = "Lấy lịch sử BỆNH ÁN của bệnh nhân, chỉ trả metadata ")]
         [HttpGet]
-        public IActionResult GetCheckupRecord([FromQuery] CheckupSearchModel searchModel, [FromQuery] PagingRequestModel paging)
+        public IActionResult GetCheckupRecord([FromQuery] CheckupAppointmentSearchModel searchModel, [FromQuery] PagingRequestModel paging)
         {
             paging = PagingUtil.checkDefaultPaging(paging);
             if (searchModel is null)

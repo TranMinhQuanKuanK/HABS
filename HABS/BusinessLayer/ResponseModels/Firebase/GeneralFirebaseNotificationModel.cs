@@ -10,9 +10,7 @@ namespace BusinessLayer.ResponseModels.Firebase
     {
         public enum NotiType
         {
-            NearlyOutOfStock,
-            StoreIsApproved,
-            StoreIsRejected,
+            CheckupStatusChangeReminder,
         }
         public NotiType Type { get; set; }
         public TDataModel Data { get; set; }

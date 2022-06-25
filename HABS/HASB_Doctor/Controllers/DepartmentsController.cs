@@ -51,7 +51,7 @@ namespace HASB_Doctor.Controllers
                 //    },
                 //};
 
-                return Ok(_departmentService.GetDepartments());
+                return Ok(_departmentService.GetDepartmentsChuyenKhoa());
             }
             catch (Exception)
             {
