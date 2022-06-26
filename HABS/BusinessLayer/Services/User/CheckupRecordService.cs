@@ -202,6 +202,7 @@ namespace BusinessLayer.Services.User
                 .Where(x => x.Weekday == date.DayOfWeek)
                 .Include(x => x.Room)
                 .FirstOrDefault();
+
             if (schedule == null)
             {
                 throw new Exception("No working schedule for doctor");

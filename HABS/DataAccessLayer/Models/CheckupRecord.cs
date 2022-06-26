@@ -13,6 +13,7 @@ namespace DataAccessLayer.Models
             DA_DAT_LICH,
             DA_THANH_TOAN,
             DANG_KHAM,
+            CHO_THANH_TOAN_PHI_XN,
             CHO_KQXN,
             DA_CO_KQXN,
             KET_THUC,

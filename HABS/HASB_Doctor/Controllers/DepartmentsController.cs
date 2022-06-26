@@ -31,26 +31,6 @@ namespace HASB_Doctor.Controllers
         {
             try
             {
-                
-                //List<DepartmentResponseModel> data = new List<DepartmentResponseModel>()
-                //{
-                //    new DepartmentResponseModel()
-                //    {
-                //          Id = 2,
-                //    Name = "Khoa tim mạch"
-                //    },
-                //   new DepartmentResponseModel()
-                //    {
-                //          Id = 3,
-                //    Name = "Khoa chấn thương chỉnh hình",
-                //    },
-                //   new DepartmentResponseModel()
-                //    {
-                //          Id = 4,
-                //    Name = "Khoa phổi",
-                //    },
-                //};
-
                 return Ok(_departmentService.GetDepartmentsChuyenKhoa());
             }
             catch (Exception)

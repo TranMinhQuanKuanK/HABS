@@ -49,7 +49,7 @@ namespace HASB_User
                 option.ConstraintMap["slugify"] = typeof(SlugifyParameterTransformer);
             });
             services.AddDbContext<HospitalAppointmentBookingContext>(
-               options => options.UseSqlServer(Configuration.GetConnectionString("HospitalLocal")));
+               options => options.UseSqlServer(Configuration.GetConnectionString("HospitalCloud")));
 
             services.AddControllers();
             services.AddControllers(options =>

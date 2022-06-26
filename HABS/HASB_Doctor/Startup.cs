@@ -4,6 +4,7 @@ using BusinessLayer.Interfaces.Notification;
 using BusinessLayer.Services.Common;
 using BusinessLayer.Services.Doctor;
 using BusinessLayer.Services.Notification;
+using BusinessLayer.Services.Test;
 using DataAccessLayer.Models;
 using DataAcessLayer;
 using DataAcessLayer.Interfaces;
@@ -146,7 +147,10 @@ namespace HASB_Doctor
                 BusinessLayer.Services.User.PatientService>();
             services.AddTransient<INumercialOrderService, NumercialOrderService>();
             services.AddTransient<IRoomService, RoomService>();
+            services.AddTransient<TestService, TestService>();
+            services.AddTransient<BusinessLayer.Interfaces.User.IScheduleService, BusinessLayer.Services.User.ScheduleService>();
 
+            
 
 
             //Firebase messaging

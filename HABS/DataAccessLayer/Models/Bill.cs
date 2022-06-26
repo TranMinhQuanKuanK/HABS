@@ -11,7 +11,8 @@ namespace DataAccessLayer.Models
         {
             CHUA_TT,
             TT_EBANKING,
-            TT_TIEN_MAT
+            TT_TIEN_MAT,
+            HUY
         }
         public Bill()
         {

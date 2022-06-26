@@ -110,12 +110,12 @@ namespace BusinessLayer.Services.User
             {
                 _curSlot = 1;
                 start = new DateTime(now.Year, now.Month, now.Day,
-                    WorkingShiftConstant.BeginEveningShiftHour,
-                    WorkingShiftConstant.BeginEveningShiftMinute,
+                    WorkingShiftConstant.BeginAfternoonShiftHour,
+                    WorkingShiftConstant.BeginAfternoonShiftMinute,
                     0);
                 end = new DateTime(now.Year, now.Month, now.Day,
-                    WorkingShiftConstant.EndEveningShiftHour,
-                    WorkingShiftConstant.EndEveningShiftMinute,
+                    WorkingShiftConstant.EndAfternoonShiftHour,
+                    WorkingShiftConstant.EndAfternoonShiftMinute,
                     0);
                 temp = start;
                 while (temp <= end)
@@ -139,12 +139,12 @@ namespace BusinessLayer.Services.User
             {
                 _curSlot = 1;
                 start = new DateTime(now.Year, now.Month, now.Day,
-                    WorkingShiftConstant.BeginAfternoonShiftHour,
-                    WorkingShiftConstant.BeginAfternoonShiftMinute,
+                    WorkingShiftConstant.BeginEveningShiftHour,
+                    WorkingShiftConstant.BeginEveningShiftMinute,
                     0);
                 end = new DateTime(now.Year, now.Month, now.Day,
-                    WorkingShiftConstant.EndAfternoonShiftHour,
-                    WorkingShiftConstant.EndAfternoonShiftMinute,
+                    WorkingShiftConstant.EndEveningShiftHour,
+                    WorkingShiftConstant.EndEveningShiftMinute,
                     0);
                 temp = start;
                 while (temp <= end)

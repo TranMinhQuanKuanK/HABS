@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.RequestModels.CreateModels.Doctor
 {
+    public class RedirectCreateModelDetail
+    {
+        public long DepartmentId { get; set; }
+        public string ClinicalSymptom { get; set; }
+    }
     public class RedirectCreateModel
     {
-        public List<long> RedirectDepartmentIds { get; set; }
+        public List<RedirectCreateModelDetail> Details { get; set; }
     }
 }

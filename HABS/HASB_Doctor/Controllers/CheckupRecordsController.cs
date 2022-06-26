@@ -70,28 +70,28 @@ namespace HASB_Doctor.Controllers
             }
         }
         
-        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id, đầy đủ thông tin (chưa check được patientId có hợp lệ ko)")]
+        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id, đầy đủ thông tin")]
         [HttpGet("{id}")]
-        public IActionResult GetById(long id)
+        public IActionResult GetById(long Id)
         {
             try
             {
-                var data = _checkupRecordService.GetCheckupRecordFullData(id);
+                var data = _checkupRecordService.GetCheckupRecordFullData(Id);
                 return Ok(data);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
 
-        [SwaggerOperation(Summary = "Chỉnh sửa bệnh án của bệnh nhân (chỉ gửi những field cần edit) (giả)")]
+        [SwaggerOperation(Summary = "Chỉnh sửa bệnh án của bệnh nhân (chỉ gửi những field cần edit)")]
         [HttpPut("{id}")]
         public IActionResult ChangeCheckupRecord([FromBody]CheckupRecordEditModel model)
         {
             try
             {
-                //var data = _checkupRecordService.GetCheckupRecordFullData(id);
+                _checkupRecordService.EditCheckupRecord(model);
                 return Ok();
             }
             catch (Exception)
@@ -99,13 +99,13 @@ namespace HASB_Doctor.Controllers
                 return BadRequest();
             }
         }
-        [SwaggerOperation(Summary = "Đặt thêm lịch xét ngiệm cho bệnh nhân (giả)")]
+        [SwaggerOperation(Summary = "Đặt thêm lịch xét ngiệm cho bệnh nhân ")]
         [HttpPost("{id}/tests")]
-        public IActionResult ArrangeTest([FromBody] TestRequestCreateModel model)
+        public async Task<IActionResult> ArrangeTest(long Id, [FromBody] TestRequestCreateModel model)
         {
             try
             {
-                //var data = _checkupRecordService.GetCheckupRecordFullData(id);
+                await _checkupRecordService.RequestExamination(Id,model);
                 return Ok();
             }
             catch (Exception)
@@ -115,11 +115,11 @@ namespace HASB_Doctor.Controllers
         }
         [SwaggerOperation(Summary = "Chuyển khoa cho bệnh nhân (giả)")]
         [HttpPost("{id}/redirect")]
-        public IActionResult RedirectPatient([FromBody] RedirectCreateModel model)
+        public IActionResult RedirectPatient(long Id, [FromBody] RedirectCreateModel model)
         {
             try
             {
-                //var data = _checkupRecordService.GetCheckupRecordFullData(id);
+                _checkupRecordService.RedirectPatient(model, Id);
                 return Ok();
             }
             catch (Exception)
@@ -129,11 +129,11 @@ namespace HASB_Doctor.Controllers
         }
         [SwaggerOperation(Summary = "Tạo đơn thuốc cho bệnh nhân (giả)")]
         [HttpPost("{id}/prescription")]
-        public IActionResult CreatePrescriptin([FromBody] PrescriptionCreateModel model)
+        public IActionResult CreatePrescriptin(long Id, [FromBody] PrescriptionCreateModel model)
         {
             try
             {
-                //var data = _checkupRecordService.GetCheckupRecordFullData(id);
+                _checkupRecordService.CreatePrescription(Id,model);
                 return Ok();
             }
             catch (Exception)

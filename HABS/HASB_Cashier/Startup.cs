@@ -1,4 +1,6 @@
+using BusinessLayer.Interfaces.Cashier;
 using BusinessLayer.Interfaces.Notification;
+using BusinessLayer.Services.Cashier;
 using BusinessLayer.Services.Notification;
 using DataAccessLayer.Models;
 using DataAcessLayer;
@@ -137,8 +139,9 @@ namespace HASB_Cashier
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             //doctor app
-            //services.AddTransient<IScheduleService, ScheduleService>();
-          
+            services.AddTransient<IBillService, BillService>();
+            services.AddTransient<ILoginService, LoginService>();
+
 
 
             //Firebase messaging

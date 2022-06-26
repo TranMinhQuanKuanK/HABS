@@ -42,9 +42,19 @@ namespace BusinessLayer.Services.Common
                 .Get()
                 .Include(x => x.TestRecords)
                 .Where(x => x.RoomTypeId == op.RoomTypeId).ToList();
-            Room roomWithLeastPeople = null;
-            int max = 0;
-            //Nhớ: Để constant "Id của Loại phòng khám"
+            if (roomList.Count==0)
+            {
+                return null;
+            }
+            Room roomWithLeastPeople = roomList[0];
+            //chuyển thành testRecord service
+            int min = roomList[0].TestRecords.Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
+                     .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
+                      || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
+                      || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
+                      || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH
+                      ).Where(x => x.RoomId == roomList[0].Id)
+                     .ToList().Count;
             if (op.RoomTypeId != IdConstant.ID_ROOMTYPE_PHONG_KHAM)
             {
                 //Flow cho phòng xét nghiệm
@@ -54,12 +64,13 @@ namespace BusinessLayer.Services.Common
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
-                      )
+                      || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH
+                      ).Where(x=>x.RoomId==room.Id)
                      .ToList().Count;
-                    if (cur > max)
+                    if (cur < min)
                     {
                         roomWithLeastPeople = room;
-                        max = cur;
+                        min = cur;
                     }
                 }
             }
@@ -81,10 +92,10 @@ namespace BusinessLayer.Services.Common
                       || x.Status == CheckupRecord.CheckupRecordStatus.DA_DAT_LICH
                       )
                      .ToList().Count;
-                    if (cur > max)
+                    if (cur > min)
                     {
                         roomWithLeastPeople = room;
-                        max = cur;
+                        min = cur;
                     }
                 }
             }
@@ -102,7 +113,8 @@ namespace BusinessLayer.Services.Common
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
-                      )
+                      || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH
+                      ).Where(x=>x.RoomId == room.Id)
                      .ToList().Count;
                 }
                 else

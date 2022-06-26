@@ -17,51 +17,30 @@ namespace HASB_Doctor.Controllers
     {
 
         private readonly ICheckupRecordService _checkupRecordService;
+        private readonly IScheduleService _scheduleService;
 
-        public CheckupQueueController(ICheckupRecordService service)
+
+        public CheckupQueueController(ICheckupRecordService service, IScheduleService scheduleService)
         {
+            _scheduleService = scheduleService;
             _checkupRecordService = service;
         }
-        [SwaggerOperation(Summary = "Lấy hàng chờ khám của bệnh nhân trong ngày (giả)")]
+        [SwaggerOperation(Summary = "Lấy hàng chờ khám của bệnh nhân trong ngày")]
         [HttpGet]
         public IActionResult GetCheckupQueue([FromQuery] long RoomId)
         {
             try
             {
-                List<CheckupAppointmentViewModel> data = new List<CheckupAppointmentViewModel>
-                {
-                    new CheckupAppointmentViewModel(){
-                    Id = 1,
-                    EstimatedStartTime = DateTime.Now,
-                    NumericalOrder = 15,
-                    PatientId = 15,
-                    PatientName = "Bệnh nhân này là khám trước",
-                    Status = 0,
-                    },
-                    new CheckupAppointmentViewModel(){
-                    Id = 1,
-                    EstimatedStartTime = DateTime.Now,
-                    NumericalOrder = 16,
-                    PatientId = 11,
-                    PatientName = "Bệnh nhân này khám sau",
-                    Status = 0,
-                    },
-                };
-                var pagingmodel = new BasePagingViewModel<CheckupAppointmentViewModel>()
-                {
-                    Data = data,
-                    PageIndex = 1,
-                    PageSize = 5
-                };
-                return Ok(pagingmodel);
+                var queue = _scheduleService.GetCheckupQueue(RoomId);
+                return Ok(queue);
             }
             catch (Exception)
             {
                 return BadRequest();
             }
         }
-        [SwaggerOperation(Summary = "Xác nhận khám cho bệnh nhân trong hàng đợi, trả về full dữ liệu để hiển thị (giả)")]
-        [HttpPut("{id}")]
+        [SwaggerOperation(Summary = "Xác nhận khám cho bệnh nhân trong hàng đợi")]
+        [HttpPut("/confirm/{id}")]
         public async Task<IActionResult> ConfirmCheckup(long id)
         {
             try
@@ -175,11 +154,12 @@ namespace HASB_Doctor.Controllers
                     PatientId = 3,
                     EstimatedDate = DateTime.Now,
                 };
-                return Ok(model);
+                await _checkupRecordService.ConfirmCheckup(id);
+                return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
 
