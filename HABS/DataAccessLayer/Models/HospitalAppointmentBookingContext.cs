@@ -78,6 +78,11 @@ namespace DataAccessLayer.Models
                     .WithMany(p => p.Bills)
                     .HasForeignKey(d => d.CashierId)
                     .HasConstraintName("FK__Bill__CashierId__47DBAE45");
+
+                entity.HasOne(d => d.Patient)
+                    .WithMany(p => p.Bills)
+                    .HasForeignKey(d => d.PatientId)
+                    .HasConstraintName("FK__Bill__PatientId__619B8048");
             });
 
             modelBuilder.Entity<BillDetail>(entity =>

@@ -28,8 +28,10 @@ namespace DataAccessLayer.Models
         public string PatientName { get; set; }
         public string CashierName { get; set; }
         public long? CashierId { get; set; }
+        public long? PatientId { get; set; }
 
         public virtual Cashier Cashier { get; set; }
+        public virtual Patient Patient { get; set; }
         public virtual ICollection<BillDetail> BillDetails { get; set; }
     }
 }

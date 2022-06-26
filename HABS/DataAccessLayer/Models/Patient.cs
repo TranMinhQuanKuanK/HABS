@@ -9,6 +9,7 @@ namespace DataAccessLayer.Models
     {
         public Patient()
         {
+            Bills = new HashSet<Bill>();
             CheckupRecords = new HashSet<CheckupRecord>();
             TestRecords = new HashSet<TestRecord>();
         }
@@ -23,6 +24,7 @@ namespace DataAccessLayer.Models
         public long AccountId { get; set; }
 
         public virtual Account Account { get; set; }
+        public virtual ICollection<Bill> Bills { get; set; }
         public virtual ICollection<CheckupRecord> CheckupRecords { get; set; }
         public virtual ICollection<TestRecord> TestRecords { get; set; }
     }
