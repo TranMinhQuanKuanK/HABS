@@ -65,6 +65,7 @@ namespace BusinessLayer.Services.Cashier
             {
                 throw new Exception("Bill doesn't exist");
             }
+            //check đã thanh toán cho từng record tương ứng của bill detail
             foreach (var bd in bill.BillDetails)
             {
                 if (bd.TestRecordId == null && bd.CheckupRecordId != null)
@@ -75,14 +76,12 @@ namespace BusinessLayer.Services.Cashier
                 else if (bd.TestRecordId != null && bd.CheckupRecordId == null)
                 {
                     var tr = _unitOfWork.TestRecordRepository.Get().Include(x=>x.CheckupRecord)
-                        .Where(x => x.Id == bd.CheckupRecordId).FirstOrDefault();
+                        .Where(x => x.Id == bd.TestRecordId).FirstOrDefault();
                     tr.CheckupRecord.Status = CheckupRecordStatus.CHO_KQXN;
                     tr.Status = TestRecordStatus.DA_THANH_TOAN;
                 }
             }
             bill.Status = DataAccessLayer.Models.Bill.BillStatus.TT_TIEN_MAT;
-
-            bill.BillDetails.ElementAt(0).CheckupRecord.Status = CheckupRecordStatus.DA_THANH_TOAN;
             bill.CashierId = cashierId;
             await _unitOfWork.SaveChangesAsync();
         }

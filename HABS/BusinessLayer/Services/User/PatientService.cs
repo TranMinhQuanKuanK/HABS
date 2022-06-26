@@ -34,6 +34,7 @@ namespace BusinessLayer.Services.User
             List<PatientResponseModel> data = new List<PatientResponseModel>();
             data = _unitOfWork.PatientRepository.Get()
                 .Where(x => x.AccountId == accountId)
+                .Where(x => x.Status == DataAccessLayer.Models.Patient.PatientStatus.HOAT_DONG)
                 .Select(x => new PatientResponseModel()
                 {
                     Id = x.Id,
@@ -51,6 +52,7 @@ namespace BusinessLayer.Services.User
         {
             var data = _unitOfWork.PatientRepository.Get()
                 .Where(x => x.Id == patientId)
+                .Where(x=>x.Status==DataAccessLayer.Models.Patient.PatientStatus.HOAT_DONG)
                 .Select(x => new PatientResponseModel()
                 {
                     Id = x.Id,

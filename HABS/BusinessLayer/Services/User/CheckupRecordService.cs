@@ -286,6 +286,7 @@ namespace BusinessLayer.Services.User
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
                 TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
+                PatientId = patient.Id
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();

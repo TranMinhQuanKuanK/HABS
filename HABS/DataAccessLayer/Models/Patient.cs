@@ -7,6 +7,11 @@ namespace DataAccessLayer.Models
 {
     public partial class Patient
     {
+        public enum PatientStatus
+        {
+            HOAT_DONG,
+            DA_XOA
+        }
         public Patient()
         {
             Bills = new HashSet<Bill>();
@@ -22,6 +27,7 @@ namespace DataAccessLayer.Models
         public string Address { get; set; }
         public string Bhyt { get; set; }
         public long AccountId { get; set; }
+        public PatientStatus? Status { get; set; }
 
         public virtual Account Account { get; set; }
         public virtual ICollection<Bill> Bills { get; set; }

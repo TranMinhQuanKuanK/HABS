@@ -268,7 +268,8 @@ namespace BusinessLayer.Services.Doctor
                 Status = BillStatus.CHUA_TT,
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
-                Total = 0
+                Total = 0,
+                PatientId = patient.Id
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
@@ -322,7 +323,7 @@ namespace BusinessLayer.Services.Doctor
                     OperationName = checkup.Name,
                     Quantity = 1,
                     SubTotal = checkup.Price,
-                    CheckupRecordId = _cr.Id,
+                    CheckupRecordId = checkup.Id,
                 };
                 await _unitOfWork.BillDetailRepository.Add(detail);
             }
@@ -346,6 +347,7 @@ namespace BusinessLayer.Services.Doctor
                 Content = "Hóa đơn thanh toán viện phí cho bệnh nhân " + patient.Name + " cho " + testReqModel.ExamOperationIds.Count + " mục.",
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
+                PatientId = patient.Id
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
@@ -395,7 +397,6 @@ namespace BusinessLayer.Services.Doctor
                     Quantity = 1,
                     SubTotal = _op.Price,
                     TestRecordId = tc.Id,
-                    CheckupRecordId = recordId,
                     BillId = bill.Id,
                 };
                 bill.Total = bill.Total += _op.Price;
