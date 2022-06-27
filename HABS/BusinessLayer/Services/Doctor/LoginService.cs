@@ -19,6 +19,7 @@ using BusinessLayer.ResponseModels.ViewModels.Doctor;
 using DataAccessLayer.Models;
 using BusinessLayer.RequestModels.CreateModels.Doctor;
 using BusinessLayer.Constants;
+using static DataAccessLayer.Models.Doctor;
 
 namespace BusinessLayer.Services.Doctor
 {
@@ -67,7 +68,6 @@ namespace BusinessLayer.Services.Doctor
         public DoctorLoginViewModel Login(LoginModel login)
         {
            
-            
             var doctor = _unitOfWork.DoctorRepository
                 .Get()
                 .Where(_doc => _doc.Username == login.Username && _doc.Password == login.Password)
@@ -81,6 +81,20 @@ namespace BusinessLayer.Services.Doctor
                 })
                 .FirstOrDefault();
             if (doctor == null) return null;
+
+            var room = _unitOfWork.RoomRepository.Get().Where(x => x.Id == login.RoomId).FirstOrDefault();
+            if (room==null)
+            {
+                throw new Exception("Room invalid");
+            }
+            if (room.RoomTypeId!= IdConstant.ID_ROOMTYPE_PHONG_KHAM)
+            {
+                if (doctor.Type == (int)DoctorType.BS_XET_NGHIEM)
+                {
+                    return doctor;
+                } 
+            }
+
             #region Sau này xóa
             if (login.Username == "doctor" && login.Password == "123123")
             {

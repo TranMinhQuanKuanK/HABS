@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.ResponseModels.ViewModels.Doctor;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,8 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Interfaces.Doctor
 {
-    public interface IScheduleService
+    public interface IFileService
     {
-        List<CheckupAppointmentViewModel> GetCheckupQueue(long RoomId);
-        List<TestAppointmentViewModel> GetTestQueue(long RoomId, bool isWaitingForResult);
-
+        Task<string> UploadToFirebase(IFormFile file, long patientId, long trId);
     }
 }

@@ -32,10 +32,13 @@ namespace BusinessLayer.Services.Cashier
         public List<BillViewModel> GetBills(BillSearchModel search)
         {
             var bills = _unitOfWork.BillRepository.Get()
+                .Where(x => search.PatientId==null ? true : x.PatientId==search.PatientId)
                 .Where(x => string.IsNullOrEmpty(search.PatientName) ? true : x.PatientName.Contains(search.PatientName))
+                .Where(x => string.IsNullOrEmpty(search.PhoneNo) ? true : x.PhoneNo.Contains(search.PhoneNo))
                 .Where(x => x.Status == DataAccessLayer.Models.Bill.BillStatus.CHUA_TT)
                 .Where(x => search.MinTotal == null ? true : x.Total >= search.MinTotal)
                 .Where(x => search.MaxTotal == null ? true : x.Total <= search.MaxTotal)
+                .OrderBy(x=>x.TimeCreated)
                 .Select(x => new BillViewModel()
                 {
                     Id = x.Id,

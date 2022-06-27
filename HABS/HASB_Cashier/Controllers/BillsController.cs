@@ -44,7 +44,7 @@ namespace HASB_Cashier.Controllers
         }
         [SwaggerOperation(Summary = "Xác nhận thanh toán một hóa đơn")]
         [HttpPost("{id}/pay")]
-        public IActionResult PayBill(long Id)
+        public async Task<IActionResult> PayBill(long Id)
         {
             try
             {
@@ -54,8 +54,8 @@ namespace HASB_Cashier.Controllers
                 {
                     cashierId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                var data = _billService.PayABill(Id,cashierId);
-                return Ok(data);
+               await _billService.PayABill(Id,cashierId);
+                return Ok();
             }
             catch (Exception)
             {
@@ -64,7 +64,7 @@ namespace HASB_Cashier.Controllers
         }
         [SwaggerOperation(Summary = "Hủy thanh toán một đơn")]
         [HttpDelete("{id}")]
-        public IActionResult CancelBill(long Id)
+        public async Task<IActionResult> CancelBill(long Id)
         {
             try
             {
@@ -74,8 +74,8 @@ namespace HASB_Cashier.Controllers
                 {
                     cashierId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                var data = _billService.CancelABill(Id, cashierId);
-                return Ok(data);
+                await _billService.CancelABill(Id, cashierId);
+                return Ok();
             }
             catch (Exception)
             {

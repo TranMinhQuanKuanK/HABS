@@ -143,7 +143,6 @@ namespace HASB_Cashier
             services.AddTransient<ILoginService, LoginService>();
 
 
-
             //Firebase messaging
             services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<BusinessLayer.Interfaces.Notification.IFCMTokenService,

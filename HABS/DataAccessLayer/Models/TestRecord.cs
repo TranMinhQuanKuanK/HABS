@@ -12,6 +12,7 @@ namespace DataAccessLayer.Models
             CHUA_DAT_LICH,
             DA_DAT_LICH,
             DA_THANH_TOAN,
+            DANG_TIEN_HANH,
             CHO_KET_QUA,
             HOAN_THANH,
             DA_HUY,

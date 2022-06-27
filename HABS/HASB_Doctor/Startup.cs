@@ -149,8 +149,10 @@ namespace HASB_Doctor
             services.AddTransient<IRoomService, RoomService>();
             services.AddTransient<TestService, TestService>();
             services.AddTransient<BusinessLayer.Interfaces.User.IScheduleService, BusinessLayer.Services.User.ScheduleService>();
+            services.AddTransient<ITestRecordService, TestRecordService>();
+            services.AddTransient<IFileService, FileService>();
 
-            
+
 
 
             //Firebase messaging

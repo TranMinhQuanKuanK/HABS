@@ -40,7 +40,7 @@ namespace HASB_Doctor.Controllers
             }
         }
         [SwaggerOperation(Summary = "Xác nhận khám cho bệnh nhân trong hàng đợi")]
-        [HttpPut("/confirm/{id}")]
+        [HttpPost("confirm/{id}")]
         public async Task<IActionResult> ConfirmCheckup(long id)
         {
             try
