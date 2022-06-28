@@ -12,9 +12,9 @@ namespace BusinessLayer.Interfaces.Doctor
     {
         List<PatientRecordMetadataViewModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId);
         PatientRecordFullDataViewModel GetCheckupRecordFullData(long patientId);
-        Task ConfirmCheckup(long crId);
+        Task ConfirmCheckup(long crId, long? doctorId);
         Task CreatePrescription(long recordId, PrescriptionCreateModel model);
-        Task RedirectPatient(RedirectCreateModel model, long recordId);
+        Task<List<RedirectViewModel>> RedirectPatient(RedirectCreateModel model, long recordId);
         Task RequestExamination(long recordId, TestRequestCreateModel testReqModel);
         Task EditCheckupRecord(CheckupRecordEditModel model);
     }

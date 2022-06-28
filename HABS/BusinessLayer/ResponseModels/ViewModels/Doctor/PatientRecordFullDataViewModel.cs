@@ -34,6 +34,6 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public long? IcdDiseaseId { get; set; }
         public string IcdDiseaseName { get; set; }
         public string IcdCode { get; set; }
-
+        public bool IsReExam { get; set; }
     }
 }

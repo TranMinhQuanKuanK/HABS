@@ -32,9 +32,9 @@ namespace HASB_Doctor.Controllers
             {
                 await ts.CreatNewAppointment(10000,
                     DateTime.Now.AddHours(7), 10007, null, "Ói mửa lung tung nên không muốn code hàm test kĩ");
-                await ts.CreatNewAppointment(10000,
+                await ts.CreatNewAppointment(10003,
                     DateTime.Now.AddHours(7), 10007, null, "Tự nhiên chán không buồn nói luôn");
-                await ts.CreatNewAppointment(10000,
+                await ts.CreatNewAppointment(10006,
                     DateTime.Now.AddHours(7), 10007, null, "Khóc la om sòm vì mãi không chạy được");
                 return Ok();
             }

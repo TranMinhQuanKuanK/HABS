@@ -113,27 +113,27 @@ namespace HASB_Doctor.Controllers
                 return BadRequest();
             }
         }
-        [SwaggerOperation(Summary = "Chuyển khoa cho bệnh nhân (giả)")]
+        [SwaggerOperation(Summary = "Chuyển khoa cho bệnh nhân, gửi cùng với lí do")]
         [HttpPost("{id}/redirect")]
-        public IActionResult RedirectPatient(long Id, [FromBody] RedirectCreateModel model)
+        public async Task<IActionResult> RedirectPatient(long Id, [FromBody] RedirectCreateModel model)
         {
             try
             {
-                _checkupRecordService.RedirectPatient(model, Id);
-                return Ok();
+                var result = await _checkupRecordService.RedirectPatient(model, Id);
+                return Ok(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
-        [SwaggerOperation(Summary = "Tạo đơn thuốc cho bệnh nhân (giả)")]
+        [SwaggerOperation(Summary = "Tạo đơn thuốc cho bệnh nhân")]
         [HttpPost("{id}/prescription")]
-        public IActionResult CreatePrescriptin(long Id, [FromBody] PrescriptionCreateModel model)
+        public async Task<IActionResult> CreatePrescriptin(long Id, [FromBody] PrescriptionCreateModel model)
         {
             try
             {
-                _checkupRecordService.CreatePrescription(Id,model);
+                await _checkupRecordService.CreatePrescription(Id,model);
                 return Ok();
             }
             catch (Exception)

@@ -41,8 +41,11 @@ namespace BusinessLayer.Services.Common
             var roomList = _unitOfWork.RoomRepository
                 .Get()
                 .Include(x => x.TestRecords)
-                .Where(x => x.RoomTypeId == op.RoomTypeId).ToList();
-            if (roomList.Count==0)
+                .Where(x => x.RoomTypeId == op.RoomTypeId)
+                .Where(x => op.DepartmentId != null ? x.DepartmentId == op.DepartmentId : true)
+                .ToList();
+
+            if (roomList.Count == 0)
             {
                 return null;
             }
@@ -65,7 +68,7 @@ namespace BusinessLayer.Services.Common
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
                       || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH
-                      ).Where(x=>x.RoomId==room.Id)
+                      ).Where(x => x.RoomId == room.Id)
                      .ToList().Count;
                     if (cur < min)
                     {
@@ -114,7 +117,7 @@ namespace BusinessLayer.Services.Common
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
                       || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH
-                      ).Where(x=>x.RoomId == room.Id)
+                      ).Where(x => x.RoomId == room.Id)
                      .ToList().Count;
                 }
                 else
@@ -129,7 +132,7 @@ namespace BusinessLayer.Services.Common
                      || x.Status == CheckupRecord.CheckupRecordStatus.KET_THUC
                      || x.Status == CheckupRecord.CheckupRecordStatus.NHAP_VIEN
                      || x.Status == CheckupRecord.CheckupRecordStatus.DA_DAT_LICH
-                     )
+                     ).Where(x => x.RoomId == room.Id)
                     .ToList().Count;
                 }
                 return curNumOfPeople + 1;

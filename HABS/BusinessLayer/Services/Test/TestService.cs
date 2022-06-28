@@ -138,6 +138,7 @@ namespace BusinessLayer.Services.Test
                 DepartmentName = dakhoaDep.Name,
                 DoctorId = schedule.DoctorId,
                 ClinicalSymptom = clinicalSymptom,
+                DoctorName = doctor.Name,
             };
             await _unitOfWork.CheckupRecordRepository.Add(cr);
             await _unitOfWork.SaveChangesAsync();

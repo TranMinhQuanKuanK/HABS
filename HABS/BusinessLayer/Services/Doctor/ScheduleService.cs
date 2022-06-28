@@ -38,7 +38,8 @@ namespace BusinessLayer.Services.Doctor
                     PatientId = x.PatientId,
                     PatientName = x.PatientName,
                     NumericalOrder = x.NumericalOrder,
-                    Status = (int)x.Status
+                    Status = (int)x.Status,
+                    IsReExam = (bool)x.IsReExam
 
                 }).ToList();
             var checkingUpPatient = queue.SingleOrDefault(x => x.Status == (int)CheckupRecordStatus.DANG_KHAM);

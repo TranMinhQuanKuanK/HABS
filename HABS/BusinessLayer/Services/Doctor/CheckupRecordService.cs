@@ -24,6 +24,7 @@ using static DataAccessLayer.Models.Bill;
 using BusinessLayer.ResponseModels.ViewModels.User;
 using BusinessLayer.Interfaces.Common;
 using Utilities;
+using BusinessLayer.Constants;
 
 namespace BusinessLayer.Services.Doctor
 {
@@ -82,7 +83,8 @@ namespace BusinessLayer.Services.Doctor
                    DepartmentName = x.DepartmentName,
                    DoctorName = x.DoctorName,
                    NumericalOrder = x.NumericalOrder,
-                   PatientName = x.PatientName
+                   PatientName = x.PatientName,
+                   IsReExam = (bool)x.IsReExam
                }
                ).ToList();
             return data;
@@ -117,6 +119,7 @@ namespace BusinessLayer.Services.Doctor
                         DoctorId = x.DoctorId,
                         EstimatedStartTime = x.EstimatedStartTime,
                         IcdCode = x.IcdDiseaseCode,
+                        IsReExam = (bool)x.IsReExam,
                         IcdDiseaseId = x.IcdDiseaseId,
                         IcdDiseaseName = x.IcdDiseaseName,
                         PatientData = new PatientViewModel()
@@ -229,10 +232,12 @@ namespace BusinessLayer.Services.Doctor
                     PrescriptionId = presc.Id,
                 });
             }
+            presc.Note = model.Note;
             await _unitOfWork.SaveChangesAsync();
         }
-        public async Task RedirectPatient(RedirectCreateModel model, long recordId)
+        public async Task<List<RedirectViewModel>> RedirectPatient(RedirectCreateModel model, long recordId)
         {
+            List<RedirectViewModel> result = new List<RedirectViewModel>();
             //kiểm tra patient
             var cr = _unitOfWork.CheckupRecordRepository.Get()
               .Where(x => x.Id == recordId).FirstOrDefault();
@@ -302,13 +307,14 @@ namespace BusinessLayer.Services.Doctor
                     RoomNumber = room.RoomNumber,
                     RoomId = room.Id,
                     PatientId = cr.PatientId,
+                    EstimatedDate = DateTime.Now.AddHours(7),
                     PatientName = patient.Name,
                     NumericalOrder = numOrd,
                     ClinicalSymptom = "Chuyển khoa từ đa khoa sang. Triệu chứng báo cáo từ bác sĩ đa khoa: \""+ symptom + "\".",
                     DepartmentName = dep.Name,
                     //NHỚ BỔ SUNG
-                    DoctorId = null,
-                    DoctorName = "Nhớ nhắc Quân bổ sung DoctorName trong trường hợp tụi mày vẫn thấy cái này",
+                    //DoctorId = null,
+                    //DoctorName = "Nhớ nhắc Quân bổ sung DoctorName trong trường hợp tụi mày vẫn thấy cái này",
                 };
                 await _unitOfWork.CheckupRecordRepository.Add(_cr);
                 await _unitOfWork.SaveChangesAsync();
@@ -323,13 +329,25 @@ namespace BusinessLayer.Services.Doctor
                     OperationName = checkup.Name,
                     Quantity = 1,
                     SubTotal = checkup.Price,
-                    CheckupRecordId = checkup.Id,
+                    CheckupRecordId = _cr.Id,
                 };
+                bill.Total = bill.Total + checkup.Price;
                 await _unitOfWork.BillDetailRepository.Add(detail);
+
+                //tạo response model tương ứng
+                result.Add(new RedirectViewModel()
+                {
+                    NumericalOrder = numOrd,
+                    DepartmentName = dep.Name,
+                    RoomId = room.Id,
+                    Floor = room.Floor,
+                    RoomNumber = room.RoomNumber,
+                });
             }
             cr.Status = CheckupRecordStatus.CHUYEN_KHOA;
             bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
             await _unitOfWork.SaveChangesAsync();
+            return result;
         }
         public async Task RequestExamination(long recordId, TestRequestCreateModel testReqModel)
         {
@@ -441,10 +459,6 @@ namespace BusinessLayer.Services.Doctor
             {
                 cr.Temperature = model.Temperature;
             }
-            if (model.EstimatedDate != null)
-            {
-                cr.EstimatedDate = model.EstimatedDate;
-            }
             if (model.BloodPressure != null)
             {
                 cr.BloodPressure = model.BloodPressure;
@@ -452,6 +466,10 @@ namespace BusinessLayer.Services.Doctor
             if (model.DoctorAdvice != null)
             {
                 cr.DoctorAdvice = model.DoctorAdvice;
+            }
+            if (model.Diagnosis != null)
+            {
+                cr.Diagnosis = model.Diagnosis;
             }
             if (model.IcdDiseaseId != null)
             {
@@ -464,9 +482,10 @@ namespace BusinessLayer.Services.Doctor
             }
             await _unitOfWork.SaveChangesAsync();
         }
-        public async Task ConfirmCheckup(long crId)
+        public async Task ConfirmCheckup(long crId, long? doctorId)
         {
             var cr = _unitOfWork.CheckupRecordRepository.Get().Where(x => x.Id == crId).FirstOrDefault();
+            
             if (cr==null)
             {
                 throw new Exception("Invalid checkup record id");
@@ -488,6 +507,19 @@ namespace BusinessLayer.Services.Doctor
             cr.Date = DateTime.Now.AddHours(7);
             queue.Remove(crInQueue);
             queue.Insert(0, crInQueue);
+
+            //nếu có doctor id, tức là đây là confirm của 
+            if (cr.DepartmentId!=IdConstant.ID_DEPARTMENT_DA_KHOA)
+            {
+                var doctor = _unitOfWork.DepartmentRepository.Get().Where(x => x.Id == (long)doctorId).FirstOrDefault();
+                if (doctor==null)
+                {
+                    throw new Exception("Invalid doctor");
+                }
+                cr.DoctorId = (long)doctorId;
+                cr.DoctorName = doctor.Name;
+            }
+
             await _unitOfWork.SaveChangesAsync();
 
             //Cập nhật lại cache hàng đợi tương ứng của phòng trong cr

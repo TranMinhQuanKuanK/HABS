@@ -15,5 +15,6 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public DateTime? EstimatedStartTime { get; set; }
         public string PatientName { get; set; }
         public long? PatientId { get; set; }
+        public bool IsReExam { get; set; }
     }
 }
