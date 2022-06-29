@@ -35,9 +35,9 @@ namespace BusinessLayer.Services.Cashier
                 .Where(x => search.PatientId==null ? true : x.PatientId==search.PatientId)
                 .Where(x => string.IsNullOrEmpty(search.PatientName) ? true : x.PatientName.Contains(search.PatientName))
                 .Where(x => string.IsNullOrEmpty(search.PhoneNo) ? true : x.PhoneNo.Contains(search.PhoneNo))
-                .Where(x => x.Status == DataAccessLayer.Models.Bill.BillStatus.CHUA_TT)
-                .Where(x => search.MinTotal == null ? true : x.Total >= search.MinTotal)
-                .Where(x => search.MaxTotal == null ? true : x.Total <= search.MaxTotal)
+                .Where(x => search.From == null ? true : x.TimeCreated >= search.From)
+                .Where(x => search.To == null ? true : x.TimeCreated <= search.To)
+                .Where(x => search.IncludeOldBills ? true : x.Status == DataAccessLayer.Models.Bill.BillStatus.CHUA_TT)
                 .OrderBy(x=>x.TimeCreated)
                 .Select(x => new BillViewModel()
                 {
@@ -48,6 +48,8 @@ namespace BusinessLayer.Services.Cashier
                     Status = (int)x.Status,
                     Total = x.Total,
                     TotalInWord = x.TotalInWord,
+                    CashierId = x.CashierId,
+                    CashierName = x.CashierName
                 })
                 .ToList();
             return bills;
