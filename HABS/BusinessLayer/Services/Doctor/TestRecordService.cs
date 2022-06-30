@@ -47,8 +47,18 @@ namespace BusinessLayer.Services.Doctor
         public async Task UpdateTestRecordResult(TestRecordEditModel model)
         {
             var tr = _unitOfWork.TestRecordRepository.Get()
-          .Where(x => x.Id == model.Id).FirstOrDefault();
+              .Where(x => x.Id == model.Id)
+              .FirstOrDefault();
+            var cr = _unitOfWork.CheckupRecordRepository.Get()
+                .Include(x => x.TestRecords)
+                .Where(x => x.Id == tr.CheckupRecordId)
+                .FirstOrDefault();
 
+            if (tr==null)
+            {
+                throw new Exception("Test record doesn't exist");
+            }
+            
             if (model.Status != null)
             {
                 if (model.Status == (int)TestRecordStatus.CHO_KET_QUA)
@@ -58,11 +68,24 @@ namespace BusinessLayer.Services.Doctor
                 else if (model.Status == (int)TestRecordStatus.HOAN_THANH)
                 {
                     tr.Status = TestRecordStatus.HOAN_THANH;
+                    //kiếm tra nếu là xét nghiệm cuối cùng thì hoàn thành phiếu 
+                    bool doneAll = true;
+                    foreach (var _tr in cr.TestRecords)
+                    {
+                        if (_tr.Id!=tr.Id && tr.Status!= TestRecordStatus.HOAN_THANH)
+                        {
+                            doneAll = false;
+                        }
+                    }
+                    if (doneAll)
+                    {
+                        cr.Status = CheckupRecordStatus.DA_CO_KQXN;
+                        //bắn noti cho mobile là đã có đủ kết quả
+                    }
                 }
             }
             if (model.ResultFile != null)
             {
-
                 // upload file lên firebase và retrieve link
                 if (tr.ResultFileLink != null)
                 {

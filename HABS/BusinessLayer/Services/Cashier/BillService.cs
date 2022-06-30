@@ -73,16 +73,40 @@ namespace BusinessLayer.Services.Cashier
             //check đã thanh toán cho từng record tương ứng của bill detail
             foreach (var bd in bill.BillDetails)
             {
+                //nếu là CR
                 if (bd.TestRecordId == null && bd.CheckupRecordId != null)
                 {
-                    var cr = _unitOfWork.CheckupRecordRepository.Get().Where(x => x.Id == bd.CheckupRecordId).FirstOrDefault();
+
+                    var cr = _unitOfWork.CheckupRecordRepository.Get()
+                        .Include(x=>x.TestRecords)
+                        .Where(x => x.Id == bd.CheckupRecordId).FirstOrDefault();
+                    //kiểm tra nếu chưa đặt lịch thì báo lỗi (tái khám)
+                    if (cr.Status== CheckupRecordStatus.CHO_TAI_KHAM)
+                    {
+                        throw new Exception("No schedule for this checkup record");
+                    }
+                    //nếu là đã tái khám thì 
+                    if ((bool)cr.IsReExam)
+                    {
+                        if (cr.TestRecords.Count>0)
+                        {
+                            foreach(var tr in cr.TestRecords)
+                            {
+                                tr.Status = TestRecordStatus.DA_THANH_TOAN;
+                            }
+                        }
+                    }
                     cr.Status = CheckupRecordStatus.DA_THANH_TOAN;
+                    //bắn status cho mobile nếu có
                 }
+                //nếu là TR
                 else if (bd.TestRecordId != null && bd.CheckupRecordId == null)
                 {
-                    var tr = _unitOfWork.TestRecordRepository.Get().Include(x=>x.CheckupRecord)
+                    var tr = _unitOfWork.TestRecordRepository.Get()
                         .Where(x => x.Id == bd.TestRecordId).FirstOrDefault();
-                    tr.CheckupRecord.Status = CheckupRecordStatus.CHO_KQXN;
+                    var cr = _unitOfWork.CheckupRecordRepository.Get()
+                        .Where(x => x.Id == tr.CheckupRecordId).FirstOrDefault();
+                    cr.Status = CheckupRecordStatus.CHO_KQXN;
                     tr.Status = TestRecordStatus.DA_THANH_TOAN;
                 }
             }

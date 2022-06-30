@@ -193,6 +193,7 @@ namespace BusinessLayer.Services.Doctor
             Prescription presc = null;
             presc = _unitOfWork.PrescriptionRepository
                .Get()
+               .Include(x=>x.PrescriptionDetails)
                .Where(x => x.CheckupRecordId == recordId)
                .FirstOrDefault();
             //chưa có thì tạo một cái mới
@@ -205,34 +206,40 @@ namespace BusinessLayer.Services.Doctor
                     TimeCreated = DateTime.Now.AddHours(7),
                 };
                 await _unitOfWork.PrescriptionRepository.Add(presc);
-            }
-            //clear hết presc detail
-            presc.PrescriptionDetails = new List<PrescriptionDetail>();
-            await _unitOfWork.SaveChangesAsync();
-            //tạo từng cái presc detail add vào presc
-            foreach (var detail in model.Details)
+            } else
             {
-                var med = _unitOfWork.MedicineRepository.Get()
-                    .Where(x => x.Id == detail.MedicineId).FirstOrDefault();
-                if (med == null)
+                //clear hết presc detail
+                foreach (var presDetail in presc.PrescriptionDetails)
                 {
-                    throw new Exception("Invalid medicine with id" + detail.MedicineId);
+                    await _unitOfWork.PrescriptionDetailRepository.Delete(presDetail.Id);
                 }
-                presc.PrescriptionDetails.Add(new PrescriptionDetail()
+                await _unitOfWork.SaveChangesAsync();
+                //tạo từng cái presc detail add vào presc
+                foreach (var detail in model.Details)
                 {
-                    MedicineId = detail.MedicineId,
-                    MedicineName = med.Name,
-                    EveningDose = detail.EveningDose,
-                    MiddayDose = detail.MiddayDose,
-                    MorningDose = detail.MorningDose,
-                    NightDose = detail.NightDose,
-                    Quantity = detail.Quantity,
-                    Unit = med.Unit,
-                    Usage = detail.Usage,
-                    PrescriptionId = presc.Id,
-                });
+                    var med = _unitOfWork.MedicineRepository.Get()
+                        .Where(x => x.Id == detail.MedicineId).FirstOrDefault();
+                    if (med == null)
+                    {
+                        throw new Exception("Invalid medicine with id" + detail.MedicineId);
+                    }
+                    var presDetail = new PrescriptionDetail()
+                    {
+                        MedicineId = detail.MedicineId,
+                        MedicineName = med.Name,
+                        EveningDose = detail.EveningDose,
+                        MiddayDose = detail.MiddayDose,
+                        MorningDose = detail.MorningDose,
+                        NightDose = detail.NightDose,
+                        Quantity = detail.Quantity,
+                        Unit = med.Unit,
+                        Usage = detail.Usage,
+                        PrescriptionId = presc.Id,
+                    };
+                    await _unitOfWork.PrescriptionDetailRepository.Add(presDetail);
+                }
+                presc.Note = model.Note;
             }
-            presc.Note = model.Note;
             await _unitOfWork.SaveChangesAsync();
         }
         public async Task<List<RedirectViewModel>> RedirectPatient(RedirectCreateModel model, long recordId)
@@ -293,7 +300,7 @@ namespace BusinessLayer.Services.Doctor
                 var dep = _departmentService.GetDepartmentById((long)checkup.DepartmentId);
                 //lấy lịch và phòng
                 var room = _numService.GetAppropriateRoomForOperation(checkup);
-                var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room);
+                var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room,DateTime.Now.AddHours(7));
                 //lấy bác sĩ làm việc tương ứng trong khung giờ + phòng
 
                 //tạo record
@@ -385,7 +392,7 @@ namespace BusinessLayer.Services.Doctor
                 {
                     throw new Exception("Rooms for this operation haven't been configured");
                 }
-                var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room);
+                var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room, DateTime.Now.AddHours(7));
                 //tạo record mới 
                 TestRecord tc = new TestRecord()
                 {
@@ -523,6 +530,130 @@ namespace BusinessLayer.Services.Doctor
             await _unitOfWork.SaveChangesAsync();
 
             //Cập nhật lại cache hàng đợi tương ứng của phòng trong cr
+        }
+        public async Task CreateReExamCheckupRecord(long previousCrId, long doctorId, ReExamCreateModel model)
+        {
+            //không cần kiểm tra id bác sĩ
+            var doc = _unitOfWork.DoctorRepository.Get().Where(x => x.Id == doctorId).FirstOrDefault();
+            //kiểm tra bệnh nhân
+            var patient = _unitOfWork.PatientRepository.Get().Where(x => x.Id == model.PatientId).FirstOrDefault();
+            if (patient==null)
+            {
+                throw new Exception("Patient doesn't exist");
+            }
+            //kiểm tra previous CR
+            var preCr = _unitOfWork.CheckupRecordRepository.Get()
+                .Where(x => x.Id == previousCrId)
+                .FirstOrDefault();
+            if (preCr == null)
+            {
+                throw new Exception("Previous Checkup record doesn't exist");
+            }
+            //kiểm tra các operation
+            var listOp = _unitOfWork.OperationRepository.Get()
+                .Where(x => model.RequiredTest.ExamOperationIds.Contains(x.Id)).ToList();
+            if (listOp.Count != model.RequiredTest.ExamOperationIds.Count)
+            {
+                throw new Exception("Invalid test request");
+            }
+            //kiểm tra department 
+            var department = _unitOfWork.DepartmentRepository.Get().Where(x => x.Id == model.DepartmentId).FirstOrDefault();
+            if (department == null)
+            {
+                throw new Exception("Department doesn't exist");
+            }
+            //Thêm note vào CR cũ
+            preCr.DoctorAdvice = preCr.DoctorAdvice + $"\\n Hẹn tái khám vào ngày {model.ReExamDate.Date}, các xét nghiệm cần thực hiện trước khi tái khám";
+            for (int i = 0; i < listOp.Count; i++)
+            {
+                preCr.DoctorAdvice = preCr.DoctorAdvice + listOp[i].Name;
+                if (i== listOp.Count-1)
+                {
+                    preCr.DoctorAdvice = preCr.DoctorAdvice + ", ";
+                } else
+                {
+                    preCr.DoctorAdvice = preCr.DoctorAdvice + ". ";
+                }
+            }
+            preCr.DoctorAdvice = preCr.DoctorAdvice + "Gặp bác sĩ " + doc.Name + " , SĐT: " + doc.PhoneNo + ".";
+
+            //tạo mới bill
+            var bill = new Bill()
+            {
+                Content = listOp.Count == 0 ? "Thanh toán viện phí tái khám" : "Thanh toán viện phí tái khám và các xét nghiệm",
+                PatientId = patient.Id,
+                PhoneNo = patient.PhoneNumber,
+                Status = BillStatus.CHUA_TT,
+                TimeCreated = DateTime.Now.AddHours(7),
+            };
+            await _unitOfWork.BillRepository.Add(bill);
+            //tạo mới CR
+            var cr = new CheckupRecord()
+            {
+                DoctorId = doctorId,
+                EstimatedDate = model.ReExamDate,
+                DepartmentId = model.DepartmentId,
+                Status = CheckupRecordStatus.CHO_TAI_KHAM,
+                IsReExam = true,
+                PatientId = model.PatientId,
+                PatientName = patient.Name,
+                TestRecords = new List<TestRecord>()
+            };
+            await _unitOfWork.CheckupRecordRepository.Add(cr);
+            await _unitOfWork.SaveChangesAsync();
+            //add bill detail and test record for TR
+            foreach (var op in listOp)
+            {
+                var testRecor = new TestRecord()
+                {
+                    EstimatedDate = model.ReExamDate,
+                    CheckupRecordId = cr.Id,
+                    OperationId = op.Id,
+                    PatientId = model.PatientId,
+                    PatientName = patient.Name,
+                    Status = TestRecord.TestRecordStatus.CHUA_DAT_LICH,
+                };
+                await _unitOfWork.TestRecordRepository.Add(testRecor);
+                await _unitOfWork.SaveChangesAsync();
+                var bdTR = new BillDetail()
+                {
+                    BillId = bill.Id,
+                    InsuranceStatus = op.InsuranceStatus,
+                    TestRecordId = testRecor.Id,
+                    OperationId = op.Id,
+                    Price = op.Price,
+                    Quantity = 1,
+                    SubTotal = op.Price,
+                    OperationName = op.Name,
+                };
+                bill.Total += op.Price;
+                await _unitOfWork.BillDetailRepository.Add(bdTR);
+            }
+            await _unitOfWork.SaveChangesAsync();
+            //bill detail for CR
+            var checkupOp = _unitOfWork.OperationRepository.Get()
+                .Where(x => x.DepartmentId != null)
+                .Where(x => x.DepartmentId == model.DepartmentId)
+                .FirstOrDefault();
+            if (checkupOp==null)
+            {
+                throw new Exception("Checkup operation corressponding with department doesn't exist");
+            }
+            var bdCR = new BillDetail()
+            {
+                BillId = bill.Id,
+                InsuranceStatus = checkupOp.InsuranceStatus,
+                CheckupRecordId = cr.Id,
+                OperationId = checkupOp.Id,
+                Price = checkupOp.Price,
+                Quantity = 1,
+                SubTotal = checkupOp.Price,
+                OperationName = checkupOp.Name,
+            };
+            bill.Total += checkupOp.Price;
+            await _unitOfWork.BillDetailRepository.Add(bdCR);
+            bill.TotalInWord = MoneyHelper.NumberToText(bill.Total);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 

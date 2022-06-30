@@ -17,5 +17,6 @@ namespace BusinessLayer.Interfaces.Doctor
         Task<List<RedirectViewModel>> RedirectPatient(RedirectCreateModel model, long recordId);
         Task RequestExamination(long recordId, TestRequestCreateModel testReqModel);
         Task EditCheckupRecord(CheckupRecordEditModel model);
+        Task CreateReExamCheckupRecord(long previousCrId, long doctorId, ReExamCreateModel model);
     }
 }

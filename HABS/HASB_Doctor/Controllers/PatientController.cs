@@ -14,6 +14,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace HASB_Doctor.Controllers
@@ -37,6 +38,13 @@ namespace HASB_Doctor.Controllers
         {
             try
             {
+                int doctorId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    doctorId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                await _checkupRecordService.CreateReExamCheckupRecord(Id, doctorId, model);
                 return Ok($"Bạn đã gửi bệnh nhân {Id} với lời nhắn {model.Note}, ngày tái khám: {model.ReExamDate}");
             }
             catch (Exception)

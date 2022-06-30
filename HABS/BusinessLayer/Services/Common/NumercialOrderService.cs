@@ -104,15 +104,15 @@ namespace BusinessLayer.Services.Common
             }
             return roomWithLeastPeople;
         }
-        //lấy số thứ tự cho phòng xét nghiệm
-        public int GetNumOrderForAutoIncreaseRoom(Room room)
+        //lấy số thứ tự cho phòng xét nghiệm TRONG NGÀY HÔM NAY
+        public int GetNumOrderForAutoIncreaseRoom(Room room, DateTime date)
         {
             lock (padlock)
             {
                 int curNumOfPeople = 0;
                 if (room.RoomTypeId != IdConstant.ID_ROOMTYPE_PHONG_KHAM)
                 {
-                    curNumOfPeople = room.TestRecords.Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
+                    curNumOfPeople = room.TestRecords.Where(x => ((DateTime)x.Date).Day == date.Day)
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
@@ -123,7 +123,7 @@ namespace BusinessLayer.Services.Common
                 else
                 {
                     curNumOfPeople = room.CheckupRecords
-                       .Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
+                       .Where(x => ((DateTime)x.Date).Day == date.Day)
                     .Where(x => x.Status == CheckupRecord.CheckupRecordStatus.CHO_KQXN
                      || x.Status == CheckupRecord.CheckupRecordStatus.CHUYEN_KHOA
                      || x.Status == CheckupRecord.CheckupRecordStatus.DANG_KHAM

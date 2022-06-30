@@ -23,6 +23,7 @@ using BusinessLayer.Constants;
 using BusinessLayer.Interfaces.Doctor;
 using Utilities;
 using static DataAccessLayer.Models.Operation;
+using BusinessLayer.Interfaces.Common;
 
 namespace BusinessLayer.Services.User
 {
@@ -32,15 +33,18 @@ namespace BusinessLayer.Services.User
         private readonly Interfaces.User.IScheduleService _scheduleService;
         private readonly IDepartmentService _departmentService;
         private readonly IOperationService _operationService;
+        private readonly INumercialOrderService _numService;
 
 
         private readonly RedisService _redisService;
-        public CheckupRecordService(IUnitOfWork unitOfWork, IDistributedCache distributedCache, 
+        public CheckupRecordService(IUnitOfWork unitOfWork, IDistributedCache distributedCache,
             Interfaces.User.IScheduleService scheduleService,
              IDepartmentService departmentService,
-             IOperationService operationService
+             IOperationService operationService,
+            INumercialOrderService numService
             ) : base(unitOfWork)
         {
+            _numService = numService;
             _operationService = operationService;
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
@@ -170,6 +174,123 @@ namespace BusinessLayer.Services.User
                 }).FirstOrDefault();
             return data;
         }
+        public async Task CreatReExamAppointment(long patientId, long previousCrId, DateTime date, long doctorId, int? numericalOrder, string clinicalSymptom)
+        {
+            //kiểm tra ngày có hợp lệ, có thuộc phiên làm việc chính thức ko
+            var reqSession = getSession(date);
+            if (reqSession == null)
+            {
+                throw new Exception("Invalid time");
+            }
+            //kiểm tra bác sĩ
+            var doctor = _unitOfWork.DoctorRepository.Get()
+               .Where(x => x.Id == doctorId)
+               .Where(x => x.Type == DoctorType.BS_DA_KHOA)
+               .FirstOrDefault();
+            if (doctor == null)
+            {
+                throw new Exception("Doctor doesn't exist");
+            }
+            //kiểm tra bệnh nhân
+            var patient = _unitOfWork.PatientRepository.Get()
+             .Where(x => x.Id == patientId)
+             .Where(x=>x.Status==Patient.PatientStatus.HOAT_DONG)
+             .FirstOrDefault();
+            if (patient == null)
+            {
+                throw new Exception("Patient doesn't exist");
+            }
+            //kiểm tra cr cũ
+            var prevCr = _unitOfWork.CheckupRecordRepository.Get()
+                .Include(x=>x.TestRecords)
+                .ThenInclude(x=>x.Operation)
+                .Where(x => x.Id == previousCrId).FirstOrDefault();
+            if (prevCr == null)
+            {
+                throw new Exception("Previous checkup record doesn't exist");
+
+            }
+            //kiểm tra xem thời điểm đó bs có làm việc ko
+            var schedule = _unitOfWork.ScheduleRepository.Get()
+                .Where(x => x.DoctorId == doctorId)
+                .Where(x => x.Session == reqSession)
+                .Where(x => x.Weekday == date.DayOfWeek)
+                .Include(x => x.Room)
+                .FirstOrDefault();
+
+            if (schedule == null)
+            {
+                throw new Exception("No working schedule for doctor");
+            }
+            //nếu số thứ tự null thì lấy số nhỏ nhất có thể trong ngày hôm đó
+            var avaiSlot = _scheduleService.GetAvailableSlots(new RequestModels.SearchModels.User.SlotSearchModel()
+            {
+                DoctorId = doctorId,
+                Date = date
+            });
+            DateTime estimatedStartTime = new DateTime();
+            if (numericalOrder == null)
+            {
+                for (int i = 0; i < avaiSlot.Count; i++)
+                {
+                    if (avaiSlot[i].IsAvailable)
+                    {
+                        numericalOrder = avaiSlot[i].NumericalOrder;
+                        estimatedStartTime = (DateTime)avaiSlot[i].EstimatedStartTime;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                //kiểm đã có checkup record nào chưa
+                bool slotExisted = false;
+                foreach (var slot in avaiSlot)
+                {
+                    if ((int)slot.NumericalOrder == (int)numericalOrder
+                        && getSession((DateTime)slot.EstimatedStartTime) == reqSession)
+                    {
+                        if (slot.IsAvailable)
+                        {
+                            estimatedStartTime = (DateTime)slot.EstimatedStartTime;
+                            break;
+                        }
+                        else
+                        {
+                            slotExisted = true;
+
+                        }
+                    }
+                }
+                if (slotExisted)
+                {
+                    throw new Exception("Slot's already been booked");
+                }
+                //gán thời gian bắt đầu cho hợp lí (không lấy date của client)
+            }
+            //chuyển status về đã đặt lịch thay vì tạo mới
+            prevCr.Status = CheckupRecordStatus.DA_DAT_LICH;
+            //đặt lịch cho các TR
+            var prevCrTRList = _unitOfWork.TestRecordRepository
+                .Get()
+                .Where(x => x.CheckupRecordId == prevCr.Id)
+                .ToList();
+            foreach (var _tr in prevCrTRList)
+            {
+                var room = _numService.GetAppropriateRoomForOperation(_tr.Operation);
+                if (room == null)
+                {
+                    throw new Exception("Rooms for this operation haven't been configured");
+                }
+                var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room, date);
+                _tr.RoomId = room.Id;
+                _tr.RoomNumber = room.RoomNumber;
+                _tr.Floor = room.Floor;
+                _tr.NumericalOrder = numOrd;
+                _tr.Status = TestRecord.TestRecordStatus.DA_DAT_LICH;
+            }
+            await _unitOfWork.SaveChangesAsync();
+        }
         public async Task CreatNewAppointment(long patientId, DateTime date, long doctorId, int? numericalOrder, string clinicalSymptom)
         {
             //kiểm tra ngày có hợp lệ, có thuộc phiên làm việc chính thức ko
@@ -187,8 +308,9 @@ namespace BusinessLayer.Services.User
             {
                 throw new Exception("Doctor doesn't exist");
             }
-            //kiểm tra bệnh nhân, nào bổ sung status check sau khi đã update db bổ sung status vào bảng patient
+            //kiểm tra bệnh nhân
             var patient = _unitOfWork.PatientRepository.Get()
+             .Where(x => x.Status == Patient.PatientStatus.HOAT_DONG)
              .Where(x => x.Id == patientId)
              .FirstOrDefault();
             if (patient == null)
@@ -252,9 +374,8 @@ namespace BusinessLayer.Services.User
                     throw new Exception("Slot's already been booked");
                 }
                 //gán thời gian bắt đầu cho hợp lí (không lấy date của client)
-
             }
-            //nếu chưa có CR thì đăng kí 1 checkup record mới
+            //nếu lịch available thì 1 checkup record mới
             var dakhoaDep = _departmentService.GetDepartmentById(IdConstant.ID_DEPARTMENT_DA_KHOA);
             var dakhoaOp = _operationService.GetOperationForDepartment(dakhoaDep.Id);
             var cr = new CheckupRecord()
