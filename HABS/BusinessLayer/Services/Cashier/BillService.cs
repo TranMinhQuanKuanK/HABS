@@ -38,7 +38,7 @@ namespace BusinessLayer.Services.Cashier
                 .Where(x => search.From == null ? true : x.TimeCreated >= search.From)
                 .Where(x => search.To == null ? true : x.TimeCreated <= search.To)
                 .Where(x => search.IncludeOldBills ? true : x.Status == DataAccessLayer.Models.Bill.BillStatus.CHUA_TT)
-                .OrderBy(x=>x.TimeCreated)
+                .OrderByDescending(x=>x.TimeCreated)
                 .Select(x => new BillViewModel()
                 {
                     Id = x.Id,
@@ -54,6 +54,38 @@ namespace BusinessLayer.Services.Cashier
                 .ToList();
             return bills;
         }
+        public BillViewModel GetBillById(long id)
+        {
+            var bill = _unitOfWork.BillRepository.Get()
+                .Where(x => x.Id == id)
+                .Include(x=>x.BillDetails)
+                .OrderBy(x => x.TimeCreated)
+                .Select(x => new BillViewModel()
+                {
+                    Id = x.Id,
+                    PatientName = x.PatientName,
+                    Content = x.Content,
+                    TimeCreated = x.TimeCreated,
+                    Status = (int)x.Status,
+                    Total = x.Total,
+                    TotalInWord = x.TotalInWord,
+                    CashierId = x.CashierId,
+                    CashierName = x.CashierName,
+                    Details = x.BillDetails.Select(d=>new BillDetailViewModel()
+                    {
+                        Id = d.Id,
+                        InsuranceStatus = (int)d.InsuranceStatus,
+                        OperationId = d.OperationId,
+                        OperationName = d.OperationName,
+                        Price = d.Price,
+                        Quantity = d.Quantity,
+                        SubTotal = d.SubTotal,
+                    }).ToList()
+                })
+                .FirstOrDefault();
+            return bill;
+        }
+
         public async Task PayABill(long billId, long cashierId)
         {
             var cashier = _unitOfWork.BillRepository
@@ -133,7 +165,7 @@ namespace BusinessLayer.Services.Cashier
             }
             bill.Status = DataAccessLayer.Models.Bill.BillStatus.HUY;
             bill.BillDetails.ElementAt(0).CheckupRecord.Status =
-                DataAccessLayer.Models.CheckupRecord.CheckupRecordStatus.DA_HUY;
+             CheckupRecordStatus.DA_HUY;
             bill.CashierId = cashierId;
             await _unitOfWork.SaveChangesAsync();
         }

@@ -1,5 +1,7 @@
+using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Interfaces.Notification;
 using BusinessLayer.Interfaces.User;
+using BusinessLayer.Services.Common;
 using BusinessLayer.Services.Notification;
 using BusinessLayer.Services.User;
 using DataAccessLayer.Models;
@@ -141,9 +143,11 @@ namespace HASB_User
                 BusinessLayer.Services.Doctor.DepartmentService>();
             services.AddTransient<BusinessLayer.Interfaces.Doctor.IOperationService,
                BusinessLayer.Services.Doctor.OperationService>();
-
+            services.AddTransient<INumercialOrderService, NumercialOrderService>();
             //Firebase messaging
             services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<IUserService, UserService>();
+
             services.AddTransient<BusinessLayer.Interfaces.Notification.IFCMTokenService,
                BusinessLayer.Services.Notification.FCMTokenService>();
         }

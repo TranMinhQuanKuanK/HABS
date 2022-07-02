@@ -29,11 +29,11 @@ namespace BusinessLayer.Services.Doctor
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
-        public List<DepartmentViewModel> GetDepartmentsChuyenKhoa()
-        {
+        public List<DepartmentViewModel> GetDepartments(bool includeGeneral)
+        { 
             List<DepartmentViewModel> departmentsData = new List<DepartmentViewModel>();
             departmentsData = _unitOfWork.DepartmentRepository.Get()
-                .Where(x=>x.Id != IdConstant.ID_DEPARTMENT_DA_KHOA)
+                .Where(x=> includeGeneral==true || x.Id != IdConstant.ID_DEPARTMENT_DA_KHOA)
                 .Where(x=>x.Status == DataAccessLayer.Models.Department.DepartmentStatus.CO_MO_KHAM)
             .Select
                (x => new DepartmentViewModel()

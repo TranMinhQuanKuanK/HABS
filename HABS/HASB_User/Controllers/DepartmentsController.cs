@@ -10,13 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HASB_Doctor.Controllers
+namespace HASB_User.Controllers
 {
-    [Route(DoctorRoute)]
+    [Route(UserRoute)]
     [ApiController]
     //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "Doctor")]
-    public class DepartmentsController : BaseDoctorController
+    public class DepartmentsController : BaseUserController
     {
 
         private readonly IDepartmentService _departmentService;
@@ -25,13 +25,13 @@ namespace HASB_Doctor.Controllers
         {
             _departmentService = service;
         }
-        [SwaggerOperation(Summary = "Lấy khoa (để chuyển viện)")]
+        [SwaggerOperation(Summary = "Lấy khoa")]
         [HttpGet]
         public IActionResult GetDepartments()
         {
             try
             {
-                return Ok(_departmentService.GetDepartments(false));
+                return Ok(_departmentService.GetDepartments(true));
             }
             catch (Exception)
             {

@@ -70,7 +70,7 @@ namespace HASB_Doctor.Controllers
             }
         }
         
-        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id, đầy đủ thông tin")]
+        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id record, đầy đủ thông tin")]
         [HttpGet("{id}")]
         public IActionResult GetById(long Id)
         {

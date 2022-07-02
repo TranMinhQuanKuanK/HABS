@@ -338,10 +338,6 @@ namespace DataAccessLayer.Models
 
                 entity.Property(e => e.EstimatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.Floor).IsRequired();
-
-                entity.Property(e => e.RoomNumber).IsRequired();
-
                 entity.HasOne(d => d.CheckupRecord)
                     .WithMany(p => p.TestRecords)
                     .HasForeignKey(d => d.CheckupRecordId)

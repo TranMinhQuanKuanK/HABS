@@ -24,16 +24,19 @@ namespace HASB_User.Controllers
     {
 
         private readonly ICheckupRecordService _checkupRecordService;
+        private readonly IScheduleService _scheduleService;
 
-        public AppointmentController(ICheckupRecordService service)
+
+        public AppointmentController(ICheckupRecordService service, IScheduleService scheduleService)
         {
+            _scheduleService = scheduleService;
             _checkupRecordService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy lịch khám của bệnh nhân từ ngày fromTime, đến ngày toTime (giả)")]
+        [SwaggerOperation(Summary = "Lấy lịch khám của bệnh nhân trong khoảng thời gian, theo khoa và bệnh nhân")]
         [HttpGet]
         //lấy lịch khám của bệnh nhân
-        public IActionResult GetCheckupAppointment([FromQuery] CheckupAppointmentSearchModel searchModel, [FromQuery] PagingRequestModel paging)
+        public IActionResult GetCheckupAppointment([FromQuery] CheckupAppointmentSearchModel searchModel)
         {
             if (searchModel is null)
             {
@@ -42,10 +45,11 @@ namespace HASB_User.Controllers
 
             try
             {
+                var result = _scheduleService.GetCheckupAppointment(searchModel);
                 //paging = PagingUtil.checkDefaultPaging(paging);
                 //var products = await _checkupRecordService.GetProductList(BrandId, searchModel, paging);
                 //return Ok(products);
-                List<CheckupAppointmentResponseModel> data = new List<CheckupAppointmentResponseModel>
+                List < CheckupAppointmentResponseModel > data = new List<CheckupAppointmentResponseModel>
                 {
                     new CheckupAppointmentResponseModel(){
                     Id = 1,
@@ -76,7 +80,7 @@ namespace HASB_User.Controllers
                     IsReExam = false,
                     },
                 };
-                return Ok(data);
+                return Ok(result);
             }
             catch (Exception)
             {
@@ -85,7 +89,7 @@ namespace HASB_User.Controllers
         }
         [SwaggerOperation(Summary = "Lấy lịch khám của bệnh nhân theo id (giả)")]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(long id)
+        public async Task<IActionResult> GetById([FromRoute]long id)
         {
             try
             {
@@ -107,7 +111,7 @@ namespace HASB_User.Controllers
             }
         }
         [HttpPost()]
-        [SwaggerOperation(Summary = "Book lịch khám mới (giả)")]
+        [SwaggerOperation(Summary = "Book lịch khám mới (hình như real rồi, gọi thử đi)")]
         public async Task<IActionResult> BookAppointment([FromBody] AppointmentCreateModel model)
         {
             try
@@ -115,7 +119,7 @@ namespace HASB_User.Controllers
                 //kiểm tra patientId có thuộc account không
 
                 //create new checkup record or return error
-                await _checkupRecordService.CreatNewAppointment(model.PatientId, model.Date, model.DoctorId, 
+                await _checkupRecordService.CreatNewAppointment(model.PatientId, model.Date, model.DoctorId,
                     model.NumericalOrder, model.ClinicalSymptom);
                 return Ok();
             }

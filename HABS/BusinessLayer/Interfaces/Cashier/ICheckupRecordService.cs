@@ -13,6 +13,7 @@ namespace BusinessLayer.Interfaces.Cashier
     public interface IBillService
     {
         List<BillViewModel> GetBills(BillSearchModel search);
+        BillViewModel GetBillById(long id);
         Task PayABill(long billId, long cashierId);
         Task CancelABill(long billId, long cashierId);
     }

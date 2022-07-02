@@ -20,19 +20,23 @@ namespace HASB_User.Controllers
     {
 
         private readonly ICheckupRecordService _checkupRecordService;
+        private readonly IScheduleService _scheduleService;
 
-        public SlotsController(ICheckupRecordService service)
+        public SlotsController(ICheckupRecordService service, IScheduleService scheduleService)
         {
             _checkupRecordService = service;
+            _scheduleService = scheduleService;
+
         }
 
-        [SwaggerOperation(Summary = "Lấy lịch khám theo ngày, bác sĩ (giả)")]
+        [SwaggerOperation(Summary = "Lấy lịch khám theo ngày, bác sĩ")]
         [HttpGet]
         //Lấy lịch khám theo filter
         public IActionResult GetCheckupSlot([FromQuery] SlotSearchModel model)
         {
             try
             {
+               var data=  _scheduleService.GetAvailableSlots(model);
                 List<CheckupSlotResponseModel> result = new List<CheckupSlotResponseModel>
                 {
                     new CheckupSlotResponseModel()
@@ -72,7 +76,7 @@ namespace HASB_User.Controllers
                         RoomId = 2,
                     }
                 };
-                return Ok(result);
+                return Ok(data);
             }
             catch (Exception)
             {

@@ -12,6 +12,7 @@ using static DataAccessLayer.Models.CheckupRecord;
 using BusinessLayer.Constants;
 using static DataAccessLayer.Models.Doctor;
 using DataAccessLayer.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Services.User
 {
@@ -25,10 +26,40 @@ namespace BusinessLayer.Services.User
             _redisService = new RedisService(_distributedCache);
 
         }
+        public List<CheckupAppointmentResponseModel> GetCheckupAppointment(CheckupAppointmentSearchModel searchModel)
+        {
+            var result = _unitOfWork.CheckupRecordRepository.Get()
+                .Where(x => searchModel.FromTime == null || ((DateTime)x.EstimatedDate).Date >= ((DateTime)searchModel.FromTime).Date)
+                .Where(x => searchModel.ToTime == null || ((DateTime)x.EstimatedDate).Date <= ((DateTime)searchModel.ToTime).Date)
+                .Where(x => searchModel.DepartmentId == null || x.DepartmentId == searchModel.DepartmentId)
+                .Where(x => searchModel.PatientId == null || x.PatientId == searchModel.PatientId)
+                .Where(x => x.Status!=CheckupRecordStatus.CHUYEN_KHOA
+                && x.Status != CheckupRecordStatus.DA_HUY
+                && x.Status != CheckupRecordStatus.DA_XOA
+                && x.Status != CheckupRecordStatus.NHAP_VIEN
+                && x.Status != CheckupRecordStatus.KET_THUC
+                )
+                .Select(x => new CheckupAppointmentResponseModel()
+                {
+                    Id = x.Id,
+                    PatientId = x.PatientId,
+                    DoctorId = x.DoctorId,
+                    DepartmentId = x.DepartmentId,
+                    DepartmentName = x.DepartmentName,
+                    EstimatedDate = x.EstimatedDate,
+                    EstimatedStartTime = x.EstimatedStartTime,
+                     DoctorName =x.DoctorName,
+                     IsReExam = (bool)x.IsReExam,
+                     NumericalOrder = x.NumericalOrder,
+                     PatientName = x.PatientName,
+                     Status =(int) x.Status,
+                }).ToList();
+            return result;
+        }
         //có thể những slot này thuộc những phòng khác nhau
         public List<CheckupSlotResponseModel> GetAvailableSlots(SlotSearchModel search)
         {
-            if (search.Date.Date<DateTime.Now.Date)
+            if (search.Date.Date < DateTime.Now.Date)
             {
                 throw new Exception("Invalid time");
             }
@@ -42,8 +73,10 @@ namespace BusinessLayer.Services.User
             }
             //lấy lịch làm việc ở các phòng của bác sĩ
             var schedule = _unitOfWork.ScheduleRepository.Get()
+                .Include(x => x.Room)
                 .Where(x => x.DoctorId == search.DoctorId)
                 .Where(x => x.Weekday == search.Date.DayOfWeek)
+
                 .ToList();
             Room morningRoom = null, afternoonRoom = null, eveningRoom = null;
             foreach (var s in schedule)
@@ -64,7 +97,7 @@ namespace BusinessLayer.Services.User
             //lấy các CR đã được đặt khám ông bác sĩ này
             var crList = _unitOfWork.CheckupRecordRepository.Get()
                 .Where(x => x.DoctorId == search.DoctorId)
-                .Where(x => ((DateTime)x.EstimatedDate).Date==search.Date.Date)
+                .Where(x => ((DateTime)x.EstimatedDate).Date == search.Date.Date)
                 .Where(x => x.Status != CheckupRecordStatus.CHO_TAI_KHAM
                 && x.Status != CheckupRecordStatus.DA_HUY
                 && x.Status != CheckupRecordStatus.DA_XOA)
@@ -170,8 +203,8 @@ namespace BusinessLayer.Services.User
             {
                 foreach (var cr in crList)
                 {
-                    if (cr.NumericalOrder==slot.NumericalOrder
-                        && (getSession((DateTime)cr.EstimatedStartTime) 
+                    if (cr.NumericalOrder == slot.NumericalOrder
+                        && (getSession((DateTime)cr.EstimatedStartTime)
                         == getSession((DateTime)slot.EstimatedStartTime)))
                     {
                         slot.IsAvailable = false;

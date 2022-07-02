@@ -58,6 +58,9 @@ namespace BusinessLayer.Services.Doctor
             List<PatientRecordMetadataViewModel> data = new List<PatientRecordMetadataViewModel>();
             var dbSetData = _unitOfWork.CheckupRecordRepository.Get();
             IQueryable<CheckupRecord> queryableData = dbSetData;
+            queryableData = queryableData.Where(x => x.Status == CheckupRecordStatus.KET_THUC
+            || x.Status == CheckupRecordStatus.NHAP_VIEN
+            );
             if (patientId != null)
             {
                 queryableData = queryableData.Where(x => x.PatientId == patientId);

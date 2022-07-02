@@ -7,6 +7,11 @@ namespace DataAccessLayer.Models
 {
     public partial class Account
     {
+        public enum UserStatus
+        {
+            BINH_THUONG,
+            DA_XOA
+        }
         public Account()
         {
             FcmTokenMobiles = new HashSet<FcmTokenMobile>();
@@ -18,6 +23,7 @@ namespace DataAccessLayer.Models
         public string Password { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
+        public UserStatus? Status { get; set; }
 
         public virtual ICollection<FcmTokenMobile> FcmTokenMobiles { get; set; }
         public virtual ICollection<Patient> Patients { get; set; }

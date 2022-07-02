@@ -34,7 +34,22 @@ namespace HASB_Cashier.Controllers
         {
             try
             {
+                //kiểm tra paging và áp dụng paging
                 var data = _billService.GetBills(search);
+                return Ok(data);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        [SwaggerOperation(Summary = "Lấy thông tin hóa đơn theo id")]
+        [HttpGet("id")]
+        public IActionResult GetBill0ById(long Id)
+        {
+            try
+            {
+                var data = _billService.GetBillById(Id);
                 return Ok(data);
             }
             catch (Exception)
