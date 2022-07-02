@@ -16,18 +16,14 @@ using BusinessLayer.Services.Redis;
 using Newtonsoft.Json;
 using BusinessLayer.Interfaces.User;
 using BusinessLayer.ResponseModels.ViewModels.User;
+using BusinessLayer.RequestModels.CreateModels.User;
 
 namespace BusinessLayer.Services.User
 {
     public class PatientService : BaseService, IPatientService
     {
-        private readonly IDistributedCache _distributedCache;
-        private readonly RedisService _redisService;
-        public PatientService(IUnitOfWork unitOfWork,IDistributedCache distributedCache) : base(unitOfWork)
+        public PatientService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
-            _distributedCache = distributedCache;
-            _redisService = new RedisService(_distributedCache);
-
         }
         public List<PatientResponseModel> GetPatients(long accountId)
         {
@@ -64,6 +60,54 @@ namespace BusinessLayer.Services.User
                     PhoneNumber = x.PhoneNumber
                 }).FirstOrDefault();
             return data;
+        }
+        public async Task RegisterANewPatient(long accountId, PatientCreateEditModel model)
+        {
+            //check user phone, email
+            var preUser = _unitOfWork.AccountRepository.Get()
+                .Where(x => x.PhoneNumber == model.PhoneNumber || x.Email == model.Email)
+                .Where(x => x.Status == Account.UserStatus.BINH_THUONG)
+                .FirstOrDefault();
+            if (preUser != null)
+            {
+                throw new Exception("Email/phone number existed");
+            }
+            var user = new Account()
+            {
+                Name = model.Name,
+                Password = model.Password,
+                PhoneNumber = model.PhoneNumber,
+                Email = model.Email,
+            };
+            await _unitOfWork.AccountRepository.Add(user);
+            await _unitOfWork.SaveChangesAsync();
+
+        }
+        public async Task EditUser(long userId, UserCreateEditModel edit)
+        {
+            //check phone
+            var preUser = _unitOfWork.AccountRepository.Get().Where(x => x.PhoneNumber == edit.PhoneNumber).FirstOrDefault();
+            if (preUser != null)
+            {
+                throw new Exception("Phone number is already used!");
+            }
+
+            var user = _unitOfWork.AccountRepository.Get().Where(x => x.Id == userId)
+                .Where(x => x.Status == Account.UserStatus.BINH_THUONG)
+                .FirstOrDefault();
+            if (user == null)
+            {
+                throw new Exception("User doesn't exist");
+            }
+            if (!string.IsNullOrEmpty(user.Name))
+            {
+                user.Name = edit.Name;
+            }
+            if (!string.IsNullOrEmpty(user.PhoneNumber))
+            {
+                user.Name = edit.Name;
+            }
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

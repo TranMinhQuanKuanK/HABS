@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interfaces.User;
 using BusinessLayer.RequestModels;
+using BusinessLayer.RequestModels.CreateModels.User;
 using BusinessLayer.RequestModels.SearchModels.User;
 using BusinessLayer.ResponseModels.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace HASB_User.Controllers
@@ -66,6 +68,46 @@ namespace HASB_User.Controllers
                 return BadRequest();
             }
         }
+        [SwaggerOperation(Summary = "Đăng kí một người bệnh nhân mới")]
+        [HttpPost]
+        public async Task<IActionResult> RegisterNewPatient([FromBody] PatientCreateEditModel model)
+        {
+            try
+            {
+                int userId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    userId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                await _patientService.(model);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
 
+        [SwaggerOperation(Summary = "Thay đổi thông tin bệnh nhân")]
+        [HttpPut]
+        public async Task<IActionResult> EditPatient([FromBody] PatientCreateEditModel model)
+        {
+            try
+            {
+                int userId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    userId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                await _userService.EditUser(userId, model);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }
