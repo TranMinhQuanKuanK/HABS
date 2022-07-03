@@ -49,7 +49,8 @@ namespace BusinessLayer.Services.Cashier
                     Total = x.Total,
                     TotalInWord = x.TotalInWord,
                     CashierId = x.CashierId,
-                    CashierName = x.CashierName
+                    CashierName = x.CashierName,
+                    PatientId=(long)x.PatientId
                 })
                 .ToList();
             return bills;
@@ -64,6 +65,7 @@ namespace BusinessLayer.Services.Cashier
                 {
                     Id = x.Id,
                     PatientName = x.PatientName,
+                    PatientId = (long)x.PatientId,
                     Content = x.Content,
                     TimeCreated = x.TimeCreated,
                     Status = (int)x.Status,

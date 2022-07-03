@@ -37,19 +37,19 @@ namespace BusinessLayer.Services.Doctor
             SessionType? session = null;
             var now = DateTime.Now.AddHours(7);
             var beginMorningShift = new DateTime(now.Year, now.Month, now.Day,
-                WorkingShiftConstant.BeginMorningShiftHour, WorkingShiftConstant.BeginMorningShiftMinute, 0);
+                WorkingShiftConfig.BeginMorningShiftHour, WorkingShiftConfig.BeginMorningShiftMinute, 0);
             var endMorningShift = new DateTime(now.Year, now.Month, now.Day,
-               WorkingShiftConstant.EndMorningShiftHour, WorkingShiftConstant.EndMorningShiftMinute, 0);
+               WorkingShiftConfig.EndMorningShiftHour, WorkingShiftConfig.EndMorningShiftMinute, 0);
 
             var beginEveningShift = new DateTime(now.Year, now.Month, now.Day,
-                WorkingShiftConstant.BeginEveningShiftHour, WorkingShiftConstant.BeginEveningShiftMinute, 0);
+                WorkingShiftConfig.BeginEveningShiftHour, WorkingShiftConfig.BeginEveningShiftMinute, 0);
             var endEveningShift = new DateTime(now.Year, now.Month, now.Day,
-               WorkingShiftConstant.EndEveningShiftHour, WorkingShiftConstant.EndAfternoonShiftMinute, 0);
+               WorkingShiftConfig.EndEveningShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
             var beginAfternoonShift = new DateTime(now.Year, now.Month, now.Day,
-               WorkingShiftConstant.BeginAfternoonShiftHour, WorkingShiftConstant.BeginAfternoonShiftMinute, 0);
+               WorkingShiftConfig.BeginAfternoonShiftHour, WorkingShiftConfig.BeginAfternoonShiftMinute, 0);
             var endAfternoonShift = new DateTime(now.Year, now.Month, now.Day,
-               WorkingShiftConstant.EndAfternoonShiftHour, WorkingShiftConstant.EndAfternoonShiftMinute, 0);
+               WorkingShiftConfig.EndAfternoonShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
             if (now >= beginMorningShift && now <= endMorningShift)
             {
@@ -87,7 +87,7 @@ namespace BusinessLayer.Services.Doctor
             {
                 throw new Exception("Room invalid");
             }
-            if (room.RoomTypeId!= IdConstant.ID_ROOMTYPE_PHONG_KHAM)
+            if (room.RoomTypeId!= IdConfig.ID_ROOMTYPE_PHONG_KHAM)
             {
                 if (doctor.Type == (int)DoctorType.BS_XET_NGHIEM)
                 {

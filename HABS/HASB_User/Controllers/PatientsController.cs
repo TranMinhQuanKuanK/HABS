@@ -35,8 +35,12 @@ namespace HASB_User.Controllers
         {
             try
             {
-                //Lấy accountId
-                long accountId = 10001;
+                int accountId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
                 var result = _patientService.GetPatients(accountId);
                 if (result.Count==0)
                 {
@@ -80,7 +84,7 @@ namespace HASB_User.Controllers
                 {
                     userId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                await _patientService.(model);
+                await _patientService.RegisterANewPatient(userId,model);
                 return Ok();
             }
             catch (Exception e)
@@ -90,8 +94,8 @@ namespace HASB_User.Controllers
         }
 
         [SwaggerOperation(Summary = "Thay đổi thông tin bệnh nhân")]
-        [HttpPut]
-        public async Task<IActionResult> EditPatient([FromBody] PatientCreateEditModel model)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditPatient(long Id,[FromBody] PatientCreateEditModel model)
         {
             try
             {
@@ -101,7 +105,27 @@ namespace HASB_User.Controllers
                 {
                     userId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                await _userService.EditUser(userId, model);
+                await _patientService.EditPatient(userId, Id,model);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [SwaggerOperation(Summary = "Xóa bệnh nhân")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePatient(long Id)
+        {
+            try
+            {
+                int userId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    userId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                await _patientService.DeletePatient(userId, Id);
                 return Ok();
             }
             catch (Exception e)

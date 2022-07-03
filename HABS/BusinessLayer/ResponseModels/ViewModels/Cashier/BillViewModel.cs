@@ -15,6 +15,8 @@ namespace BusinessLayer.ResponseModels.ViewModels.Cashier
         public int Status { get; set; }
         public string Content { get; set; }
         public string PatientName { get; set; }
+        public long PatientId { get; set; }
+
         public string CashierName { get; set; }
         public long? CashierId { get; set; }
         public List<BillDetailViewModel> Details { get; set; }

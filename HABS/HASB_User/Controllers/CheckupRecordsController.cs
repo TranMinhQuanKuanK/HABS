@@ -13,6 +13,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace HASB_User.Controllers
@@ -30,7 +31,7 @@ namespace HASB_User.Controllers
             _checkupRecordService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân, chỉ trả metadata (chưa check được patientId có hợp lệ ko)")]
+        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân, trả metadata")]
         [HttpGet]
         public IActionResult GetCheckupRecord([FromQuery] CheckupAppointmentSearchModel searchModel, [FromQuery] PagingRequestModel paging)
         {
@@ -41,10 +42,14 @@ namespace HASB_User.Controllers
             }
             try
             {
-                //QUAN TRỌNG:
-                //Bổ sung kiểm tra patientId có thuộc accountId không? bổ sung sau khi đã thêm authentication
-
-                var data = _checkupRecordService.GetCheckupRecordMetadata(null, searchModel.FromTime, searchModel.ToTime, searchModel.DepartmentId);
+                int accountId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                var data = _checkupRecordService.GetCheckupRecordMetadata(null, searchModel.FromTime, 
+                    searchModel.ToTime, searchModel.DepartmentId, accountId);
 
                 int totalItem = data.Count;
                 if (totalItem == 0)
@@ -70,13 +75,19 @@ namespace HASB_User.Controllers
                 return BadRequest();
             }
         }
-        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id, đầy đủ thông tin (chưa check được patientId có hợp lệ ko)")]
+        [SwaggerOperation(Summary = "Lấy đầy đủ thông tin BỆNH ÁN của bệnh nhân theo record id")]
         [HttpGet("{id}")]
         public IActionResult GetById(long id)
         {
             try
             {
-                var data = _checkupRecordService.GetCheckupRecordFullData(id);
+                int accountId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                var data = _checkupRecordService.GetCheckupRecordFullData(id, accountId);
                 if (data == null)
                 {
                     return NotFound();

@@ -108,12 +108,12 @@ namespace BusinessLayer.Services.User
             DateTime now = DateTime.Now.AddHours(7);
 
             DateTime start = new DateTime(now.Year, now.Month, now.Day,
-                WorkingShiftConstant.BeginMorningShiftHour,
-                WorkingShiftConstant.BeginAfternoonShiftMinute,
+                WorkingShiftConfig.BeginMorningShiftHour,
+                WorkingShiftConfig.BeginAfternoonShiftMinute,
                 0);
             DateTime end = new DateTime(now.Year, now.Month, now.Day,
-                WorkingShiftConstant.EndMorningShiftHour,
-                WorkingShiftConstant.EndMorningShiftMinute,
+                WorkingShiftConfig.EndMorningShiftHour,
+                WorkingShiftConfig.EndMorningShiftMinute,
                 0);
             DateTime temp = start;
             int _curSlot = 1;
@@ -143,12 +143,12 @@ namespace BusinessLayer.Services.User
             {
                 _curSlot = 1;
                 start = new DateTime(now.Year, now.Month, now.Day,
-                    WorkingShiftConstant.BeginAfternoonShiftHour,
-                    WorkingShiftConstant.BeginAfternoonShiftMinute,
+                    WorkingShiftConfig.BeginAfternoonShiftHour,
+                    WorkingShiftConfig.BeginAfternoonShiftMinute,
                     0);
                 end = new DateTime(now.Year, now.Month, now.Day,
-                    WorkingShiftConstant.EndAfternoonShiftHour,
-                    WorkingShiftConstant.EndAfternoonShiftMinute,
+                    WorkingShiftConfig.EndAfternoonShiftHour,
+                    WorkingShiftConfig.EndAfternoonShiftMinute,
                     0);
                 temp = start;
                 while (temp <= end)
@@ -172,12 +172,12 @@ namespace BusinessLayer.Services.User
             {
                 _curSlot = 1;
                 start = new DateTime(now.Year, now.Month, now.Day,
-                    WorkingShiftConstant.BeginEveningShiftHour,
-                    WorkingShiftConstant.BeginEveningShiftMinute,
+                    WorkingShiftConfig.BeginEveningShiftHour,
+                    WorkingShiftConfig.BeginEveningShiftMinute,
                     0);
                 end = new DateTime(now.Year, now.Month, now.Day,
-                    WorkingShiftConstant.EndEveningShiftHour,
-                    WorkingShiftConstant.EndEveningShiftMinute,
+                    WorkingShiftConfig.EndEveningShiftHour,
+                    WorkingShiftConfig.EndEveningShiftMinute,
                     0);
                 temp = start;
                 while (temp <= end)
@@ -218,19 +218,19 @@ namespace BusinessLayer.Services.User
         {
             SessionType? session = null;
             var beginMorningShift = new DateTime(time.Year, time.Month, time.Day,
-                WorkingShiftConstant.BeginMorningShiftHour, WorkingShiftConstant.BeginMorningShiftMinute, 0);
+                WorkingShiftConfig.BeginMorningShiftHour, WorkingShiftConfig.BeginMorningShiftMinute, 0);
             var endMorningShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.EndMorningShiftHour, WorkingShiftConstant.EndMorningShiftMinute, 0);
+               WorkingShiftConfig.EndMorningShiftHour, WorkingShiftConfig.EndMorningShiftMinute, 0);
 
             var beginEveningShift = new DateTime(time.Year, time.Month, time.Day,
-                WorkingShiftConstant.BeginEveningShiftHour, WorkingShiftConstant.BeginEveningShiftMinute, 0);
+                WorkingShiftConfig.BeginEveningShiftHour, WorkingShiftConfig.BeginEveningShiftMinute, 0);
             var endEveningShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.EndEveningShiftHour, WorkingShiftConstant.EndAfternoonShiftMinute, 0);
+               WorkingShiftConfig.EndEveningShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
             var beginAfternoonShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.BeginAfternoonShiftHour, WorkingShiftConstant.BeginAfternoonShiftMinute, 0);
+               WorkingShiftConfig.BeginAfternoonShiftHour, WorkingShiftConfig.BeginAfternoonShiftMinute, 0);
             var endAfternoonShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.EndAfternoonShiftHour, WorkingShiftConstant.EndAfternoonShiftMinute, 0);
+               WorkingShiftConfig.EndAfternoonShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
             if (time >= beginMorningShift && time <= endMorningShift)
             {

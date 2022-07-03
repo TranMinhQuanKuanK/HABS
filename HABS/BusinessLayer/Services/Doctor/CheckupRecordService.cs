@@ -30,13 +30,13 @@ namespace BusinessLayer.Services.Doctor
 {
     public class CheckupRecordService : BaseService, Interfaces.Doctor.ICheckupRecordService
     {
-        private readonly IDistributedCache _distributedCache;
         private readonly IPatientService _patientService;
         private readonly Interfaces.Doctor.IScheduleService _scheduleService;
-
         private readonly IDepartmentService _departmentService;
         private readonly INumercialOrderService _numService;
+
         private readonly RedisService _redisService;
+        private readonly IDistributedCache _distributedCache;
         public CheckupRecordService(IUnitOfWork unitOfWork,
             IDistributedCache distributedCache,
             IPatientService patientService,
@@ -131,7 +131,7 @@ namespace BusinessLayer.Services.Doctor
                             Address = x.Patient.Address,
                             Bhyt = x.Patient.Bhyt,
                             DateOfBirth = x.Patient.DateOfBirth,
-                            Gender = x.Patient.Gender,
+                            Gender = (int)x.Patient.Gender,
                             PhoneNumber = x.Patient.PhoneNumber,
                             Name = x.Patient.Name,
                         },
@@ -359,7 +359,7 @@ namespace BusinessLayer.Services.Doctor
             await _unitOfWork.SaveChangesAsync();
             return result;
         }
-        public async Task RequestExamination(long recordId, TestRequestCreateModel testReqModel)
+        public async Task<List<IncomingTestResponseModel>> RequestExamination(long recordId, TestRequestCreateModel testReqModel)
         {
             var cr = _unitOfWork.CheckupRecordRepository.Get()
                .Where(x => x.Id == recordId).FirstOrDefault();
@@ -379,6 +379,7 @@ namespace BusinessLayer.Services.Doctor
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
+            List<IncomingTestResponseModel> result = new List<IncomingTestResponseModel>();
             foreach (var opId in testReqModel.ExamOperationIds)
             {
                 Operation _op = null;
@@ -430,10 +431,20 @@ namespace BusinessLayer.Services.Doctor
                 bill.Total = bill.Total += _op.Price;
                 await _unitOfWork.BillDetailRepository.Add(bd);
                 await _unitOfWork.SaveChangesAsync();
+                //tạo thêm một lịch vào kết quả
+                result.Add(new IncomingTestResponseModel()
+                {
+                    Floor = room.Floor,
+                    RoomNumber = room.RoomNumber,
+                    OperationId = _op.Id,
+                    OperationName =_op.Name,
+                    NumericalOrder = numOrd,
+                });
             }
             cr.Status = CheckupRecordStatus.CHO_KQXN;
             bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
             await _unitOfWork.SaveChangesAsync();
+            return result;
         }
         public async Task EditCheckupRecord(CheckupRecordEditModel model)
         {
@@ -519,7 +530,7 @@ namespace BusinessLayer.Services.Doctor
             queue.Insert(0, crInQueue);
 
             //nếu có doctor id, tức là đây là confirm của 
-            if (cr.DepartmentId!=IdConstant.ID_DEPARTMENT_DA_KHOA)
+            if (cr.DepartmentId!=IdConfig.ID_DEPARTMENT_DA_KHOA)
             {
                 var doctor = _unitOfWork.DepartmentRepository.Get().Where(x => x.Id == (long)doctorId).FirstOrDefault();
                 if (doctor==null)

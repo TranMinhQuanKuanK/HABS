@@ -8,15 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
-using BusinessLayer.Services.Redis;
-using Newtonsoft.Json;
 using BusinessLayer.Interfaces.User;
 using BusinessLayer.ResponseModels.ViewModels.User;
 using BusinessLayer.RequestModels.CreateModels.User;
+using DataAccessLayer.Models;
+using static DataAccessLayer.Models.Patient;
 
 namespace BusinessLayer.Services.User
 {
@@ -30,14 +27,14 @@ namespace BusinessLayer.Services.User
             List<PatientResponseModel> data = new List<PatientResponseModel>();
             data = _unitOfWork.PatientRepository.Get()
                 .Where(x => x.AccountId == accountId)
-                .Where(x => x.Status == DataAccessLayer.Models.Patient.PatientStatus.HOAT_DONG)
+                .Where(x => x.Status == PatientStatus.HOAT_DONG)
                 .Select(x => new PatientResponseModel()
                 {
                     Id = x.Id,
                     Address = x.Address,
                     Bhyt = x.Bhyt,
                     DateOfBirth = x.DateOfBirth,
-                    Gender = x.Gender,
+                    Gender = (int)x.Gender,
                     Name = x.Name,
                     PhoneNumber = x.PhoneNumber
                 })
@@ -48,14 +45,14 @@ namespace BusinessLayer.Services.User
         {
             var data = _unitOfWork.PatientRepository.Get()
                 .Where(x => x.Id == patientId)
-                .Where(x=>x.Status==DataAccessLayer.Models.Patient.PatientStatus.HOAT_DONG)
+                .Where(x => x.Status == PatientStatus.HOAT_DONG)
                 .Select(x => new PatientResponseModel()
                 {
                     Id = x.Id,
                     Address = x.Address,
                     Bhyt = x.Bhyt,
                     DateOfBirth = x.DateOfBirth,
-                    Gender = x.Gender,
+                    Gender = (int)x.Gender,
                     Name = x.Name,
                     PhoneNumber = x.PhoneNumber
                 }).FirstOrDefault();
@@ -63,50 +60,103 @@ namespace BusinessLayer.Services.User
         }
         public async Task RegisterANewPatient(long accountId, PatientCreateEditModel model)
         {
-            //check user phone, email
-            var preUser = _unitOfWork.AccountRepository.Get()
-                .Where(x => x.PhoneNumber == model.PhoneNumber || x.Email == model.Email)
-                .Where(x => x.Status == Account.UserStatus.BINH_THUONG)
+            //check patient
+            var prePatient = _unitOfWork.PatientRepository.Get()
+                .Where(x => x.Bhyt == model.Bhyt || x.PhoneNumber == model.PhoneNumber)
+                .Where(x => x.Status == PatientStatus.HOAT_DONG)
                 .FirstOrDefault();
-            if (preUser != null)
+            if (prePatient != null)
             {
-                throw new Exception("Email/phone number existed");
+                throw new Exception("Health Insurance code is used.");
             }
-            var user = new Account()
+            //không cần check account
+            //tạo patient
+            if (model.Gender > (int)GenderEnum.NOT_SPECIFIED)
+            {
+                model.Gender = (int)GenderEnum.NOT_SPECIFIED;
+            }
+            var patient = new Patient()
             {
                 Name = model.Name,
-                Password = model.Password,
                 PhoneNumber = model.PhoneNumber,
-                Email = model.Email,
+                AccountId = accountId,
+                Address = model.Address,
+                Gender = (GenderEnum)model.Gender,
+                DateOfBirth = (DateTime)model.DateOfBirth,
+                Bhyt = model.Bhyt,
+                Status = PatientStatus.HOAT_DONG
             };
-            await _unitOfWork.AccountRepository.Add(user);
+            await _unitOfWork.PatientRepository.Add(patient);
             await _unitOfWork.SaveChangesAsync();
 
         }
-        public async Task EditUser(long userId, UserCreateEditModel edit)
+        public async Task EditPatient(long userId, long patientId, PatientCreateEditModel edit)
         {
-            //check phone
-            var preUser = _unitOfWork.AccountRepository.Get().Where(x => x.PhoneNumber == edit.PhoneNumber).FirstOrDefault();
-            if (preUser != null)
-            {
-                throw new Exception("Phone number is already used!");
-            }
-
-            var user = _unitOfWork.AccountRepository.Get().Where(x => x.Id == userId)
-                .Where(x => x.Status == Account.UserStatus.BINH_THUONG)
+            //check user exist
+            var user = _unitOfWork.PatientRepository
+                .Get()
+                .Where(x => x.Id == patientId)
+                .Where(x => x.AccountId == userId)
+                .Where(x => x.Status == PatientStatus.HOAT_DONG)
                 .FirstOrDefault();
             if (user == null)
             {
                 throw new Exception("User doesn't exist");
             }
-            if (!string.IsNullOrEmpty(user.Name))
+            //check phone no exist
+            var prePatient = _unitOfWork.PatientRepository.Get()
+               .Where(x => x.Bhyt == edit.Bhyt || x.PhoneNumber == edit.PhoneNumber)
+               .FirstOrDefault();
+            if (prePatient != null && prePatient.PhoneNumber == edit.PhoneNumber)
+            {
+                throw new Exception("Phone number is used.");
+            }
+            //check bảo hiểm exist
+            if (prePatient != null && prePatient.Bhyt == edit.Bhyt)
+            {
+                throw new Exception("Health Insurance code is used.");
+            }
+            //edit
+            if (edit.Bhyt != null)
+            {
+                user.Bhyt = edit.Bhyt;
+            }
+            if (edit.DateOfBirth != null)
+            {
+                user.DateOfBirth = (DateTime)edit.DateOfBirth;
+            }
+            if (edit.Gender != null)
+            {
+                user.Gender = (GenderEnum)edit.Gender;
+            }
+            if (edit.Name != null)
             {
                 user.Name = edit.Name;
             }
-            if (!string.IsNullOrEmpty(user.PhoneNumber))
+            if (edit.PhoneNumber != null)
             {
-                user.Name = edit.Name;
+                user.PhoneNumber = edit.PhoneNumber;
             }
+            if (edit.Address != null)
+            {
+                user.Address = edit.Address;
+            }
+            await _unitOfWork.SaveChangesAsync();
+        }
+        public async Task DeletePatient(long userId, long patientId)
+        {
+            //check user exist
+            var user = _unitOfWork.PatientRepository
+                .Get()
+                .Where(x => x.Id == patientId)
+                .Where(x => x.AccountId == userId)
+                .Where(x=>x.Status==PatientStatus.HOAT_DONG)
+                .FirstOrDefault();
+            if (user == null)
+            {
+                throw new Exception("User doesn't exist");
+            }
+            user.Status = PatientStatus.DA_XOA;
             await _unitOfWork.SaveChangesAsync();
         }
     }

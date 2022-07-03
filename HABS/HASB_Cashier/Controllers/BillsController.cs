@@ -38,7 +38,7 @@ namespace HASB_Cashier.Controllers
                 var data = _billService.GetBills(search);
                 return Ok(data);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return BadRequest();
             }

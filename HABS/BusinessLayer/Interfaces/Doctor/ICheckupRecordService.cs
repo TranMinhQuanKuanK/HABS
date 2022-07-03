@@ -15,7 +15,7 @@ namespace BusinessLayer.Interfaces.Doctor
         Task ConfirmCheckup(long crId, long? doctorId);
         Task CreatePrescription(long recordId, PrescriptionCreateModel model);
         Task<List<RedirectViewModel>> RedirectPatient(RedirectCreateModel model, long recordId);
-        Task RequestExamination(long recordId, TestRequestCreateModel testReqModel);
+        Task<List<IncomingTestResponseModel>> RequestExamination(long recordId, TestRequestCreateModel testReqModel);
         Task EditCheckupRecord(CheckupRecordEditModel model);
         Task CreateReExamCheckupRecord(long previousCrId, long doctorId, ReExamCreateModel model);
     }

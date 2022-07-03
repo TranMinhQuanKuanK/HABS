@@ -12,6 +12,12 @@ namespace DataAccessLayer.Models
             HOAT_DONG,
             DA_XOA
         }
+        public enum GenderEnum
+        {
+            MALE,
+            FEMALE,
+            NOT_SPECIFIED
+        }
         public Patient()
         {
             Bills = new HashSet<Bill>();
@@ -22,7 +28,7 @@ namespace DataAccessLayer.Models
         public long Id { get; set; }
         public string PhoneNumber { get; set; }
         public string Name { get; set; }
-        public int Gender { get; set; }
+        public GenderEnum Gender { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string Address { get; set; }
         public string Bhyt { get; set; }

@@ -44,7 +44,7 @@ namespace BusinessLayer.Services.Doctor
             _scheduleService = scheduleService;
         }
 
-        public async Task UpdateTestRecordResult(TestRecordEditModel model)
+        public async Task UpdateTestRecordResult( TestRecordEditModel model)
         {
             var tr = _unitOfWork.TestRecordRepository.Get()
               .Where(x => x.Id == model.Id)
@@ -127,8 +127,8 @@ namespace BusinessLayer.Services.Doctor
             trInQueue.Status = (int)TestRecordStatus.DANG_TIEN_HANH;
             tr.Status = TestRecordStatus.DANG_TIEN_HANH;
             tr.Date = DateTime.Now.AddHours(7);
-            tr.DoctorId = tr.DoctorId;
-            tr.DoctorName = tr.DoctorName;
+            tr.DoctorId = doc.Id;
+            tr.DoctorName = doc.Name;
             queue.Remove(trInQueue);
             queue.Insert(0, trInQueue);
             await _unitOfWork.SaveChangesAsync();

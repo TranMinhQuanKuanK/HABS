@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Constants
 {
-    public class WorkingShiftConstant
+    public class WorkingShiftConfig
     {
         public const int BeginMorningShiftHour = 7;
         public const int BeginMorningShiftMinute = 0;

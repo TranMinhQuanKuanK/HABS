@@ -44,7 +44,7 @@ namespace HASB_Doctor.Controllers
             try
             {
                 var data = _checkupRecordService.GetCheckupRecordMetadata(searchModel.PatientId, searchModel.FromTime, searchModel.ToTime, searchModel.DepartmentId);
-                
+
                 int totalItem = data.Count;
                 if (totalItem == 0)
                 {
@@ -69,7 +69,7 @@ namespace HASB_Doctor.Controllers
                 return BadRequest();
             }
         }
-        
+
         [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân theo id record, đầy đủ thông tin")]
         [HttpGet("{id}")]
         public IActionResult GetById(long Id)
@@ -87,7 +87,7 @@ namespace HASB_Doctor.Controllers
 
         [SwaggerOperation(Summary = "Chỉnh sửa bệnh án của bệnh nhân (chỉ gửi những field cần edit)")]
         [HttpPut("{id}")]
-        public IActionResult ChangeCheckupRecord([FromBody]CheckupRecordEditModel model)
+        public IActionResult ChangeCheckupRecord([FromBody] CheckupRecordEditModel model)
         {
             try
             {
@@ -105,8 +105,8 @@ namespace HASB_Doctor.Controllers
         {
             try
             {
-                await _checkupRecordService.RequestExamination(Id,model);
-                return Ok();
+                var result = await _checkupRecordService.RequestExamination(Id, model);
+                return Ok(result);
             }
             catch (Exception)
             {
@@ -133,7 +133,7 @@ namespace HASB_Doctor.Controllers
         {
             try
             {
-                await _checkupRecordService.CreatePrescription(Id,model);
+                await _checkupRecordService.CreatePrescription(Id, model);
                 return Ok();
             }
             catch (Exception)

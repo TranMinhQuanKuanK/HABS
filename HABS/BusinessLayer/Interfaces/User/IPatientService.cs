@@ -1,4 +1,5 @@
-﻿using BusinessLayer.ResponseModels.ViewModels.User;
+﻿using BusinessLayer.RequestModels.CreateModels.User;
+using BusinessLayer.ResponseModels.ViewModels.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,9 @@ namespace BusinessLayer.Interfaces.User
     {
         List<PatientResponseModel> GetPatients(long accountId);
         PatientResponseModel GetPatientById(long patientId);
+        Task RegisterANewPatient(long accountId, PatientCreateEditModel model);
+        Task EditPatient(long userId, long patientId, PatientCreateEditModel edit);
+        Task DeletePatient(long userId, long patientId);
+
     }
 }

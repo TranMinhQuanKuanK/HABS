@@ -33,7 +33,7 @@ namespace BusinessLayer.Services.Doctor
         { 
             List<DepartmentViewModel> departmentsData = new List<DepartmentViewModel>();
             departmentsData = _unitOfWork.DepartmentRepository.Get()
-                .Where(x=> includeGeneral==true || x.Id != IdConstant.ID_DEPARTMENT_DA_KHOA)
+                .Where(x=> includeGeneral==true || x.Id != IdConfig.ID_DEPARTMENT_DA_KHOA)
                 .Where(x=>x.Status == DataAccessLayer.Models.Department.DepartmentStatus.CO_MO_KHAM)
             .Select
                (x => new DepartmentViewModel()

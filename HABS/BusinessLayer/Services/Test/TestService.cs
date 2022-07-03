@@ -36,19 +36,19 @@ namespace BusinessLayer.Services.Test
         {
             SessionType? session = null;
             var beginMorningShift = new DateTime(time.Year, time.Month, time.Day,
-                WorkingShiftConstant.BeginMorningShiftHour, WorkingShiftConstant.BeginMorningShiftMinute, 0);
+                WorkingShiftConfig.BeginMorningShiftHour, WorkingShiftConfig.BeginMorningShiftMinute, 0);
             var endMorningShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.EndMorningShiftHour, WorkingShiftConstant.EndMorningShiftMinute, 0);
+               WorkingShiftConfig.EndMorningShiftHour, WorkingShiftConfig.EndMorningShiftMinute, 0);
 
             var beginEveningShift = new DateTime(time.Year, time.Month, time.Day,
-                WorkingShiftConstant.BeginEveningShiftHour, WorkingShiftConstant.BeginEveningShiftMinute, 0);
+                WorkingShiftConfig.BeginEveningShiftHour, WorkingShiftConfig.BeginEveningShiftMinute, 0);
             var endEveningShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.EndEveningShiftHour, WorkingShiftConstant.EndAfternoonShiftMinute, 0);
+               WorkingShiftConfig.EndEveningShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
             var beginAfternoonShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.BeginAfternoonShiftHour, WorkingShiftConstant.BeginAfternoonShiftMinute, 0);
+               WorkingShiftConfig.BeginAfternoonShiftHour, WorkingShiftConfig.BeginAfternoonShiftMinute, 0);
             var endAfternoonShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.EndAfternoonShiftHour, WorkingShiftConstant.EndAfternoonShiftMinute, 0);
+               WorkingShiftConfig.EndAfternoonShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
             if (time >= beginMorningShift && time <= endMorningShift)
             {
@@ -118,7 +118,7 @@ namespace BusinessLayer.Services.Test
                //không đặt trước trong hàm test
             }
             //nếu chưa có CR thì đăng kí 1 checkup record mới
-            var dakhoaDep = _departmentService.GetDepartmentById(IdConstant.ID_DEPARTMENT_DA_KHOA);
+            var dakhoaDep = _departmentService.GetDepartmentById(IdConfig.ID_DEPARTMENT_DA_KHOA);
             var dakhoaOp = _operationService.GetOperationForDepartment(dakhoaDep.Id);
             var cr = new CheckupRecord()
             {
@@ -134,7 +134,7 @@ namespace BusinessLayer.Services.Test
                 NumericalOrder = numericalOrder,
                 EstimatedDate = date,
                 EstimatedStartTime = estimatedStartTime,
-                DepartmentId = IdConstant.ID_DEPARTMENT_DA_KHOA,
+                DepartmentId = IdConfig.ID_DEPARTMENT_DA_KHOA,
                 DepartmentName = dakhoaDep.Name,
                 DoctorId = schedule.DoctorId,
                 ClinicalSymptom = clinicalSymptom,

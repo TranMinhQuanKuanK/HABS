@@ -12,6 +12,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace HASB_User.Controllers
@@ -89,7 +90,7 @@ namespace HASB_User.Controllers
         }
         [SwaggerOperation(Summary = "Lấy lịch khám của bệnh nhân theo id (giả)")]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute]long id)
+        public IActionResult GetById([FromRoute]long id)
         {
             try
             {
@@ -117,10 +118,24 @@ namespace HASB_User.Controllers
             try
             {
                 //kiểm tra patientId có thuộc account không
-
+                int accountId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
                 //create new checkup record or return error
-                await _checkupRecordService.CreatNewAppointment(model.PatientId, model.Date, model.DoctorId,
-                    model.NumericalOrder, model.ClinicalSymptom);
+                if (model.IsReExam && model.Id!=null)
+                {
+                    await _checkupRecordService.CreatReExamAppointment(model.PatientId,(int)model.Id,model.Date,model.DoctorId,
+                        model.NumericalOrder,model.ClinicalSymptom,accountId);
+                }
+                else
+                {
+                    await _checkupRecordService.CreatNewAppointment(model.PatientId, model.Date, model.DoctorId,
+                  model.NumericalOrder, model.ClinicalSymptom, accountId);
+                }
+              
                 return Ok();
             }
             catch (Exception)

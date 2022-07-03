@@ -82,7 +82,7 @@ namespace HASB_User.Controllers
                 return BadRequest();
             }
         }
-        [SwaggerOperation(Summary = "Đăng nhập SĐT-password")]
+        [SwaggerOperation(Summary = "Đăng nhập SĐT-password, default 0978610119 - 123")]
         [HttpPost]
         public IActionResult Login([FromBody] LoginModel login)
         {

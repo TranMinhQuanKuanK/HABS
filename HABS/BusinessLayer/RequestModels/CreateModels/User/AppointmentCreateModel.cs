@@ -8,11 +8,13 @@ namespace BusinessLayer.RequestModels.CreateModels.User
 {
     public class AppointmentCreateModel
     {
+        public long? Id { get; set; }
         public long PatientId { get; set; }
         public int? NumericalOrder { get; set; }
         public DateTime Date { get; set; }
         public long DoctorId { get; set; }
         public string ClinicalSymptom { get; set; }
+        public bool IsReExam { get; set; }
 
     }
 }

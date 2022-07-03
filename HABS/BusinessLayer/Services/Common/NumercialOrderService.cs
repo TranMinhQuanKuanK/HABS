@@ -58,7 +58,7 @@ namespace BusinessLayer.Services.Common
                       || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH
                       ).Where(x => x.RoomId == roomList[0].Id)
                      .ToList().Count;
-            if (op.RoomTypeId != IdConstant.ID_ROOMTYPE_PHONG_KHAM)
+            if (op.RoomTypeId != IdConfig.ID_ROOMTYPE_PHONG_KHAM)
             {
                 //Flow cho phòng xét nghiệm
                 foreach (var room in roomList)
@@ -110,7 +110,7 @@ namespace BusinessLayer.Services.Common
             lock (padlock)
             {
                 int curNumOfPeople = 0;
-                if (room.RoomTypeId != IdConstant.ID_ROOMTYPE_PHONG_KHAM)
+                if (room.RoomTypeId != IdConfig.ID_ROOMTYPE_PHONG_KHAM)
                 {
                     curNumOfPeople = room.TestRecords.Where(x => ((DateTime)x.Date).Day == date.Day)
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN

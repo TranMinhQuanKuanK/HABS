@@ -51,11 +51,12 @@ namespace BusinessLayer.Services.User
             _scheduleService = scheduleService;
             _departmentService = departmentService;
         }
-        public List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId)
+        public List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId, long accountId)
         {
             List<PatientRecordMetadataResponseModel> data = new List<PatientRecordMetadataResponseModel>();
-            var dbSetData = _unitOfWork.CheckupRecordRepository.Get();
+            var dbSetData = _unitOfWork.CheckupRecordRepository.Get().Include(x=>x.Patient);
             IQueryable<CheckupRecord> queryableData = dbSetData;
+            queryableData=queryableData.Where(x => x.Patient.AccountId == accountId);
             if (patientId != null)
             {
                 queryableData = queryableData.Where(x => x.PatientId == patientId);
@@ -86,7 +87,7 @@ namespace BusinessLayer.Services.User
                ).ToList();
             return data;
         }
-        public PatientRecordFullDataResponseModel GetCheckupRecordFullData(long recordId)
+        public PatientRecordFullDataResponseModel GetCheckupRecordFullData(long recordId, long accountId)
         {
             PatientRecordFullDataResponseModel data = new PatientRecordFullDataResponseModel();
             data = _unitOfWork.CheckupRecordRepository.Get()
@@ -94,7 +95,8 @@ namespace BusinessLayer.Services.User
                 .Include(x => x.Prescriptions)
                     .ThenInclude(x => x.PrescriptionDetails)
                 .Include(x => x.TestRecords)
-                .Where(x => x.Id == recordId).AsEnumerable().Select
+                .Where(x => x.Id == recordId)
+                .Where(x=>x.Patient.AccountId==accountId) .AsEnumerable().Select
                 (x =>
                 {
                     var _prescription = x.Prescriptions.ToArray()[0];
@@ -123,7 +125,7 @@ namespace BusinessLayer.Services.User
                             Address = x.Patient.Address,
                             Bhyt = x.Patient.Bhyt,
                             DateOfBirth = x.Patient.DateOfBirth,
-                            Gender = x.Patient.Gender,
+                            Gender = (int)x.Patient.Gender,
                             PhoneNumber = x.Patient.PhoneNumber,
                             Name = x.Patient.Name,
                         },
@@ -174,7 +176,8 @@ namespace BusinessLayer.Services.User
                 }).FirstOrDefault();
             return data;
         }
-        public async Task CreatReExamAppointment(long patientId, long previousCrId, DateTime date, long doctorId, int? numericalOrder, string clinicalSymptom)
+        public async Task CreatReExamAppointment(long patientId, long previousCrId, DateTime date,
+            long doctorId, int? numericalOrder, string clinicalSymptom,long accountId)
         {
             //kiểm tra ngày có hợp lệ, có thuộc phiên làm việc chính thức ko
             var reqSession = getSession(date);
@@ -195,6 +198,7 @@ namespace BusinessLayer.Services.User
             var patient = _unitOfWork.PatientRepository.Get()
              .Where(x => x.Id == patientId)
              .Where(x=>x.Status==Patient.PatientStatus.HOAT_DONG)
+             .Where(x=>x.AccountId==accountId)
              .FirstOrDefault();
             if (patient == null)
             {
@@ -291,7 +295,7 @@ namespace BusinessLayer.Services.User
             }
             await _unitOfWork.SaveChangesAsync();
         }
-        public async Task CreatNewAppointment(long patientId, DateTime date, long doctorId, int? numericalOrder, string clinicalSymptom)
+        public async Task CreatNewAppointment(long patientId, DateTime date, long doctorId, int? numericalOrder, string clinicalSymptom, long accountId)
         {
             //kiểm tra ngày có hợp lệ, có thuộc phiên làm việc chính thức ko
             var reqSession = getSession(date);
@@ -312,6 +316,7 @@ namespace BusinessLayer.Services.User
             var patient = _unitOfWork.PatientRepository.Get()
              .Where(x => x.Status == Patient.PatientStatus.HOAT_DONG)
              .Where(x => x.Id == patientId)
+             .Where(x => x.AccountId == accountId)
              .FirstOrDefault();
             if (patient == null)
             {
@@ -376,7 +381,7 @@ namespace BusinessLayer.Services.User
                 //gán thời gian bắt đầu cho hợp lí (không lấy date của client)
             }
             //nếu lịch available thì 1 checkup record mới
-            var dakhoaDep = _departmentService.GetDepartmentById(IdConstant.ID_DEPARTMENT_DA_KHOA);
+            var dakhoaDep = _departmentService.GetDepartmentById(IdConfig.ID_DEPARTMENT_DA_KHOA);
             var dakhoaOp = _operationService.GetOperationForDepartment(dakhoaDep.Id);
             var cr = new CheckupRecord()
             {
@@ -390,7 +395,7 @@ namespace BusinessLayer.Services.User
                 NumericalOrder = numericalOrder,
                 EstimatedDate = date,
                 EstimatedStartTime = estimatedStartTime,
-                DepartmentId = IdConstant.ID_DEPARTMENT_DA_KHOA,
+                DepartmentId = IdConfig.ID_DEPARTMENT_DA_KHOA,
                 DepartmentName = dakhoaDep.Name,
                 DoctorId = doctorId,
                 ClinicalSymptom = clinicalSymptom,
@@ -429,19 +434,19 @@ namespace BusinessLayer.Services.User
         {
             SessionType? session = null;
             var beginMorningShift = new DateTime(time.Year, time.Month, time.Day,
-                WorkingShiftConstant.BeginMorningShiftHour, WorkingShiftConstant.BeginMorningShiftMinute, 0);
+                WorkingShiftConfig.BeginMorningShiftHour, WorkingShiftConfig.BeginMorningShiftMinute, 0);
             var endMorningShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.EndMorningShiftHour, WorkingShiftConstant.EndMorningShiftMinute, 0);
+               WorkingShiftConfig.EndMorningShiftHour, WorkingShiftConfig.EndMorningShiftMinute, 0);
 
             var beginEveningShift = new DateTime(time.Year, time.Month, time.Day,
-                WorkingShiftConstant.BeginEveningShiftHour, WorkingShiftConstant.BeginEveningShiftMinute, 0);
+                WorkingShiftConfig.BeginEveningShiftHour, WorkingShiftConfig.BeginEveningShiftMinute, 0);
             var endEveningShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.EndEveningShiftHour, WorkingShiftConstant.EndAfternoonShiftMinute, 0);
+               WorkingShiftConfig.EndEveningShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
             var beginAfternoonShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.BeginAfternoonShiftHour, WorkingShiftConstant.BeginAfternoonShiftMinute, 0);
+               WorkingShiftConfig.BeginAfternoonShiftHour, WorkingShiftConfig.BeginAfternoonShiftMinute, 0);
             var endAfternoonShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConstant.EndAfternoonShiftHour, WorkingShiftConstant.EndAfternoonShiftMinute, 0);
+               WorkingShiftConfig.EndAfternoonShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
             if (time >= beginMorningShift && time <= endMorningShift)
             {
