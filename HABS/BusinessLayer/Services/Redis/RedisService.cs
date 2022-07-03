@@ -20,6 +20,10 @@ namespace BusinessLayer.Services.Redis
            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(60*10));
             _distributedCache.SetString(key, value, options);
         }
+        public void RemoveValueToKey(string key)
+        {
+            _distributedCache.Remove(key);
+        }
         public string GetValueFromKey(string key)
         {
             return _distributedCache.GetString(key);

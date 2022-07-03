@@ -599,6 +599,7 @@ namespace BusinessLayer.Services.Doctor
                 PhoneNo = patient.PhoneNumber,
                 Status = BillStatus.CHUA_TT,
                 TimeCreated = DateTime.Now.AddHours(7),
+                PatientName = patient.Name,
             };
             await _unitOfWork.BillRepository.Add(bill);
             //tạo mới CR

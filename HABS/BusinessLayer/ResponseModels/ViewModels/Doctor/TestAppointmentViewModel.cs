@@ -17,5 +17,6 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public long OperationId { get; set; }
         public string OperationName { get; set; }
         public long? PatientId { get; set; }
+        public PatientViewModel Patient { get; set; }
     }
 }

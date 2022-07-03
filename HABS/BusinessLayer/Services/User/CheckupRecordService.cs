@@ -51,23 +51,26 @@ namespace BusinessLayer.Services.User
             _scheduleService = scheduleService;
             _departmentService = departmentService;
         }
-        public List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId, long accountId)
+        public List<PatientRecordMetadataResponseModel> UpdateRedis_CheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime,
+            long? departmentId, long accountId)
         {
+            string redisKey = $"checkup-record-history-metadata-patient{patientId}-from{((DateTime)fromTime).Date}-to{((DateTime)toTime).Date}";
+
             List<PatientRecordMetadataResponseModel> data = new List<PatientRecordMetadataResponseModel>();
-            var dbSetData = _unitOfWork.CheckupRecordRepository.Get().Include(x=>x.Patient);
+            var dbSetData = _unitOfWork.CheckupRecordRepository.Get().Include(x => x.Patient);
             IQueryable<CheckupRecord> queryableData = dbSetData;
-            queryableData=queryableData.Where(x => x.Patient.AccountId == accountId);
+            queryableData = queryableData.Where(x => x.Patient.AccountId == accountId);
             if (patientId != null)
             {
                 queryableData = queryableData.Where(x => x.PatientId == patientId);
             }
             if (fromTime != null)
             {
-                queryableData = queryableData.Where(x => x.Date >= fromTime);
+                queryableData = queryableData.Where(x => x.Date >= ((DateTime)fromTime).Date);
             }
             if (toTime != null)
             {
-                queryableData = queryableData.Where(x => x.Date <= toTime);
+                queryableData = queryableData.Where(x => x.Date <= ((DateTime)toTime).Date);
             }
             if (departmentId != null)
             {
@@ -85,6 +88,26 @@ namespace BusinessLayer.Services.User
                    PatientName = x.PatientName
                }
                ).ToList();
+
+            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(data));
+            return data;
+        }
+        public List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime,
+            long? departmentId, long accountId)
+        {
+            List<PatientRecordMetadataResponseModel> data = null;
+
+            string redisKey = $"checkup-record-history-metadata-patient{patientId}-from{((DateTime)fromTime).Date}-to{((DateTime)toTime).Date}"
+                + $"department{departmentId}-account{accountId}";
+            string dataFromRedis = _redisService.GetValueFromKey(redisKey);
+            if (!String.IsNullOrEmpty(dataFromRedis))
+            {
+                data = JsonConvert.DeserializeObject<List<PatientRecordMetadataResponseModel>>(dataFromRedis);
+            }
+            else
+            {
+                data = UpdateRedis_CheckupRecordMetadata(patientId, fromTime, toTime, departmentId, accountId);
+            }
             return data;
         }
         public PatientRecordFullDataResponseModel GetCheckupRecordFullData(long recordId, long accountId)

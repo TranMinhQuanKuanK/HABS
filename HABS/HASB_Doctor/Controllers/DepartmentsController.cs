@@ -33,9 +33,9 @@ namespace HASB_Doctor.Controllers
             {
                 return Ok(_departmentService.GetDepartments(false));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e);
             }
         }
     }

@@ -44,6 +44,20 @@ namespace HASB_Doctor.Controllers
                 return BadRequest();
             }
         }
+        [SwaggerOperation(Summary = "Lấy thông tin một phiếu xét nghiệm")]
+        [HttpGet("{id}")]
+        public IActionResult GetTestQueueItem(long Id)
+        {
+            try
+            {
+                var data = _scheduleService.GetItemInTestQueue(Id);
+                return Ok(data);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
         [SwaggerOperation(Summary = "Xác nhận xét nghiệm cho bệnh nhân trong hàng đợi")]
         [HttpPost("confirm/{id}")]
         public async Task<IActionResult> ConfirmCheckup(long id)

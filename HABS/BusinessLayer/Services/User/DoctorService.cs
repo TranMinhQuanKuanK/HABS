@@ -1,9 +1,4 @@
-﻿using BusinessLayer.RequestModels;
-using BusinessLayer.RequestModels.CreateModels;
-using BusinessLayer.RequestModels.SearchModels;
-using BusinessLayer.ResponseModels.ViewModels;
-using BusinessLayer.Services;
-using DataAcessLayer.Interfaces;
+﻿using DataAcessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -32,18 +27,30 @@ namespace BusinessLayer.Services.User
         public List<DoctorResponseModel> GetDoctors(DateTime? date, long departmentId)
         {
             List<DoctorResponseModel> data = new List<DoctorResponseModel>();
-            data = _unitOfWork.ScheduleRepository.Get()
-                .Include(x => x.Doctor)
-                .Include(x => x.Room)
-                .ThenInclude(x => x.Department)
-                .Where(x => x.Weekday == ((DateTime)date).DayOfWeek)
-                .Where(x => x.Room.Department.Id == departmentId).Select(x => new DoctorResponseModel()
-                {
-                    Id = x.DoctorId,
-                    Name = x.Doctor.Name
-                })
-                .Distinct()
-                .ToList();
+            string redisKey = $"doctor-list-date{((DateTime)date).Date}-department-{departmentId}";
+            string dataFromRedis = _redisService.GetValueFromKey(redisKey);
+            if (!String.IsNullOrEmpty(dataFromRedis))
+            {
+                data = JsonConvert.DeserializeObject<List<DoctorResponseModel>>(dataFromRedis);
+            }
+            else
+            {
+                data = _unitOfWork.ScheduleRepository.Get()
+               .Include(x => x.Doctor)
+               .Include(x => x.Room)
+               .ThenInclude(x => x.Department)
+               .Where(x => x.Weekday == ((DateTime)date).DayOfWeek)
+               .Where(x => x.Room.Department.Id == departmentId).Select(x => new DoctorResponseModel()
+               {
+                   Id = x.DoctorId,
+                   Name = x.Doctor.Name
+               })
+               .Distinct()
+               .ToList();
+
+                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(data));
+            }
+
             return data;
         }
     }

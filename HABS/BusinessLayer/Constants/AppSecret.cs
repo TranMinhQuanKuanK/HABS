@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Constants
 {
-    //lưu những constant id dưới server
     public class AppSecret
     {
         public string SecretForCashierApp = "Secretttttt%123123123123!@#!@#";

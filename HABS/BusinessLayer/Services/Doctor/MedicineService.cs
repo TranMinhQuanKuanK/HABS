@@ -33,35 +33,46 @@ namespace BusinessLayer.Services.Doctor
         }
         public List<MedicineViewModel> GetMedicines(MedicineSearchModel search)
         {
-            //Search???
             List<MedicineViewModel> data = new List<MedicineViewModel>();
-            IQueryable<Medicine> tempData;
-            tempData = _unitOfWork.MedicineRepository.Get();
-            if (!string.IsNullOrEmpty(search.Name))
+
+            string redisKey = $"medicine-list-{search.Name}-{search.CategoryId}";
+            string dataFromRedis = _redisService.GetValueFromKey(redisKey);
+            if (!String.IsNullOrEmpty(dataFromRedis))
             {
-                tempData = tempData.Where(x => x.Name.Contains(search.Name));
+                data = JsonConvert.DeserializeObject<List<MedicineViewModel>>(dataFromRedis);
             }
-            if (search.CategoryId != null)
+            else
             {
-                tempData = tempData.Where(x => x.MedicineCategoryId == search.CategoryId);
+                IQueryable<Medicine> tempData;
+                tempData = _unitOfWork.MedicineRepository.Get();
+                if (!string.IsNullOrEmpty(search.Name))
+                {
+                    tempData = tempData.Where(x => x.Name.Contains(search.Name));
+                }
+                if (search.CategoryId != null)
+                {
+                    tempData = tempData.Where(x => x.MedicineCategoryId == search.CategoryId);
+                }
+                data = tempData
+                    .Include(x => x.MedicineCategory)
+                    .Select
+                   (x => new MedicineViewModel()
+                   {
+                       Id = x.Id,
+                       MedicineCategory = x.MedicineCategory.Name,
+                       Name = x.Name,
+                       Status = (int)x.Status,
+                       Manufacturer = x.Manufacturer,
+                       ManufacturingCountry = x.ManufacturingCountry,
+                       Note = x.Note,
+                       MedicineCategoryId = x.MedicineCategoryId,
+                       Unit = x.Unit,
+                       Usage = x.Usage
+                   }
+                   ).ToList();
+
+                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(data));
             }
-            data = tempData
-                .Include(x => x.MedicineCategory)
-                .Select
-               (x => new MedicineViewModel()
-               {
-                   Id = x.Id,
-                   MedicineCategory = x.MedicineCategory.Name,
-                   Name = x.Name,
-                   Status = (int)x.Status,
-                   Manufacturer = x.Manufacturer,
-                   ManufacturingCountry = x.ManufacturingCountry,
-                   Note = x.Note,
-                   MedicineCategoryId = x.MedicineCategoryId,
-                   Unit = x.Unit,
-                   Usage = x.Usage
-               }
-               ).ToList();
             return data;
         }
     }

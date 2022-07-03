@@ -30,11 +30,20 @@ namespace BusinessLayer.Services.Doctor
             _redisService = new RedisService(_distributedCache);
         }
         public List<DepartmentViewModel> GetDepartments(bool includeGeneral)
-        { 
+        {
             List<DepartmentViewModel> departmentsData = new List<DepartmentViewModel>();
-            departmentsData = _unitOfWork.DepartmentRepository.Get()
-                .Where(x=> includeGeneral==true || x.Id != IdConfig.ID_DEPARTMENT_DA_KHOA)
-                .Where(x=>x.Status == DataAccessLayer.Models.Department.DepartmentStatus.CO_MO_KHAM)
+
+            string redisKey = $"department-list-{includeGeneral}";
+            string dataFromRedis = _redisService.GetValueFromKey(redisKey);
+            if (!String.IsNullOrEmpty(dataFromRedis))
+            {
+                departmentsData = JsonConvert.DeserializeObject<List<DepartmentViewModel>>(dataFromRedis);
+            }
+            else
+            {
+                departmentsData = _unitOfWork.DepartmentRepository.Get()
+                .Where(x => includeGeneral == true || x.Id != IdConfig.ID_DEPARTMENT_DA_KHOA)
+                .Where(x => x.Status == DataAccessLayer.Models.Department.DepartmentStatus.CO_MO_KHAM)
             .Select
                (x => new DepartmentViewModel()
                {
@@ -42,6 +51,9 @@ namespace BusinessLayer.Services.Doctor
                    Name = x.Name
                }
                ).ToList();
+
+                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(departmentsData));
+            }
             return departmentsData;
         }
         public DepartmentViewModel GetDepartmentById(long id)
