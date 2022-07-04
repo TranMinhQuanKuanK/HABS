@@ -31,6 +31,7 @@ namespace BusinessLayer.Services.User
     {
         private readonly IDistributedCache _distributedCache;
         private readonly Interfaces.User.IScheduleService _scheduleService;
+        private readonly Interfaces.Doctor.IScheduleService _scheduleServiceDoctor;
         private readonly IDepartmentService _departmentService;
         private readonly IOperationService _operationService;
         private readonly INumercialOrderService _numService;
@@ -39,11 +40,13 @@ namespace BusinessLayer.Services.User
         private readonly RedisService _redisService;
         public CheckupRecordService(IUnitOfWork unitOfWork, IDistributedCache distributedCache,
             Interfaces.User.IScheduleService scheduleService,
+            Interfaces.Doctor.IScheduleService scheduleServiceDoctor,
              IDepartmentService departmentService,
              IOperationService operationService,
             INumercialOrderService numService
             ) : base(unitOfWork)
         {
+            _scheduleServiceDoctor = scheduleServiceDoctor;
             _numService = numService;
             _operationService = operationService;
             _distributedCache = distributedCache;
@@ -452,6 +455,10 @@ namespace BusinessLayer.Services.User
             };
             await _unitOfWork.BillDetailRepository.Add(bd);
             await _unitOfWork.SaveChangesAsync();
+            if (((DateTime)cr.EstimatedDate).Date==DateTime.Now.AddHours(7).Date)
+            {
+                _scheduleServiceDoctor.UpdateRedis_CheckupQueue((long)cr.RoomId);
+            }
         }
         private SessionType? getSession(DateTime time)
         {

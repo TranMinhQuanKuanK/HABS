@@ -33,9 +33,9 @@ namespace HASB_User.Controllers
             {
                 return Ok(_departmentService.GetDepartments(true));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
     }

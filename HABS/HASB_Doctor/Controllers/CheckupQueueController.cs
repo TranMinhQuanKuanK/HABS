@@ -35,9 +35,9 @@ namespace HASB_Doctor.Controllers
                 var queue = _scheduleService.GetCheckupQueue(RoomId);
                 return Ok(queue);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Xác nhận khám cho bệnh nhân trong hàng đợi")]

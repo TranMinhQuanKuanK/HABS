@@ -64,9 +64,9 @@ namespace HASB_Doctor.Controllers
                 };
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
 
@@ -87,16 +87,16 @@ namespace HASB_Doctor.Controllers
 
         [SwaggerOperation(Summary = "Chỉnh sửa bệnh án của bệnh nhân (chỉ gửi những field cần edit)")]
         [HttpPut("{id}")]
-        public IActionResult ChangeCheckupRecord([FromBody] CheckupRecordEditModel model)
+        public async Task<IActionResult> ChangeCheckupRecord([FromBody] CheckupRecordEditModel model)
         {
             try
             {
-                _checkupRecordService.EditCheckupRecord(model);
+                await _checkupRecordService.EditCheckupRecord(model);
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Đặt thêm lịch xét ngiệm cho bệnh nhân ")]
@@ -108,9 +108,9 @@ namespace HASB_Doctor.Controllers
                 var result = await _checkupRecordService.RequestExamination(Id, model);
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Chuyển khoa cho bệnh nhân, gửi cùng với lí do")]
@@ -136,9 +136,9 @@ namespace HASB_Doctor.Controllers
                 await _checkupRecordService.CreatePrescription(Id, model);
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
     }

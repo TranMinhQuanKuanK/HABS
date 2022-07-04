@@ -48,9 +48,9 @@ namespace HASB_User.Controllers
                 }
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Lấy bệnh nhân theo id")]

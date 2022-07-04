@@ -46,6 +46,7 @@ namespace BusinessLayer.Services.Doctor
 
         public async Task UpdateTestRecordResult( TestRecordEditModel model)
         {
+            bool doneAll = false;
             var tr = _unitOfWork.TestRecordRepository.Get()
               .Where(x => x.Id == model.Id)
               .FirstOrDefault();
@@ -69,7 +70,7 @@ namespace BusinessLayer.Services.Doctor
                 {
                     tr.Status = TestRecordStatus.HOAN_THANH;
                     //kiếm tra nếu là xét nghiệm cuối cùng thì hoàn thành phiếu 
-                    bool doneAll = true;
+                    doneAll = true;
                     foreach (var _tr in cr.TestRecords)
                     {
                         if (_tr.Id!=tr.Id && tr.Status!= TestRecordStatus.HOAN_THANH)
@@ -96,6 +97,15 @@ namespace BusinessLayer.Services.Doctor
                 tr.ResultFileLink = url;
             }
             await _unitOfWork.SaveChangesAsync();
+            if (doneAll)
+            {
+                _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
+            }
+            if (model.Status != null)
+            {
+                _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, false);
+                _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, true);
+            }
         }
         public async Task ConfirmTest(long doctorId, long tId)
         {
@@ -133,6 +143,7 @@ namespace BusinessLayer.Services.Doctor
             queue.Insert(0, trInQueue);
             await _unitOfWork.SaveChangesAsync();
 
+            _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, false);
             //Cập nhật lại cache hàng đợi tương ứng của phòng trong tr
         }
     }

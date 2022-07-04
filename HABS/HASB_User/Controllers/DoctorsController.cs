@@ -40,9 +40,9 @@ namespace HASB_User.Controllers
                 var doctors = _doctorService.GetDoctors(Date, 10000);
                 return Ok(doctors);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
     }

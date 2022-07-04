@@ -39,9 +39,9 @@ namespace HASB_Doctor.Controllers
                 var queue = _scheduleService.GetTestQueue(RoomId, IsWaitingForResult);
                 return Ok(queue);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Lấy thông tin một phiếu xét nghiệm")]
@@ -53,9 +53,9 @@ namespace HASB_Doctor.Controllers
                 var data = _scheduleService.GetItemInTestQueue(Id);
                 return Ok(data);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Xác nhận xét nghiệm cho bệnh nhân trong hàng đợi")]

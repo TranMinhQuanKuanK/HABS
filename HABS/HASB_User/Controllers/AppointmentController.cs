@@ -83,9 +83,9 @@ namespace HASB_User.Controllers
                 };
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Lấy lịch khám của bệnh nhân theo id (giả)")]
@@ -106,9 +106,9 @@ namespace HASB_User.Controllers
                 };
                 return Ok(model);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [HttpPost()]
@@ -138,9 +138,9 @@ namespace HASB_User.Controllers
               
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
     }

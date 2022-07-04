@@ -42,9 +42,9 @@ namespace HASB_User.Controllers
                 await _fcmService.AddToken(model.TokenId, model.AccountId);
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Lấy thông tin tài khoản cá nhân")]
@@ -63,9 +63,9 @@ namespace HASB_User.Controllers
                 var user = _loginService.GetAccountInfo(accountId);
                 return Ok(user);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Xóa đăng kí Fcm token khi đăng xuất")]
@@ -77,9 +77,9 @@ namespace HASB_User.Controllers
                 await _fcmService.DeleteToken(model.TokenId, model.AccountId);
                 return NoContent();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Đăng nhập SĐT-password, default 0978610119 - 123")]
@@ -105,9 +105,9 @@ namespace HASB_User.Controllers
                     return Unauthorized();
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
     }

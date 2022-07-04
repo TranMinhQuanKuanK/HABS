@@ -35,7 +35,7 @@ namespace HASB_Doctor.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e);
+                return BadRequest(e.Message);
             }
         }
     }

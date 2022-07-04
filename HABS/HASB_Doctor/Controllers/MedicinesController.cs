@@ -35,9 +35,9 @@ namespace HASB_Doctor.Controllers
                 var data = _medicineService.GetMedicines(model);
                 return Ok(data);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
     }

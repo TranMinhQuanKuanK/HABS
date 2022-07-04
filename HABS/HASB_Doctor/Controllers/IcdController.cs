@@ -35,9 +35,9 @@ namespace HASB_Doctor.Controllers
                 var data = _icdService.GetIcdList(search);
                 return Ok(data);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
     }

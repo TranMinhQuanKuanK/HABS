@@ -45,7 +45,7 @@ namespace BusinessLayer.Services.Doctor
                 IsReExam = (bool)x.IsReExam
 
             }).ToList();
-            var checkingUpPatient = queue.SingleOrDefault(x => x.Status == (int)CheckupRecordStatus.DANG_KHAM);
+            var checkingUpPatient = queue.FirstOrDefault(x => x.Status == (int)CheckupRecordStatus.DANG_KHAM);
             if (checkingUpPatient != null)
             {
                 queue.Remove(checkingUpPatient);

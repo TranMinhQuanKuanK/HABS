@@ -78,9 +78,9 @@ namespace HASB_User.Controllers
                 };
                 return Ok(data);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
             //mock data
         }

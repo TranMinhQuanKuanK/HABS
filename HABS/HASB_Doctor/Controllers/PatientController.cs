@@ -47,9 +47,9 @@ namespace HASB_Doctor.Controllers
                 await _checkupRecordService.CreateReExamCheckupRecord(Id, doctorId, model);
                 return Ok($"Bạn đã gửi bệnh nhân {Id} với lời nhắn {model.Note}, ngày tái khám: {model.ReExamDate}");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
        

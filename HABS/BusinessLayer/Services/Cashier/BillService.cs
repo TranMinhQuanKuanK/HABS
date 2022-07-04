@@ -22,10 +22,15 @@ namespace BusinessLayer.Services.Cashier
     {
         private readonly IDistributedCache _distributedCache;
         private readonly RedisService _redisService;
+        private readonly Interfaces.Doctor.IScheduleService _scheduleService;
+
         public BillService(IUnitOfWork unitOfWork,
-            IDistributedCache distributedCache) : base(unitOfWork)
+            IDistributedCache distributedCache,
+             Interfaces.Doctor.IScheduleService scheduleService
+            ) : base(unitOfWork)
 
         {
+            _scheduleService = scheduleService;
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
@@ -90,6 +95,11 @@ namespace BusinessLayer.Services.Cashier
 
         public async Task PayABill(long billId, long cashierId)
         {
+            long tempRoomForCheckup = 0;
+            List<long> tempRoomForTest = new List<long>();
+            bool doUpdateTestQueue = false;
+            bool doUpdateCheckupQueue = false;
+
             var cashier = _unitOfWork.BillRepository
                 .Get().Where(x => x.Id == cashierId).FirstOrDefault();
             if (cashier == null)
@@ -110,7 +120,6 @@ namespace BusinessLayer.Services.Cashier
                 //nếu là CR
                 if (bd.TestRecordId == null && bd.CheckupRecordId != null)
                 {
-
                     var cr = _unitOfWork.CheckupRecordRepository.Get()
                         .Include(x=>x.TestRecords)
                         .Where(x => x.Id == bd.CheckupRecordId).FirstOrDefault();
@@ -131,6 +140,11 @@ namespace BusinessLayer.Services.Cashier
                         }
                     }
                     cr.Status = CheckupRecordStatus.DA_THANH_TOAN;
+                    if (((DateTime)cr.EstimatedDate).Date==DateTime.Now.AddHours(7).Date)
+                    {
+                        doUpdateCheckupQueue = true;
+                        tempRoomForCheckup = (long)cr.RoomId;
+                    }
                     //bắn status cho mobile nếu có
                 }
                 //nếu là TR
@@ -142,11 +156,24 @@ namespace BusinessLayer.Services.Cashier
                         .Where(x => x.Id == tr.CheckupRecordId).FirstOrDefault();
                     cr.Status = CheckupRecordStatus.CHO_KQXN;
                     tr.Status = TestRecordStatus.DA_THANH_TOAN;
+                    doUpdateTestQueue = true;
+                    tempRoomForTest.Add((long)tr.RoomId);
                 }
             }
             bill.Status = DataAccessLayer.Models.Bill.BillStatus.TT_TIEN_MAT;
             bill.CashierId = cashierId;
             await _unitOfWork.SaveChangesAsync();
+            if (doUpdateCheckupQueue)
+            {
+                _scheduleService.UpdateRedis_CheckupQueue(tempRoomForCheckup);
+            }
+            if (doUpdateTestQueue)
+            {
+                foreach(var id in tempRoomForTest)
+                {
+                    _scheduleService.UpdateRedis_TestQueue(id, false);
+                }
+            }
         }
         public async Task CancelABill(long billId, long cashierId)
         {

@@ -248,9 +248,9 @@ namespace BusinessLayer.Services.Doctor
         public async Task<List<RedirectViewModel>> RedirectPatient(RedirectCreateModel model, long recordId)
         {
             List<RedirectViewModel> result = new List<RedirectViewModel>();
-            //kiểm tra patient
             var cr = _unitOfWork.CheckupRecordRepository.Get()
               .Where(x => x.Id == recordId).FirstOrDefault();
+            //kiểm tra patient
             var patient = _patientService.GetPatientById((int)cr.PatientId);
             if (patient == null)
             {
@@ -357,6 +357,9 @@ namespace BusinessLayer.Services.Doctor
             cr.Status = CheckupRecordStatus.CHUYEN_KHOA;
             bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
             await _unitOfWork.SaveChangesAsync();
+
+            _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
+
             return result;
         }
         public async Task<List<IncomingTestResponseModel>> RequestExamination(long recordId, TestRequestCreateModel testReqModel)
@@ -444,6 +447,7 @@ namespace BusinessLayer.Services.Doctor
             cr.Status = CheckupRecordStatus.CHO_KQXN;
             bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
             await _unitOfWork.SaveChangesAsync();
+            _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
             return result;
         }
         public async Task EditCheckupRecord(CheckupRecordEditModel model)
@@ -474,7 +478,9 @@ namespace BusinessLayer.Services.Doctor
                 if (model.Status== (int)CheckupRecordStatus.KET_THUC 
                     || model.Status == (int)CheckupRecordStatus.NHAP_VIEN
                     )
+                {
                     cr.Status = (CheckupRecordStatus)model.Status;
+                }
             }
             if (model.Temperature != null)
             {
@@ -502,6 +508,12 @@ namespace BusinessLayer.Services.Doctor
                 cr.IcdDiseaseId = model.IcdDiseaseId;
             }
             await _unitOfWork.SaveChangesAsync();
+            if (model.Status == (int)CheckupRecordStatus.KET_THUC
+                  || model.Status == (int)CheckupRecordStatus.NHAP_VIEN
+                  )
+            {
+                _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
+            }
         }
         public async Task ConfirmCheckup(long crId, long? doctorId)
         {
@@ -526,6 +538,7 @@ namespace BusinessLayer.Services.Doctor
             crInQueue.Status = (int)CheckupRecordStatus.DANG_KHAM;
             cr.Status = CheckupRecordStatus.DANG_KHAM;
             cr.Date = DateTime.Now.AddHours(7);
+            //sai
             queue.Remove(crInQueue);
             queue.Insert(0, crInQueue);
 
@@ -540,9 +553,8 @@ namespace BusinessLayer.Services.Doctor
                 cr.DoctorId = (long)doctorId;
                 cr.DoctorName = doctor.Name;
             }
-
             await _unitOfWork.SaveChangesAsync();
-
+            _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
             //Cập nhật lại cache hàng đợi tương ứng của phòng trong cr
         }
         public async Task CreateReExamCheckupRecord(long previousCrId, long doctorId, ReExamCreateModel model)

@@ -52,9 +52,9 @@ namespace HASB_Cashier.Controllers
                 var data = _billService.GetBillById(Id);
                 return Ok(data);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Xác nhận thanh toán một hóa đơn")]
@@ -72,9 +72,9 @@ namespace HASB_Cashier.Controllers
                await _billService.PayABill(Id,cashierId);
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Hủy thanh toán một đơn")]
@@ -92,9 +92,9 @@ namespace HASB_Cashier.Controllers
                 await _billService.CancelABill(Id, cashierId);
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
     }

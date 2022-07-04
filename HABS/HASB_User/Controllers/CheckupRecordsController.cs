@@ -70,9 +70,9 @@ namespace HASB_User.Controllers
                 };
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
         [SwaggerOperation(Summary = "Lấy đầy đủ thông tin BỆNH ÁN của bệnh nhân theo record id")]
@@ -94,9 +94,9 @@ namespace HASB_User.Controllers
                 }
                 return Ok(data);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
 
         }

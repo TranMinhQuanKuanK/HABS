@@ -1,6 +1,8 @@
 using BusinessLayer.Interfaces.Cashier;
+using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.Interfaces.Notification;
 using BusinessLayer.Services.Cashier;
+using BusinessLayer.Services.Doctor;
 using BusinessLayer.Services.Notification;
 using DataAccessLayer.Models;
 using DataAcessLayer;
@@ -29,6 +31,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Utilities;
+using ILoginService = BusinessLayer.Interfaces.Cashier.ILoginService;
+using LoginService = BusinessLayer.Services.Cashier.LoginService;
 
 namespace HASB_Cashier
 {
@@ -48,8 +52,8 @@ namespace HASB_Cashier
             services.AddDistributedMemoryCache();
             services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = "redis-19822.c53.west-us.azure.cloud.redislabs.com:19822,password=2uAjtMUBLf8j4BQjzKG7L5EjtBqug0S6,ssl=False,abortConnect=False";
-                options.InstanceName = "SWDRedisCache";
+                options.Configuration = "redis-16974.c89.us-east-1-3.ec2.cloud.redislabs.com:16974,password=bbMlurx8k7lOY1Jv4YqYZJ8VGXY8xhgs,ssl=False,abortConnect=False";
+                options.InstanceName = "HospitalRedisCache";
             });
             services.AddRouting(option =>
             {
@@ -141,6 +145,7 @@ namespace HASB_Cashier
             //doctor app
             services.AddTransient<IBillService, BillService>();
             services.AddTransient<ILoginService, LoginService>();
+            services.AddTransient<IScheduleService, ScheduleService>();
 
 
             //Firebase messaging

@@ -20,14 +20,18 @@ namespace BusinessLayer.Services.Test
     public class TestService :  BaseService
     {
         private readonly Interfaces.User.IScheduleService _scheduleService;
+        private readonly Interfaces.Doctor.IScheduleService _scheduleServiceDoctor;
+
         private readonly IDepartmentService _departmentService;
         private readonly IOperationService _operationService;
         public TestService(IUnitOfWork unitOfWork, IDistributedCache distributedCache,
             Interfaces.User.IScheduleService scheduleService,
              IDepartmentService departmentService,
+            Interfaces.Doctor.IScheduleService scheduleServiceDoctor,
              IOperationService operationService
             ) : base(unitOfWork)
         {
+            _scheduleServiceDoctor = scheduleServiceDoctor;
             _operationService = operationService;
             _scheduleService = scheduleService;
             _departmentService = departmentService;
@@ -148,7 +152,7 @@ namespace BusinessLayer.Services.Test
                 Content = "Thanh toán viện phí khám tổng quát đa khoa",
                 //tính luôn
                 Total = dakhoaOp.Price,
-                Status = Bill.BillStatus.CHUA_TT,
+                Status = Bill.BillStatus.TT_TIEN_MAT,
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
                 TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
@@ -171,6 +175,7 @@ namespace BusinessLayer.Services.Test
             };
             await _unitOfWork.BillDetailRepository.Add(bd);
             await _unitOfWork.SaveChangesAsync();
+            _scheduleServiceDoctor.UpdateRedis_CheckupQueue((long)cr.RoomId);
         }
         public async Task CreatNewAppointmentWithPreviousTest(long patientId, DateTime date,
             long doctorId, int? numericalOrder, string clinicalSymptom)
@@ -238,7 +243,7 @@ namespace BusinessLayer.Services.Test
                 RoomNumber = "002",
                 Floor = "1",
                 //đã thanh toán luôn
-                Status = CheckupRecordStatus.DA_THANH_TOAN,
+                Status = CheckupRecordStatus.CHO_KQXN,
                 NumericalOrder = numericalOrder,
                 EstimatedDate = date,
                 EstimatedStartTime = estimatedStartTime,
@@ -251,34 +256,67 @@ namespace BusinessLayer.Services.Test
             await _unitOfWork.CheckupRecordRepository.Add(cr);
             await _unitOfWork.SaveChangesAsync();
             //tạo một bill detail và 1 bill tương ứng
-            Bill bill = new Bill()
+            //Bill bill = new Bill()
+            //{
+            //    Content = "Thanh toán viện phí khám tổng quát đa khoa",
+            //    //tính luôn
+            //    Total = dakhoaOp.Price,
+            //    Status = Bill.BillStatus.CHUA_TT,
+            //    TimeCreated = DateTime.Now.AddHours(7),
+            //    PatientName = patient.Name,
+            //    TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
+            //    CashierId = 10001,
+            //    CashierName = "Nhân viên test",
+            //    PatientId = patient.Id,
+            //};
+            //await _unitOfWork.BillRepository.Add(bill);
+            //await _unitOfWork.SaveChangesAsync();
+            //BillDetail bd = new BillDetail()
+            //{
+            //    Price = dakhoaOp.Price,
+            //    OperationId = dakhoaOp.Id,
+            //    InsuranceStatus = (InsuranceSupportStatus)dakhoaOp.InsuranceStatus,
+            //    OperationName = dakhoaOp.Name,
+            //    Quantity = 1,
+            //    SubTotal = dakhoaOp.Price,
+            //    CheckupRecordId = cr.Id,
+            //    BillId = bill.Id
+            //};
+            //await _unitOfWork.BillDetailRepository.Add(bd);
+            TestRecord tr = new TestRecord()
             {
-                Content = "Thanh toán viện phí khám tổng quát đa khoa",
-                //tính luôn
-                Total = dakhoaOp.Price,
-                Status = Bill.BillStatus.CHUA_TT,
-                TimeCreated = DateTime.Now.AddHours(7),
-                PatientName = patient.Name,
-                TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
-                CashierId = 10001,
-                CashierName = "Nhân viên test",
+                RoomId = 10007,
+                EstimatedDate = DateTime.Now.AddHours(7),
+                Date = DateTime.Now.AddHours(7),
+                Floor = "23",
+                NumericalOrder = 9999,
+                OperationId = 10010,
+                OperationName = "Xét nghiệm máu",
                 PatientId = patient.Id,
-            };
-            await _unitOfWork.BillRepository.Add(bill);
-            await _unitOfWork.SaveChangesAsync();
-            BillDetail bd = new BillDetail()
-            {
-                Price = dakhoaOp.Price,
-                OperationId = dakhoaOp.Id,
-                InsuranceStatus = (InsuranceSupportStatus)dakhoaOp.InsuranceStatus,
-                OperationName = dakhoaOp.Name,
-                Quantity = 1,
-                SubTotal = dakhoaOp.Price,
+                PatientName = patient.Name,
                 CheckupRecordId = cr.Id,
-                BillId = bill.Id
+                Status = TestRecord.TestRecordStatus.DA_THANH_TOAN,
             };
-            await _unitOfWork.BillDetailRepository.Add(bd);
+            TestRecord tr2 = new TestRecord()
+            {
+                RoomId = 10007,
+                EstimatedDate = DateTime.Now.AddHours(7),
+                Date = DateTime.Now.AddHours(7),
+                Floor = "23",
+                NumericalOrder = 9999,
+                OperationId = 10011,
+                OperationName = "Xét nghiệm mỡ trong máu",
+                PatientId = patient.Id,
+                PatientName = patient.Name,
+                CheckupRecordId = cr.Id,
+                Status = TestRecord.TestRecordStatus.DA_THANH_TOAN,
+            };
+            await _unitOfWork.TestRecordRepository.Add(tr2); 
+            await _unitOfWork.TestRecordRepository.Add(tr);
             await _unitOfWork.SaveChangesAsync();
+            _scheduleServiceDoctor.UpdateRedis_CheckupQueue((long)cr.RoomId);
+            _scheduleServiceDoctor.UpdateRedis_TestQueue(10007,false);
+
         }
     }
 }

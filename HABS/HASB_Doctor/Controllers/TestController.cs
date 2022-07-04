@@ -2,6 +2,7 @@
 using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.SearchModels.Doctor;
 using BusinessLayer.ResponseModels.ViewModels.Doctor;
+using BusinessLayer.Services.Doctor;
 using BusinessLayer.Services.Test;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,8 +21,11 @@ namespace HASB_Doctor.Controllers
     public class TestController : BaseDoctorController
     {
         private readonly TestService ts;
-        public TestController(TestService service)
+        private readonly IScheduleService _scheduleServce;
+
+        public TestController(TestService service, IScheduleService scheduleServce)
         {
+            _scheduleServce = scheduleServce;
             ts = service;
         }
         [SwaggerOperation(Summary = "Tạo 3 bệnh nhân đặt khám trong ngày hôm đấy, đã thanh toán")]
@@ -38,9 +42,40 @@ namespace HASB_Doctor.Controllers
                     DateTime.Now.AddHours(7), 10007, null, "Khóc la om sòm vì mãi không chạy được");
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
+            }
+        }
+        [SwaggerOperation(Summary = "Tạo 2 bệnh nhân đã được đưa vào phòng chờ xét nghiệm")]
+        [HttpGet("ohhhhno")]
+        public async Task<IActionResult> CreateThreePatidentsAppointment()
+        {
+            try
+            {
+                await ts.CreatNewAppointmentWithPreviousTest(10006,
+                   DateTime.Now.AddHours(7), 10007, null, "Khóc la om sòm vì mãi không chạy được");
+                await ts.CreatNewAppointmentWithPreviousTest(10006,
+                 DateTime.Now.AddHours(7), 10007, null, "Khóc la om sòm vì mãi không chạy được");
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [SwaggerOperation(Summary = "Reset queue 10001")]
+        [HttpPost]
+        public async Task<IActionResult> reset()
+        {
+            try
+            {
+                _scheduleServce.UpdateRedis_CheckupQueue(10001);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
             }
         }
     }
