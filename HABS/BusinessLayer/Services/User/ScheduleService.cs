@@ -27,60 +27,38 @@ namespace BusinessLayer.Services.User
             _redisService = new RedisService(_distributedCache);
 
         }
-        public List<CheckupAppointmentResponseModel> UpdateRedis_CheckupAppointment(CheckupAppointmentSearchModel searchModel)
-        {
-            string redisKey = $"checkup-appointment-from{searchModel.FromTime}-to{searchModel.ToTime}-department-{searchModel.DepartmentId}"
-      + $"patient{searchModel.PatientId}";
-
-            var result = _unitOfWork.CheckupRecordRepository.Get()
-                 .Where(x => searchModel.FromTime == null || ((DateTime)x.EstimatedDate).Date >= ((DateTime)searchModel.FromTime).Date)
-                 .Where(x => searchModel.ToTime == null || ((DateTime)x.EstimatedDate).Date <= ((DateTime)searchModel.ToTime).Date)
-                 .Where(x => searchModel.DepartmentId == null || x.DepartmentId == searchModel.DepartmentId)
-                 .Where(x => searchModel.PatientId == null || x.PatientId == searchModel.PatientId)
-                 .Where(x => x.Status != CheckupRecordStatus.CHUYEN_KHOA
-                 && x.Status != CheckupRecordStatus.DA_HUY
-                 && x.Status != CheckupRecordStatus.DA_XOA
-                 && x.Status != CheckupRecordStatus.NHAP_VIEN
-                 && x.Status != CheckupRecordStatus.KET_THUC
-                 )
-                 .Select(x => new CheckupAppointmentResponseModel()
-                 {
-                     Id = x.Id,
-                     PatientId = x.PatientId,
-                     DoctorId = x.DoctorId,
-                     DepartmentId = x.DepartmentId,
-                     DepartmentName = x.DepartmentName,
-                     EstimatedDate = x.EstimatedDate,
-                     EstimatedStartTime = x.EstimatedStartTime,
-                     DoctorName = x.DoctorName,
-                     IsReExam = (bool)x.IsReExam,
-                     NumericalOrder = x.NumericalOrder,
-                     PatientName = x.PatientName,
-                     Status = (int)x.Status,
-                 }).ToList();
-
-            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(result));
-            return result;
-        }
         public List<CheckupAppointmentResponseModel> GetCheckupAppointment(CheckupAppointmentSearchModel searchModel)
         {
-            List<CheckupAppointmentResponseModel> result = null;
-
-            string redisKey = $"checkup-appointment-from{searchModel.FromTime}-to{searchModel.ToTime}-department-{searchModel.DepartmentId}"
-                + $"patient{searchModel.PatientId}";
-            string dataFromRedis = _redisService.GetValueFromKey(redisKey);
-            if (!String.IsNullOrEmpty(dataFromRedis))
-            {
-                result = JsonConvert.DeserializeObject<List<CheckupAppointmentResponseModel>>(dataFromRedis);
-            }
-            else
-            {
-                result = UpdateRedis_CheckupAppointment(searchModel);
-            }
-
+            var result = _unitOfWork.CheckupRecordRepository.Get()
+                            .Where(x => searchModel.FromTime == null || ((DateTime)x.EstimatedDate).Date >= ((DateTime)searchModel.FromTime).Date)
+                            .Where(x => searchModel.ToTime == null || ((DateTime)x.EstimatedDate).Date <= ((DateTime)searchModel.ToTime).Date)
+                            .Where(x => searchModel.DepartmentId == null || x.DepartmentId == searchModel.DepartmentId)
+                            .Where(x => searchModel.PatientId == null || x.PatientId == searchModel.PatientId)
+                            .Where(x => x.Status != CheckupRecordStatus.CHUYEN_KHOA
+                            && x.Status != CheckupRecordStatus.DA_HUY
+                            && x.Status != CheckupRecordStatus.DA_XOA
+                            && x.Status != CheckupRecordStatus.NHAP_VIEN
+                            && x.Status != CheckupRecordStatus.KET_THUC
+                            )
+                            .Select(x => new CheckupAppointmentResponseModel()
+                            {
+                                Id = x.Id,
+                                PatientId = x.PatientId,
+                                DoctorId = x.DoctorId,
+                                DepartmentId = x.DepartmentId,
+                                DepartmentName = x.DepartmentName,
+                                EstimatedDate = x.EstimatedDate,
+                                EstimatedStartTime = x.EstimatedStartTime,
+                                DoctorName = x.DoctorName,
+                                IsReExam = (bool)x.IsReExam,
+                                NumericalOrder = x.NumericalOrder,
+                                PatientName = x.PatientName,
+                                Status = (int)x.Status,
+                            }).ToList();
             return result;
         }
-        public List<CheckupSlotResponseModel> UpdateRedis_AvailableSlots(SlotSearchModel search)
+        //có thể những slot này thuộc những phòng khác nhau
+        public List<CheckupSlotResponseModel> GetAvailableSlots(SlotSearchModel search)
         {
             List<CheckupSlotResponseModel> result = new List<CheckupSlotResponseModel>();
 
@@ -131,13 +109,13 @@ namespace BusinessLayer.Services.User
                 .ToList();
 
             #region Thêm lịch
-            DateTime now = DateTime.Now.AddHours(7);
+            DateTime searchDate = search.Date.Date;
 
-            DateTime start = new DateTime(now.Year, now.Month, now.Day,
+            DateTime start = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                 WorkingShiftConfig.BeginMorningShiftHour,
                 WorkingShiftConfig.BeginAfternoonShiftMinute,
                 0);
-            DateTime end = new DateTime(now.Year, now.Month, now.Day,
+            DateTime end = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                 WorkingShiftConfig.EndMorningShiftHour,
                 WorkingShiftConfig.EndMorningShiftMinute,
                 0);
@@ -168,11 +146,11 @@ namespace BusinessLayer.Services.User
             if (afternoonRoom != null)
             {
                 _curSlot = 1;
-                start = new DateTime(now.Year, now.Month, now.Day,
+                start = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                     WorkingShiftConfig.BeginAfternoonShiftHour,
                     WorkingShiftConfig.BeginAfternoonShiftMinute,
                     0);
-                end = new DateTime(now.Year, now.Month, now.Day,
+                end = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                     WorkingShiftConfig.EndAfternoonShiftHour,
                     WorkingShiftConfig.EndAfternoonShiftMinute,
                     0);
@@ -197,11 +175,11 @@ namespace BusinessLayer.Services.User
             if (eveningRoom != null)
             {
                 _curSlot = 1;
-                start = new DateTime(now.Year, now.Month, now.Day,
+                start = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                     WorkingShiftConfig.BeginEveningShiftHour,
                     WorkingShiftConfig.BeginEveningShiftMinute,
                     0);
-                end = new DateTime(now.Year, now.Month, now.Day,
+                end = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                     WorkingShiftConfig.EndEveningShiftHour,
                     WorkingShiftConfig.EndEveningShiftMinute,
                     0);
@@ -237,24 +215,6 @@ namespace BusinessLayer.Services.User
                     }
                 }
             }
-            return result;
-        }
-        //có thể những slot này thuộc những phòng khác nhau
-        public List<CheckupSlotResponseModel> GetAvailableSlots(SlotSearchModel search)
-        {
-            List<CheckupSlotResponseModel> result = new List<CheckupSlotResponseModel>();
-
-            string redisKey = $"available-slots-for-doctor{search.DoctorId}-date{search.Date.Date}";
-            string dataFromRedis = _redisService.GetValueFromKey(redisKey);
-            if (!String.IsNullOrEmpty(dataFromRedis))
-            {
-                result = JsonConvert.DeserializeObject<List<CheckupSlotResponseModel>>(dataFromRedis);
-            }
-            else
-            {
-                result = UpdateRedis_AvailableSlots(search);
-            }
-
             return result;
         }
         //trùng với loginService của doctor => chuyển sang util

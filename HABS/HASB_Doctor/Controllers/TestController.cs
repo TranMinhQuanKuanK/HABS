@@ -29,7 +29,7 @@ namespace HASB_Doctor.Controllers
             ts = service;
         }
         [SwaggerOperation(Summary = "Tạo 3 bệnh nhân đặt khám trong ngày hôm đấy, đã thanh toán")]
-        [HttpGet]
+        [HttpGet("checkup-book-3")]
         public async Task<IActionResult> CreateThreePatientsAppointment()
         {
             try
@@ -48,7 +48,7 @@ namespace HASB_Doctor.Controllers
             }
         }
         [SwaggerOperation(Summary = "Tạo 2 bệnh nhân đã được đưa vào phòng chờ xét nghiệm")]
-        [HttpGet("ohhhhno")]
+        [HttpGet("test-book-2")]
         public async Task<IActionResult> CreateThreePatidentsAppointment()
         {
             try
@@ -64,8 +64,38 @@ namespace HASB_Doctor.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [SwaggerOperation(Summary = "Reset queue 10001")]
-        [HttpPost]
+        [SwaggerOperation(Summary = "Hủy hết bill :D ")]
+        [HttpGet("clear-bill")]
+        public async Task<IActionResult> df()
+        {
+            try
+            {
+                await ts.RemoveAllBill();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [SwaggerOperation(Summary = "Xóa hết hàng đợi checkup phòng 10001")]
+        [HttpGet("remove-all-10001")]
+        public async Task<IActionResult> dfdf()
+        {
+            try
+            {
+                await ts.RemoveAllPatientThatDay(10001);
+                _scheduleServce.UpdateRedis_CheckupQueue(10001);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+       
+        [SwaggerOperation(Summary = "Refresh queue của phòng 10001 nếu có gì sai sót")]
+        [HttpGet("refresh-queue")]
         public async Task<IActionResult> reset()
         {
             try

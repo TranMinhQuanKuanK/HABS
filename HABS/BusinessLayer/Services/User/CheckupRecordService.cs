@@ -54,11 +54,9 @@ namespace BusinessLayer.Services.User
             _scheduleService = scheduleService;
             _departmentService = departmentService;
         }
-        public List<PatientRecordMetadataResponseModel> UpdateRedis_CheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime,
+        public List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime,
             long? departmentId, long accountId)
         {
-            string redisKey = $"checkup-record-history-metadata-patient{patientId}-from{((DateTime)fromTime).Date}-to{((DateTime)toTime).Date}";
-
             List<PatientRecordMetadataResponseModel> data = new List<PatientRecordMetadataResponseModel>();
             var dbSetData = _unitOfWork.CheckupRecordRepository.Get().Include(x => x.Patient);
             IQueryable<CheckupRecord> queryableData = dbSetData;
@@ -92,25 +90,6 @@ namespace BusinessLayer.Services.User
                }
                ).ToList();
 
-            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(data));
-            return data;
-        }
-        public List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime,
-            long? departmentId, long accountId)
-        {
-            List<PatientRecordMetadataResponseModel> data = null;
-
-            string redisKey = $"checkup-record-history-metadata-patient{patientId}-from{((DateTime)fromTime).Date}-to{((DateTime)toTime).Date}"
-                + $"department{departmentId}-account{accountId}";
-            string dataFromRedis = _redisService.GetValueFromKey(redisKey);
-            if (!String.IsNullOrEmpty(dataFromRedis))
-            {
-                data = JsonConvert.DeserializeObject<List<PatientRecordMetadataResponseModel>>(dataFromRedis);
-            }
-            else
-            {
-                data = UpdateRedis_CheckupRecordMetadata(patientId, fromTime, toTime, departmentId, accountId);
-            }
             return data;
         }
         public PatientRecordFullDataResponseModel GetCheckupRecordFullData(long recordId, long accountId)
@@ -283,6 +262,12 @@ namespace BusinessLayer.Services.User
                         if (slot.IsAvailable)
                         {
                             estimatedStartTime = (DateTime)slot.EstimatedStartTime;
+                            prevCr.RoomId = slot.RoomId;
+                            prevCr.RoomNumber = slot.RoomNumber;
+                            prevCr.Floor = slot.Floor;
+                            prevCr.Date = slot.EstimatedStartTime;
+                            prevCr.NumericalOrder = slot.NumericalOrder;
+                            prevCr.EstimatedStartTime = slot.EstimatedStartTime;
                             break;
                         }
                         else
@@ -318,6 +303,7 @@ namespace BusinessLayer.Services.User
                 _tr.Floor = room.Floor;
                 _tr.NumericalOrder = numOrd;
                 _tr.Status = TestRecord.TestRecordStatus.DA_DAT_LICH;
+                _tr.Date = date.Date;
             }
             await _unitOfWork.SaveChangesAsync();
         }
@@ -421,6 +407,7 @@ namespace BusinessLayer.Services.User
                 NumericalOrder = numericalOrder,
                 EstimatedDate = date,
                 EstimatedStartTime = estimatedStartTime,
+                Date = estimatedStartTime,
                 DepartmentId = IdConfig.ID_DEPARTMENT_DA_KHOA,
                 DepartmentName = dakhoaDep.Name,
                 DoctorId = doctorId,
@@ -438,7 +425,8 @@ namespace BusinessLayer.Services.User
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
                 TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
-                PatientId = patient.Id
+                PatientId = patient.Id,
+                PhoneNo = patient.PhoneNumber
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();

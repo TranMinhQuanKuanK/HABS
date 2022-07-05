@@ -44,7 +44,7 @@ namespace HASB_Cashier.Controllers
             }
         }
         [SwaggerOperation(Summary = "Lấy thông tin hóa đơn theo id")]
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public IActionResult GetBill0ById(long Id)
         {
             try

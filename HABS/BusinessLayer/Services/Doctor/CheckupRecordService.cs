@@ -589,20 +589,19 @@ namespace BusinessLayer.Services.Doctor
                 throw new Exception("Department doesn't exist");
             }
             //Thêm note vào CR cũ
-            preCr.DoctorAdvice = preCr.DoctorAdvice + $"\\n Hẹn tái khám vào ngày {model.ReExamDate.Date}, các xét nghiệm cần thực hiện trước khi tái khám";
+            preCr.DoctorAdvice = preCr.DoctorAdvice + $"\\n Hẹn tái khám vào ngày {model.ReExamDate.Date}, các xét nghiệm cần thực hiện trước khi tái khám: ";
             for (int i = 0; i < listOp.Count; i++)
             {
                 preCr.DoctorAdvice = preCr.DoctorAdvice + listOp[i].Name;
                 if (i== listOp.Count-1)
                 {
-                    preCr.DoctorAdvice = preCr.DoctorAdvice + ", ";
+                    preCr.DoctorAdvice = preCr.DoctorAdvice + ". ";
                 } else
                 {
-                    preCr.DoctorAdvice = preCr.DoctorAdvice + ". ";
+                    preCr.DoctorAdvice = preCr.DoctorAdvice + ", ";
                 }
             }
-            preCr.DoctorAdvice = preCr.DoctorAdvice + "Gặp bác sĩ " + doc.Name + " , SĐT: " + doc.PhoneNo + ".";
-
+            preCr.DoctorAdvice = preCr.DoctorAdvice + "Gặp bác sĩ " + doc.Name + ", SĐT: " + doc.PhoneNo + ".";
             //tạo mới bill
             var bill = new Bill()
             {
@@ -636,6 +635,7 @@ namespace BusinessLayer.Services.Doctor
                     EstimatedDate = model.ReExamDate,
                     CheckupRecordId = cr.Id,
                     OperationId = op.Id,
+                    OperationName = op.Name,
                     PatientId = model.PatientId,
                     PatientName = patient.Name,
                     Status = TestRecord.TestRecordStatus.CHUA_DAT_LICH,
@@ -681,6 +681,7 @@ namespace BusinessLayer.Services.Doctor
             await _unitOfWork.BillDetailRepository.Add(bdCR);
             bill.TotalInWord = MoneyHelper.NumberToText(bill.Total);
             await _unitOfWork.SaveChangesAsync();
+            //_scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
         }
     }
 

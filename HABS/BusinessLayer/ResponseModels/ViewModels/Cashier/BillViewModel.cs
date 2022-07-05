@@ -16,6 +16,8 @@ namespace BusinessLayer.ResponseModels.ViewModels.Cashier
         public string Content { get; set; }
         public string PatientName { get; set; }
         public long PatientId { get; set; }
+        public int Gender { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         public string CashierName { get; set; }
         public long? CashierId { get; set; }

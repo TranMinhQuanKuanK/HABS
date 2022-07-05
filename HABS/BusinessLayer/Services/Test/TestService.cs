@@ -17,7 +17,7 @@ using static DataAccessLayer.Models.Operation;
 
 namespace BusinessLayer.Services.Test
 {
-    public class TestService :  BaseService
+    public class TestService : BaseService
     {
         private readonly Interfaces.User.IScheduleService _scheduleService;
         private readonly Interfaces.Doctor.IScheduleService _scheduleServiceDoctor;
@@ -68,7 +68,7 @@ namespace BusinessLayer.Services.Test
             }
             return session;
         }
-        public async Task CreatNewAppointment(long patientId, DateTime date, 
+        public async Task CreatNewAppointment(long patientId, DateTime date,
             long doctorId, int? numericalOrder, string clinicalSymptom)
         {
             var reqSession = SessionType.SANG;
@@ -83,13 +83,13 @@ namespace BusinessLayer.Services.Test
             }
             //kiểm tra xem thời điểm đó bs có làm việc ko
             var schedule = _unitOfWork.ScheduleRepository.Get()
-                .Where(x => x.RoomId==10001)
+                .Where(x => x.RoomId == 10001)
                 .Where(x => x.Session == reqSession)
                 .Where(x => x.Weekday == date.DayOfWeek)
                 .Include(x => x.Room)
-                .Include(x=>x.Doctor)
+                .Include(x => x.Doctor)
                 .FirstOrDefault();
-           
+
             //kiểm tra bệnh nhân, nào bổ sung status check sau khi đã update db bổ sung status vào bảng patient
             var patient = _unitOfWork.PatientRepository.Get()
              .Where(x => x.Id == patientId)
@@ -119,7 +119,7 @@ namespace BusinessLayer.Services.Test
             }
             else
             {
-               //không đặt trước trong hàm test
+                //không đặt trước trong hàm test
             }
             //nếu chưa có CR thì đăng kí 1 checkup record mới
             var dakhoaDep = _departmentService.GetDepartmentById(IdConfig.ID_DEPARTMENT_DA_KHOA);
@@ -311,12 +311,34 @@ namespace BusinessLayer.Services.Test
                 CheckupRecordId = cr.Id,
                 Status = TestRecord.TestRecordStatus.DA_THANH_TOAN,
             };
-            await _unitOfWork.TestRecordRepository.Add(tr2); 
+            await _unitOfWork.TestRecordRepository.Add(tr2);
             await _unitOfWork.TestRecordRepository.Add(tr);
             await _unitOfWork.SaveChangesAsync();
             _scheduleServiceDoctor.UpdateRedis_CheckupQueue((long)cr.RoomId);
-            _scheduleServiceDoctor.UpdateRedis_TestQueue(10007,false);
+            _scheduleServiceDoctor.UpdateRedis_TestQueue(10007, false);
 
+        }
+        public async Task RemoveAllPatientThatDay(long roomId)
+        {
+            var crList = _unitOfWork.CheckupRecordRepository.Get()
+                .Where(x => ((DateTime)x.Date).Date == DateTime.Now.Date || ((DateTime)x.EstimatedDate).Date == DateTime.Now.Date
+               )
+                .ToList();
+            foreach (var item in crList)
+            {
+                item.Status = CheckupRecordStatus.DA_XOA;
+            }
+            await _unitOfWork.SaveChangesAsync();
+        }
+        public async Task RemoveAllBill()
+        {
+            var billList = _unitOfWork.BillRepository.Get()
+                .ToList();
+            foreach (var item in billList)
+            {
+                item.Status = Bill.BillStatus.HUY;
+            }
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

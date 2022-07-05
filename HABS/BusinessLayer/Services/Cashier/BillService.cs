@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static DataAccessLayer.Models.Bill;
 using static DataAccessLayer.Models.CheckupRecord;
 using static DataAccessLayer.Models.TestRecord;
 
@@ -37,12 +38,14 @@ namespace BusinessLayer.Services.Cashier
         public List<BillViewModel> GetBills(BillSearchModel search)
         {
             var bills = _unitOfWork.BillRepository.Get()
+                .Include(x=>x.Patient)
                 .Where(x => search.PatientId==null ? true : x.PatientId==search.PatientId)
                 .Where(x => string.IsNullOrEmpty(search.PatientName) ? true : x.PatientName.Contains(search.PatientName))
                 .Where(x => string.IsNullOrEmpty(search.PhoneNo) ? true : x.PhoneNo.Contains(search.PhoneNo))
                 .Where(x => search.From == null ? true : x.TimeCreated >= search.From)
                 .Where(x => search.To == null ? true : x.TimeCreated <= search.To)
-                .Where(x => search.IncludeOldBills ? true : x.Status == DataAccessLayer.Models.Bill.BillStatus.CHUA_TT)
+                .Where(x => search.Status==null ? true : x.Status == (BillStatus)search.Status)
+                .Where(x => x.Status!= DataAccessLayer.Models.Bill.BillStatus.HUY)
                 .OrderByDescending(x=>x.TimeCreated)
                 .Select(x => new BillViewModel()
                 {
@@ -55,7 +58,9 @@ namespace BusinessLayer.Services.Cashier
                     TotalInWord = x.TotalInWord,
                     CashierId = x.CashierId,
                     CashierName = x.CashierName,
-                    PatientId=(long)x.PatientId
+                    PatientId=(long)x.PatientId,
+                    DateOfBirth = x.Patient.DateOfBirth,
+                    Gender =(int) x.Patient.Gender,
                 })
                 .ToList();
             return bills;
@@ -78,6 +83,8 @@ namespace BusinessLayer.Services.Cashier
                     TotalInWord = x.TotalInWord,
                     CashierId = x.CashierId,
                     CashierName = x.CashierName,
+                    DateOfBirth = x.Patient.DateOfBirth,
+                    Gender = (int)x.Patient.Gender,
                     Details = x.BillDetails.Select(d=>new BillDetailViewModel()
                     {
                         Id = d.Id,
@@ -100,7 +107,7 @@ namespace BusinessLayer.Services.Cashier
             bool doUpdateTestQueue = false;
             bool doUpdateCheckupQueue = false;
 
-            var cashier = _unitOfWork.BillRepository
+            var cashier = _unitOfWork.CashierRepository
                 .Get().Where(x => x.Id == cashierId).FirstOrDefault();
             if (cashier == null)
             {
@@ -162,6 +169,8 @@ namespace BusinessLayer.Services.Cashier
             }
             bill.Status = DataAccessLayer.Models.Bill.BillStatus.TT_TIEN_MAT;
             bill.CashierId = cashierId;
+            bill.CashierName = cashier.Name;
+
             await _unitOfWork.SaveChangesAsync();
             if (doUpdateCheckupQueue)
             {

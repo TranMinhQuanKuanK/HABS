@@ -147,6 +147,8 @@ namespace HASB_User
             //Firebase messaging
             services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.IScheduleService, 
+                BusinessLayer.Services.Doctor.ScheduleService>();
 
             services.AddTransient<BusinessLayer.Interfaces.Notification.IFCMTokenService,
                BusinessLayer.Services.Notification.FCMTokenService>();

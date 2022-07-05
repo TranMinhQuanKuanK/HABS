@@ -51,7 +51,7 @@ namespace BusinessLayer.Services.Common
             }
             Room roomWithLeastPeople = roomList[0];
             //chuyển thành testRecord service
-            int min = roomList[0].TestRecords.Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
+            int min = roomList[0].TestRecords.Where(x => x.Date!=null ? ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day :false )
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
@@ -63,7 +63,7 @@ namespace BusinessLayer.Services.Common
                 //Flow cho phòng xét nghiệm
                 foreach (var room in roomList)
                 {
-                    int cur = room.TestRecords.Where(x => ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day)
+                    int cur = room.TestRecords.Where(x => x.Date != null ? ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day : false)
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
@@ -112,7 +112,7 @@ namespace BusinessLayer.Services.Common
                 int curNumOfPeople = 0;
                 if (room.RoomTypeId != IdConfig.ID_ROOMTYPE_PHONG_KHAM)
                 {
-                    curNumOfPeople = room.TestRecords.Where(x => ((DateTime)x.Date).Day == date.Day)
+                    curNumOfPeople = room.TestRecords.Where(x => x.Date != null ? ((DateTime)x.Date).Day == date.Day:false)
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
@@ -123,7 +123,7 @@ namespace BusinessLayer.Services.Common
                 else
                 {
                     curNumOfPeople = room.CheckupRecords
-                       .Where(x => ((DateTime)x.Date).Day == date.Day)
+                       .Where(x => x.Date != null ? ((DateTime)x.Date).Day == date.Day : false)
                     .Where(x => x.Status == CheckupRecord.CheckupRecordStatus.CHO_KQXN
                      || x.Status == CheckupRecord.CheckupRecordStatus.CHUYEN_KHOA
                      || x.Status == CheckupRecord.CheckupRecordStatus.DANG_KHAM
