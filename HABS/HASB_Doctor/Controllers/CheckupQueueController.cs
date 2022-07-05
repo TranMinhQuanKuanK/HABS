@@ -12,7 +12,6 @@ namespace HASB_Doctor.Controllers
 {
     [Route(DoctorRoute)]
     [ApiController]
-    //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "Doctor")]
     public class CheckupQueueController : BaseDoctorController
     {
@@ -47,7 +46,7 @@ namespace HASB_Doctor.Controllers
             try
             {
                 int doctorId = 0;
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
                 if (identity != null)
                 {
                     doctorId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);

@@ -1,20 +1,15 @@
 ﻿using BusinessLayer.Interfaces.User;
 using BusinessLayer.RequestModels;
-using BusinessLayer.RequestModels.CreateModels.User;
 using BusinessLayer.RequestModels.SearchModels.User;
-using BusinessLayer.ResponseModels.SearchModels.User;
 using BusinessLayer.ResponseModels.ViewModels;
 using BusinessLayer.ResponseModels.ViewModels.User;
 using BusinessLayer.Utilities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace HASB_User.Controllers
 {
@@ -31,7 +26,7 @@ namespace HASB_User.Controllers
             _checkupRecordService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy BỆNH ÁN của bệnh nhân, trả metadata")]
+        [SwaggerOperation(Summary = "Lấy metadata BỆNH ÁN của bệnh nhân")]
         [HttpGet]
         public IActionResult GetCheckupRecord([FromQuery] CheckupAppointmentSearchModel searchModel, [FromQuery] PagingRequestModel paging)
         {

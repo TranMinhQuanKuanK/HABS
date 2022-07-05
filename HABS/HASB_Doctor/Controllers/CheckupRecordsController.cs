@@ -20,7 +20,6 @@ namespace HASB_Doctor.Controllers
 {
     [Route(DoctorRoute)]
     [ApiController]
-    //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "Doctor")
     public class CheckupRecordsController : BaseDoctorController
     {

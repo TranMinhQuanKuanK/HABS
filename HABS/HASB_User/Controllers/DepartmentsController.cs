@@ -14,7 +14,6 @@ namespace HASB_User.Controllers
 {
     [Route(UserRoute)]
     [ApiController]
-    //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "Doctor")]
     public class DepartmentsController : BaseUserController
     {
@@ -25,7 +24,7 @@ namespace HASB_User.Controllers
         {
             _departmentService = service;
         }
-        [SwaggerOperation(Summary = "Lấy khoa")]
+        [SwaggerOperation(Summary = "Lấy danh sách khoa")]
         [HttpGet]
         public IActionResult GetDepartments()
         {

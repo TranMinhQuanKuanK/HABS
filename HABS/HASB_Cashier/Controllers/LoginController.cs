@@ -1,23 +1,15 @@
 ﻿using BusinessLayer.Interfaces.Cashier;
-using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.CreateModels.Cashier;
 using BusinessLayer.ResponseModels.ViewModels;
 using BusinessLayer.ResponseModels.ViewModels.Cashier;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Utilities;
 
 namespace HASB_Cashier.Controllers
 {
     [Route(CashierRoute)]
     [ApiController]
-    //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "Doctor")]
     public class LoginController : BaseCashierController
     {

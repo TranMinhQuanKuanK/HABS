@@ -14,7 +14,6 @@ namespace HASB_Doctor.Controllers
 {
     [Route(DoctorRoute)]
     [ApiController]
-    //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "Doctor")]
     public class TestQueueController : BaseDoctorController
     {
@@ -44,7 +43,7 @@ namespace HASB_Doctor.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [SwaggerOperation(Summary = "Lấy thông tin một phiếu xét nghiệm")]
+        [SwaggerOperation(Summary = "Lấy thông tin một xét nghiệm")]
         [HttpGet("{id}")]
         public IActionResult GetTestQueueItem(long Id)
         {

@@ -1,17 +1,10 @@
 ﻿using BusinessLayer.Interfaces.Cashier;
-using BusinessLayer.Interfaces.Common;
-using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.SearchModels.Cashier;
-using BusinessLayer.RequestModels.SearchModels.Doctor;
-using BusinessLayer.ResponseModels.ViewModels.Doctor;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -19,7 +12,6 @@ namespace HASB_Cashier.Controllers
 {
     [Route(CashierRoute)]
     [ApiController]
-    //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "Cashier")]
     public class BillsController : BaseCashierController
     {
@@ -30,7 +22,7 @@ namespace HASB_Cashier.Controllers
         }
         [SwaggerOperation(Summary = "Lấy danh sách hóa đơn chưa thanh toán")]
         [HttpGet]
-        public IActionResult GetBills([FromQuery] BillSearchModel search, [FromQuery] PagingRequestModel paging)
+        public IActionResult GetBills([FromQuery] BillSearchModel search)
         {
             try
             {
@@ -43,7 +35,7 @@ namespace HASB_Cashier.Controllers
                 return BadRequest();
             }
         }
-        [SwaggerOperation(Summary = "Lấy thông tin hóa đơn theo id")]
+        [SwaggerOperation(Summary = "Lấy thông tin hóa đơn theo id hóa đơn")]
         [HttpGet("{id}")]
         public IActionResult GetBill0ById(long Id)
         {

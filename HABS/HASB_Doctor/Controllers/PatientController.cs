@@ -32,7 +32,7 @@ namespace HASB_Doctor.Controllers
         {
             _checkupRecordService = service;
         }
-        [SwaggerOperation(Summary = "Đặt thêm lịch tái khám cho bệnh nhân, id url là id của record lúc trước (giả)")]
+        [SwaggerOperation(Summary = "Đặt thêm lịch tái khám cho bệnh nhân (id url là id của record lúc trước")]
         [HttpPost("{id}/reexam")]
         public async Task<IActionResult> ArrangeTest(long Id, [FromBody] ReExamCreateModel model)
         {

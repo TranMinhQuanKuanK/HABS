@@ -14,18 +14,16 @@ namespace HASB_Doctor.Controllers
 {
     [Route(DoctorRoute)]
     [ApiController]
-    //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "Doctor")]
     public class DepartmentsController : BaseDoctorController
     {
-
         private readonly IDepartmentService _departmentService;
 
         public DepartmentsController(IDepartmentService service)
         {
             _departmentService = service;
         }
-        [SwaggerOperation(Summary = "Lấy khoa (để chuyển viện)")]
+        [SwaggerOperation(Summary = "Lấy danh sách các khoa để chuyển viện")]
         [HttpGet]
         public IActionResult GetDepartments()
         {

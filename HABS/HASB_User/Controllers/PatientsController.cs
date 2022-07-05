@@ -1,15 +1,9 @@
 ﻿using BusinessLayer.Interfaces.User;
-using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.CreateModels.User;
-using BusinessLayer.RequestModels.SearchModels.User;
-using BusinessLayer.ResponseModels.ViewModels.User;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -17,7 +11,6 @@ namespace HASB_User.Controllers
 {
     [Route(UserRoute)]
     [ApiController]
-    //[ApiExplorerSettings(GroupName = Role)]
     //[Authorize(Roles = "User")]
     public class PatientsController : BaseUserController
     {
@@ -29,7 +22,7 @@ namespace HASB_User.Controllers
             _patientService = service;
         }
 
-        [SwaggerOperation(Summary = "Lấy danh sách bệnh nhân của tài khoản")]
+        [SwaggerOperation(Summary = "Lấy danh sách bệnh nhân của tài khoản này")]
         [HttpGet]
         public IActionResult GetPatients()
         {
