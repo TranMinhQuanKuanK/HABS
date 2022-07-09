@@ -54,7 +54,8 @@ namespace BusinessLayer.Services.User
                     DateOfBirth = x.DateOfBirth,
                     Gender = (int)x.Gender,
                     Name = x.Name,
-                    PhoneNumber = x.PhoneNumber
+                    PhoneNumber = x.PhoneNumber,
+                    AccountId = x.AccountId
                 }).FirstOrDefault();
             return data;
         }

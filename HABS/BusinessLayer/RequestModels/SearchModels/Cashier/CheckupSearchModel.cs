@@ -13,6 +13,7 @@ namespace BusinessLayer.RequestModels.SearchModels.Cashier
         public long? PatientId { get; set; }
         public string PhoneNo { get; set; }
         public string PatientName { get; set; }
+        public string SearchTerm { get; set; }
         public DateTime? From { get; set; }
         public DateTime? To { get; set; }
 

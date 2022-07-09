@@ -11,7 +11,7 @@ namespace BusinessLayer.Interfaces.Doctor
     public interface ICheckupRecordService
     {
         List<PatientRecordMetadataViewModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime, long? departmentId);
-        PatientRecordFullDataViewModel GetCheckupRecordFullData(long patientId);
+        PatientRecordFullDataViewModel GetCheckupRecordFullData(long recordId);
         Task ConfirmCheckup(long crId, long? doctorId);
         Task CreatePrescription(long recordId, PrescriptionCreateModel model);
         Task<List<RedirectViewModel>> RedirectPatient(RedirectCreateModel model, long recordId);

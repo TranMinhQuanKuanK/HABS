@@ -83,7 +83,13 @@ namespace HASB_Doctor.Controllers
         {
             try
             {
-                await _testRecordService.UpdateTestRecordResult(model);
+                int doctorId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    doctorId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                await _testRecordService.UpdateTestRecordResult(model, doctorId);
                 return Ok();
             }
             catch (Exception e)

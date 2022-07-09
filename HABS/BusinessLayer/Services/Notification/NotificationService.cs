@@ -1,5 +1,8 @@
-﻿using BusinessLayer.Interfaces.Notification;
+﻿using BusinessLayer.Interfaces.User;
+using BusinessLayer.Interfaces.Notification;
 using BusinessLayer.ResponseModels.Firebase;
+using BusinessLayer.ResponseModels.ViewModels.User;
+using DataAccessLayer.Models;
 using DataAcessLayer.Interfaces;
 using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
@@ -15,6 +18,8 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using BusinessLayer.ResponseModels.ViewModels.Doctor;
+using System.Text.Json;
 
 namespace BusinessLayer.Services.Notification
 {
@@ -22,41 +27,45 @@ namespace BusinessLayer.Services.Notification
     {
         private readonly FirebaseApp _firebaseApp;
         private readonly IFCMTokenService _tokenService;
-
-        public NotificationService(FirebaseApp firebaseApp, IFCMTokenService tokenService, IUnitOfWork unitOfWork) : base(unitOfWork)
+        private readonly ICheckupRecordService _checkupService;
+        public NotificationService(FirebaseApp firebaseApp, IFCMTokenService tokenService, IUnitOfWork unitOfWork,
+            ICheckupRecordService checkupService) : base(unitOfWork)
         {
+            _checkupService = checkupService;
             _firebaseApp = firebaseApp;
             _tokenService = tokenService;
         }
-        //public async Task SendNotificationStoreRejected(int storeId, int brandId, string storeName)
-        //{
-        //    var notiModel = new StoreApprovedRejectedNotificationModel()
-        //    {
-        //        BrandId = brandId,
-        //        StoreId = storeId,
-        //        StoreName = storeName,
-        //        ClickAction = "FLUTTER_NOTIFICATION_CLICK",
-        //        Screen = "/stores",
-        //    };
-        //    string title = "YÊU CẦU BỊ TỪ CHỐI";
-        //    string body = $"Yêu cầu mở tiệm \"{storeName}\" của bạn đã bị từ chối. Liên hệ chúng tôi để biết thêm chi tiết.";
-        //    await SendNotification(notiModel, "StoreRejected", title, body, brandId);
-        //}
-        public async Task SendUpdateCheckupInfoReminder(long patientId, long checkupRecordId)
+        public async Task SendUpdateCheckupInfoReminder(long checkupRecordId,long accountId)
         {
-
+            var cr = _checkupService.GetCheckupRecordFullData(checkupRecordId,accountId);
+            GeneralFirebaseNotificationModel<PatientRecordFullDataResponseModel> data =
+                new GeneralFirebaseNotificationModel<PatientRecordFullDataResponseModel>()
+            {
+                Data = cr,
+                Type = GeneralFirebaseNotificationModel<PatientRecordFullDataResponseModel>.NotiType.CheckupStatusChangeReminder
+            };
+            await sendNotification(data, "","Trạng thái khám thay đổi","Trạng thái khám đã thay đổi.", accountId);
+        }
+        public async Task SendDepartmentChangeNoti(List<DepartmentChangeNoti> listDepartment, long accountId)
+        {
+            GeneralFirebaseNotificationModel<List<DepartmentChangeNoti>> data = 
+                new GeneralFirebaseNotificationModel<List<DepartmentChangeNoti>>()
+            {
+                Data = listDepartment,
+                Type = GeneralFirebaseNotificationModel<List<DepartmentChangeNoti>>
+                        .NotiType.CheckupStatusChangeReminder
+            };
+            await sendNotification(data, "", "Trạng thái khám thay đổi", "Trạng thái khám đã thay đổi.", accountId);
         }
         private async Task sendNotification(object data, string topic, string title, string body, long accountId)
         {
             try
             {
                 var dataForMesssage = new Dictionary<string, string>();
-
-                foreach (PropertyInfo prop in data.GetType().GetProperties())
+                dataForMesssage.Add("data", JsonSerializer.Serialize(data, new JsonSerializerOptions()
                 {
-                    dataForMesssage.Add(prop.Name, prop.GetValue(data).ToString());
-                }
-
+                    PropertyNameCaseInsensitive = true
+                }).ToString()); 
                 List<string> tokenList = _tokenService.GetTokenList(accountId);
                 List<Message> messageList = new List<Message>();
                 tokenList.ForEach(_token => messageList.Add(new Message()
@@ -67,7 +76,7 @@ namespace BusinessLayer.Services.Notification
                         Body = body,
                         Title = title
                     },
-                    Data = dataForMesssage,
+                    Data = dataForMesssage
                 }));
                 var response = await FirebaseMessaging.DefaultInstance.SendAllAsync(messageList);
                 // Response is a message ID string.

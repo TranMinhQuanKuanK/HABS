@@ -10,7 +10,7 @@ namespace BusinessLayer.Interfaces.Doctor
 {
     public interface ITestRecordService
     {
-        Task UpdateTestRecordResult(TestRecordEditModel model);
+        Task UpdateTestRecordResult(TestRecordEditModel model, long doctorId);
         Task ConfirmTest(long doctorId, long tId);
     }
 }

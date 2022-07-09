@@ -1,10 +1,12 @@
 ﻿using BusinessLayer.Interfaces.Cashier;
 using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Interfaces.Doctor;
+using BusinessLayer.Interfaces.Notification;
 using BusinessLayer.Interfaces.User;
 using BusinessLayer.RequestModels.SearchModels.Cashier;
 using BusinessLayer.ResponseModels.ViewModels.Cashier;
 using BusinessLayer.Services.Redis;
+using DataAccessLayer.Models;
 using DataAcessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
@@ -24,13 +26,16 @@ namespace BusinessLayer.Services.Cashier
         private readonly IDistributedCache _distributedCache;
         private readonly RedisService _redisService;
         private readonly Interfaces.Doctor.IScheduleService _scheduleService;
+        private readonly INotificationService _notiService;
 
         public BillService(IUnitOfWork unitOfWork,
             IDistributedCache distributedCache,
-             Interfaces.Doctor.IScheduleService scheduleService
+             Interfaces.Doctor.IScheduleService scheduleService,
+              INotificationService notiService
             ) : base(unitOfWork)
 
         {
+            _notiService = notiService;
             _scheduleService = scheduleService;
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
@@ -42,6 +47,9 @@ namespace BusinessLayer.Services.Cashier
                 .Where(x => search.PatientId==null ? true : x.PatientId==search.PatientId)
                 .Where(x => string.IsNullOrEmpty(search.PatientName) ? true : x.PatientName.Contains(search.PatientName))
                 .Where(x => string.IsNullOrEmpty(search.PhoneNo) ? true : x.PhoneNo.Contains(search.PhoneNo))
+                .Where(x => string.IsNullOrEmpty(search.SearchTerm) ? true : x.PhoneNo.Contains(search.SearchTerm)
+                || x.PatientName.Contains(search.SearchTerm)
+                || x.AccountPhoneNo.Contains(search.SearchTerm))
                 .Where(x => search.From == null ? true : x.TimeCreated >= search.From)
                 .Where(x => search.To == null ? true : x.TimeCreated <= search.To)
                 .Where(x => search.Status==null ? true : x.Status == (BillStatus)search.Status)
@@ -51,6 +59,8 @@ namespace BusinessLayer.Services.Cashier
                 {
                     Id = x.Id,
                     PatientName = x.PatientName,
+                    PhoneNo = x.PhoneNo,
+                    AccountPhoneNo = x.AccountPhoneNo,
                     Content = x.Content,
                     TimeCreated = x.TimeCreated,
                     Status = (int)x.Status,
@@ -122,13 +132,15 @@ namespace BusinessLayer.Services.Cashier
                 throw new Exception("Bill doesn't exist");
             }
             //check đã thanh toán cho từng record tương ứng của bill detail
+            CheckupRecord cr = null;
             foreach (var bd in bill.BillDetails)
             {
                 //nếu là CR
                 if (bd.TestRecordId == null && bd.CheckupRecordId != null)
                 {
-                    var cr = _unitOfWork.CheckupRecordRepository.Get()
+                    cr = _unitOfWork.CheckupRecordRepository.Get()
                         .Include(x=>x.TestRecords)
+                        .Include(x=>x.Patient)
                         .Where(x => x.Id == bd.CheckupRecordId).FirstOrDefault();
                     //kiểm tra nếu chưa đặt lịch thì báo lỗi (tái khám)
                     if (cr.Status== CheckupRecordStatus.CHO_TAI_KHAM)
@@ -159,7 +171,8 @@ namespace BusinessLayer.Services.Cashier
                 {
                     var tr = _unitOfWork.TestRecordRepository.Get()
                         .Where(x => x.Id == bd.TestRecordId).FirstOrDefault();
-                    var cr = _unitOfWork.CheckupRecordRepository.Get()
+                    cr = _unitOfWork.CheckupRecordRepository.Get()
+                         .Include(x => x.Patient)
                         .Where(x => x.Id == tr.CheckupRecordId).FirstOrDefault();
                     cr.Status = CheckupRecordStatus.CHO_KQXN;
                     tr.Status = TestRecordStatus.DA_THANH_TOAN;
@@ -183,6 +196,7 @@ namespace BusinessLayer.Services.Cashier
                     _scheduleService.UpdateRedis_TestQueue(id, false);
                 }
             }
+            await _notiService.SendUpdateCheckupInfoReminder(cr.Id,cr.Patient.AccountId);
         }
         public async Task CancelABill(long billId, long cashierId)
         {
@@ -202,8 +216,11 @@ namespace BusinessLayer.Services.Cashier
                 throw new Exception("Bill doesn't exist");
             }
             bill.Status = DataAccessLayer.Models.Bill.BillStatus.HUY;
-            bill.BillDetails.ElementAt(0).CheckupRecord.Status =
+            if (bill.BillDetails.Count>0)
+            {
+                bill.BillDetails.ElementAt(0).CheckupRecord.Status =
              CheckupRecordStatus.DA_HUY;
+            }
             bill.CashierId = cashierId;
             await _unitOfWork.SaveChangesAsync();
         }

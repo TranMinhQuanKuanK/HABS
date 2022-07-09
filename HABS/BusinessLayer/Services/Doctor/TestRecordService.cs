@@ -26,25 +26,29 @@ using BusinessLayer.Interfaces.Common;
 using Utilities;
 using static DataAccessLayer.Models.TestRecord;
 using static DataAccessLayer.Models.Doctor;
+using BusinessLayer.Interfaces.Notification;
 
 namespace BusinessLayer.Services.Doctor
 {
     public class TestRecordService : BaseService, Interfaces.Doctor.ITestRecordService
     {
         private readonly IFileService _fileService;
+        private readonly INotificationService _notiService;
 
         private readonly Interfaces.Doctor.IScheduleService _scheduleService;
         public TestRecordService(IUnitOfWork unitOfWork,
              Interfaces.Doctor.IScheduleService scheduleService,
-             IFileService fileService
+             IFileService fileService,
+              INotificationService notiService
             ) : base(unitOfWork)
 
         {
+            _notiService = notiService;
             _fileService = fileService;
             _scheduleService = scheduleService;
         }
 
-        public async Task UpdateTestRecordResult( TestRecordEditModel model)
+        public async Task UpdateTestRecordResult( TestRecordEditModel model,long doctorId)
         {
             bool doneAll = false;
             var tr = _unitOfWork.TestRecordRepository.Get()
@@ -52,6 +56,7 @@ namespace BusinessLayer.Services.Doctor
               .FirstOrDefault();
             var cr = _unitOfWork.CheckupRecordRepository.Get()
                 .Include(x => x.TestRecords)
+                .Include(x=>x.Patient)
                 .Where(x => x.Id == tr.CheckupRecordId)
                 .FirstOrDefault();
 
@@ -71,11 +76,14 @@ namespace BusinessLayer.Services.Doctor
                     tr.Status = TestRecordStatus.HOAN_THANH;
                     //kiếm tra nếu là xét nghiệm cuối cùng thì hoàn thành phiếu 
                     doneAll = true;
-                    foreach (var _tr in cr.TestRecords)
+                    if (cr.TestRecords.Count>1)
                     {
-                        if (_tr.Id!=tr.Id && tr.Status!= TestRecordStatus.HOAN_THANH)
+                        foreach (var _tr in cr.TestRecords)
                         {
-                            doneAll = false;
+                            if (_tr.Id != tr.Id && tr.Status != TestRecordStatus.HOAN_THANH)
+                            {
+                                doneAll = false;
+                            }
                         }
                     }
                     if (doneAll)
@@ -96,7 +104,18 @@ namespace BusinessLayer.Services.Doctor
                 // gán link vào test record
                 tr.ResultFileLink = url;
             }
+            var doctor = _unitOfWork.DoctorRepository.Get().Where(x => x.Id == doctorId).FirstOrDefault();
+            if (doctor==null)
+            {
+                throw new Exception("Doctor doesn't exist");
+            }
+            tr.DoctorId = doctorId;
+            tr.DoctorName = doctor.Name;
             await _unitOfWork.SaveChangesAsync();
+            if (model.Status== (int)TestRecordStatus.HOAN_THANH)
+            {
+               await _notiService.SendUpdateCheckupInfoReminder(cr.Id, cr.Patient.AccountId);
+            }
             if (doneAll)
             {
                 _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);

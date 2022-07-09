@@ -11,6 +11,7 @@ namespace BusinessLayer.ResponseModels.Firebase
         public enum NotiType
         {
             CheckupStatusChangeReminder,
+            DepartmentChangeReminder
         }
         public NotiType Type { get; set; }
         public TDataModel Data { get; set; }

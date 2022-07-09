@@ -285,9 +285,9 @@ namespace BusinessLayer.Services.Test
             //await _unitOfWork.BillDetailRepository.Add(bd);
             TestRecord tr = new TestRecord()
             {
-                RoomId = 10007,
-                EstimatedDate = DateTime.Now.AddHours(7),
-                Date = DateTime.Now.AddHours(7),
+                RoomId = 10008,
+                EstimatedDate = DateTime.Now.AddYears(-2),
+                Date = DateTime.Now.AddYears(-2),
                 Floor = "23",
                 NumericalOrder = 9999,
                 OperationId = 10010,
@@ -299,9 +299,9 @@ namespace BusinessLayer.Services.Test
             };
             TestRecord tr2 = new TestRecord()
             {
-                RoomId = 10007,
-                EstimatedDate = DateTime.Now.AddHours(7),
-                Date = DateTime.Now.AddHours(7),
+                RoomId = 10008,
+                EstimatedDate = DateTime.Now.AddYears(-2),
+                Date = DateTime.Now.AddYears(-2),
                 Floor = "23",
                 NumericalOrder = 9999,
                 OperationId = 10011,
@@ -338,7 +338,192 @@ namespace BusinessLayer.Services.Test
             {
                 item.Status = Bill.BillStatus.HUY;
             }
+            var crList = _unitOfWork.CheckupRecordRepository.Get()
+                .ToList();
+            foreach (var item in crList)
+            {
+                item.Status = CheckupRecordStatus.DA_XOA;
+            }
+            var trList = _unitOfWork.TestRecordRepository.Get()
+               .ToList();
+            foreach (var item in trList)
+            {
+                item.Status = TestRecord.TestRecordStatus.DA_XOA;
+            }
             await _unitOfWork.SaveChangesAsync();
+        }
+        public async Task CreateAHistory(long patientId, DateTime date,
+          long doctorId, int? numericalOrder, string clinicalSymptom, long departmentId)
+        {
+            var reqSession = SessionType.SANG;
+            //kiểm tra bác sĩ
+            var doctor = _unitOfWork.DoctorRepository.Get()
+               .Where(x => x.Id == doctorId)
+               .Where(x => x.Type == DoctorType.BS_DA_KHOA)
+               .FirstOrDefault();
+            if (doctor == null)
+            {
+                throw new Exception("Doctor doesn't exist");
+            }
+            //kiểm tra xem thời điểm đó bs có làm việc ko
+            var schedule = _unitOfWork.ScheduleRepository.Get()
+                .Where(x => x.RoomId == 10001)
+                .Where(x => x.Session == reqSession)
+                .Where(x => x.Weekday == date.DayOfWeek)
+                .Include(x => x.Room)
+                .Include(x => x.Doctor)
+                .FirstOrDefault();
+
+            //kiểm tra bệnh nhân, nào bổ sung status check sau khi đã update db bổ sung status vào bảng patient
+            var patient = _unitOfWork.PatientRepository.Get()
+             .Where(x => x.Id == patientId)
+             .FirstOrDefault();
+            if (patient == null)
+            {
+                throw new Exception("Patient doesn't exist");
+            }
+            //nếu số thứ tự null thì lấy số nhỏ nhất có thể trong ngày hôm đó
+            //nếu chưa có CR thì đăng kí 1 checkup record mới
+            var dep = _departmentService.GetDepartmentById(departmentId);
+            var dakhoaOp = _operationService.GetOperationForDepartment(dep.Id);
+            var cr = new CheckupRecord()
+            {
+                Date= date,
+                Diagnosis = "Bệnh nhân này có triệu chứng bất thường.",
+                BloodPressure = 42,
+                DoctorAdvice = "Về ngâm nước muối trong 23h",
+                IcdDiseaseId = 10004,
+                IcdDiseaseCode = "A09",
+                IcdDiseaseName = "Tiêu chảy, viêm dạ dày - ruột",
+                //nhớ cho đơn thuốc
+                Temperature = 23,
+                Pulse=231,
+                IsReExam = false,
+                PatientId = patientId,
+                PatientName = patient.Name,
+                //mặc định phòng 10001 test
+                RoomId = 10001,
+                RoomNumber = "002",
+                Floor = "1",
+                //đã thanh toán luôn
+                Status = CheckupRecordStatus.KET_THUC,
+                NumericalOrder = numericalOrder,
+                EstimatedDate = date,
+                EstimatedStartTime = DateTime.Now,
+                DepartmentId = departmentId,
+                DepartmentName = dep.Name,
+                DoctorId =10005,
+                ClinicalSymptom = clinicalSymptom,
+                DoctorName = "Ngô Trần Thanh Long",
+            };
+            
+            await _unitOfWork.CheckupRecordRepository.Add(cr);
+            await _unitOfWork.SaveChangesAsync();
+            var pr = new Prescription()
+            {
+                CheckupRecordId = cr.Id,
+                Note = "Về không được ăn chiều ăn xế gì hết",
+                TimeCreated = DateTime.Now,
+            };
+            await _unitOfWork.PrescriptionRepository.Add(pr);
+            await _unitOfWork.SaveChangesAsync();
+            var prdt1 = new PrescriptionDetail()
+            {
+                EveningDose = 2,
+                MiddayDose = 2,
+                MorningDose = 4,
+                MedicineId = 10003,
+                MedicineName = "Aminoglycoside",
+                NightDose = 3,
+                PrescriptionId = pr.Id,
+                Quantity = 23,
+                Unit = "Lọ",
+                Usage = "Bỏ vô miệng nhai nhai",
+            };
+            var prdt2 = new PrescriptionDetail()
+            {
+                EveningDose = 2,
+                MiddayDose = 2,
+                MorningDose = 4,
+                MedicineId = 10004,
+                MedicineName = "Promethazine",
+                NightDose = 3,
+                PrescriptionId = pr.Id,
+                Quantity = 23,
+                Unit = "Lọ",
+                Usage = "Uống không mở nắp",
+            };
+            await _unitOfWork.PrescriptionDetailRepository.Add(prdt1);
+            await _unitOfWork.PrescriptionDetailRepository.Add(prdt2);
+            await _unitOfWork.SaveChangesAsync();
+            Bill bill = new Bill()
+            {
+                Content = "Thanh toán viện phí khám tổng quát đa khoa",
+                Total = dakhoaOp.Price,
+                Status = Bill.BillStatus.TT_TIEN_MAT,
+                TimeCreated = DateTime.Now.AddHours(7),
+                PatientName = patient.Name,
+                TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
+                CashierId = 10001,
+                CashierName = "Nhân viên test",
+                PatientId = patient.Id,
+            };
+            await _unitOfWork.BillRepository.Add(bill);
+            await _unitOfWork.SaveChangesAsync();
+            BillDetail bd = new BillDetail()
+            {
+                Price = dakhoaOp.Price,
+                OperationId = dakhoaOp.Id,
+                InsuranceStatus = (InsuranceSupportStatus)dakhoaOp.InsuranceStatus,
+                OperationName = dakhoaOp.Name,
+                Quantity = 1,
+                SubTotal = dakhoaOp.Price,
+                CheckupRecordId = cr.Id,
+                BillId = bill.Id
+            };
+            await _unitOfWork.BillDetailRepository.Add(bd);
+            TestRecord tr = new TestRecord()
+            {
+                RoomId = 10007,
+                EstimatedDate = DateTime.Now.AddHours(7),
+                Date = DateTime.Now.AddHours(7),
+                Floor = "23",
+                RoomNumber = "0012",
+                NumericalOrder = 9999,
+                OperationId = 10010,
+                OperationName = "Xét nghiệm máu",
+                PatientId = patient.Id,
+                PatientName = patient.Name,
+                DoctorId = 10014,
+                DoctorName = "Thành Phước Tâm",
+                CheckupRecordId = cr.Id,
+                Status = TestRecord.TestRecordStatus.HOAN_THANH,
+                ResultFileLink = "https://firebasestorage.googleapis.com/v0/b/hospitalmanagement-42da9.appspot.com/o/test-result%2Fpatient-10000%2Fresult-10034-1656324975418.pdf?alt=media&token=ac9092ba-174f-40e0-b3f1-3bbeaa5eb723"
+            };
+            TestRecord tr2 = new TestRecord()
+            {
+                DoctorId = 10014,
+                RoomNumber = "0012",
+                DoctorName = "Thành Phước Tâm",
+                RoomId = 10007,
+                EstimatedDate = DateTime.Now.AddHours(7),
+                Date = DateTime.Now.AddHours(7),
+                Floor = "23",
+                NumericalOrder = 9999,
+                OperationId = 10011,
+                OperationName = "Xét nghiệm mỡ trong máu",
+                PatientId = patient.Id,
+                PatientName = patient.Name,
+                CheckupRecordId = cr.Id,
+                Status = TestRecord.TestRecordStatus.HOAN_THANH,
+                ResultFileLink = "https://firebasestorage.googleapis.com/v0/b/hospitalmanagement-42da9.appspot.com/o/test-result%2Fpatient-10000%2Fresult-10034-1656324975418.pdf?alt=media&token=ac9092ba-174f-40e0-b3f1-3bbeaa5eb723"
+            };
+            await _unitOfWork.TestRecordRepository.Add(tr2);
+            await _unitOfWork.TestRecordRepository.Add(tr);
+            await _unitOfWork.SaveChangesAsync();
+            _scheduleServiceDoctor.UpdateRedis_CheckupQueue((long)cr.RoomId);
+            _scheduleServiceDoctor.UpdateRedis_TestQueue(10007, false);
+
         }
     }
 }

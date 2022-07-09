@@ -144,6 +144,7 @@ namespace HASB_User
             services.AddTransient<BusinessLayer.Interfaces.Doctor.IOperationService,
                BusinessLayer.Services.Doctor.OperationService>();
             services.AddTransient<INumercialOrderService, NumercialOrderService>();
+
             //Firebase messaging
             services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<IUserService, UserService>();

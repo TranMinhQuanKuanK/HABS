@@ -45,6 +45,15 @@ namespace BusinessLayer.Services.Doctor
                 IsReExam = (bool)x.IsReExam
 
             }).ToList();
+            var gotResultPatients = queue.Where(x => x.Status == (int)CheckupRecordStatus.DA_CO_KQXN).OrderBy(x => x.NumericalOrder);
+            if (gotResultPatients.Count() > 0)
+            {
+                foreach (var item in gotResultPatients)
+                {
+                    queue.Remove(item);
+                    queue.Insert(0, item);
+                }
+            }
             var checkingUpPatient = queue.FirstOrDefault(x => x.Status == (int)CheckupRecordStatus.DANG_KHAM);
             if (checkingUpPatient != null)
             {
@@ -52,15 +61,7 @@ namespace BusinessLayer.Services.Doctor
                 queue.Insert(0, checkingUpPatient);
             }
             //lấy những đứa vừa có kết quả xét nghiệm bỏ lên đầu
-            var gotResultPatients = queue.Where(x => x.Status == (int)CheckupRecordStatus.DA_CO_KQXN).OrderBy(x => x.NumericalOrder);
-            if (gotResultPatients.Count() > 0)
-            {
-                foreach (var item in gotResultPatients)
-                {
-                    queue.Remove(item);
-                }
-                queue.InsertRange(1, gotResultPatients);
-            }
+            
             _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue));
             return queue;
         }

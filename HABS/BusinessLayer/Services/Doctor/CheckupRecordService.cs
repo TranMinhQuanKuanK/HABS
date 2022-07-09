@@ -25,6 +25,7 @@ using BusinessLayer.ResponseModels.ViewModels.User;
 using BusinessLayer.Interfaces.Common;
 using Utilities;
 using BusinessLayer.Constants;
+using BusinessLayer.Interfaces.Notification;
 
 namespace BusinessLayer.Services.Doctor
 {
@@ -33,6 +34,8 @@ namespace BusinessLayer.Services.Doctor
         private readonly IPatientService _patientService;
         private readonly Interfaces.Doctor.IScheduleService _scheduleService;
         private readonly IDepartmentService _departmentService;
+        private readonly INotificationService _notiService;
+
         private readonly INumercialOrderService _numService;
 
         private readonly RedisService _redisService;
@@ -42,9 +45,11 @@ namespace BusinessLayer.Services.Doctor
             IPatientService patientService,
              IDepartmentService departmentService,
              Interfaces.Doctor.IScheduleService scheduleService,
-            INumercialOrderService numService) : base(unitOfWork)
+            INumercialOrderService numService,
+            INotificationService notiService) : base(unitOfWork)
 
-        { 
+        {
+            _notiService = notiService;
             _scheduleService = scheduleService;
             _numService = numService;
             _patientService = patientService;
@@ -60,6 +65,7 @@ namespace BusinessLayer.Services.Doctor
             IQueryable<CheckupRecord> queryableData = dbSetData;
             queryableData = queryableData.Where(x => x.Status == CheckupRecordStatus.KET_THUC
             || x.Status == CheckupRecordStatus.NHAP_VIEN
+            || x.Status == CheckupRecordStatus.CHUYEN_KHOA
             );
             if (patientId != null)
             {
@@ -289,6 +295,7 @@ namespace BusinessLayer.Services.Doctor
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
             //tạo các checkup record tương ứng
+            var listDepartmentResp = new List<DepartmentChangeNoti>();
             foreach (var checkup in checkupOpList)
             {
                 string symptom = "";
@@ -353,13 +360,22 @@ namespace BusinessLayer.Services.Doctor
                     Floor = room.Floor,
                     RoomNumber = room.RoomNumber,
                 });
+                listDepartmentResp.Add(new DepartmentChangeNoti()
+                {
+                    DepartmentId = dep.Id,
+                    DepartmentName = dep.Name,
+                    Floor = room.Floor,
+                    RoomId = room.Id,
+                    RoomNumber = room.RoomNumber,
+                    NumericalOrder = numOrd
+                });
             }
             cr.Status = CheckupRecordStatus.CHUYEN_KHOA;
             bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
             await _unitOfWork.SaveChangesAsync();
 
             _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
-
+            await _notiService.SendDepartmentChangeNoti(listDepartmentResp, patient.AccountId);
             return result;
         }
         public async Task<List<IncomingTestResponseModel>> RequestExamination(long recordId, TestRequestCreateModel testReqModel)
@@ -448,6 +464,7 @@ namespace BusinessLayer.Services.Doctor
             bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
             await _unitOfWork.SaveChangesAsync();
             _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
+            await _notiService.SendUpdateCheckupInfoReminder(cr.Id, patient.AccountId);
             return result;
         }
         public async Task EditCheckupRecord(CheckupRecordEditModel model)
@@ -513,6 +530,7 @@ namespace BusinessLayer.Services.Doctor
                   )
             {
                 _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
+                await _notiService.SendUpdateCheckupInfoReminder(cr.Id, patient.AccountId);
             }
         }
         public async Task ConfirmCheckup(long crId, long? doctorId)
@@ -535,9 +553,12 @@ namespace BusinessLayer.Services.Doctor
             {
                 throw new Exception("A patient is currently in the checkup room");
             }
+            var doctor = _unitOfWork.DoctorRepository.Get().Where(x => x.Id == doctorId).FirstOrDefault();
             crInQueue.Status = (int)CheckupRecordStatus.DANG_KHAM;
             cr.Status = CheckupRecordStatus.DANG_KHAM;
             cr.Date = DateTime.Now.AddHours(7);
+            cr.DoctorId = doctorId;
+            cr.DoctorName = doctor.Name;
             //sai
             queue.Remove(crInQueue);
             queue.Insert(0, crInQueue);
@@ -545,7 +566,6 @@ namespace BusinessLayer.Services.Doctor
             //nếu có doctor id, tức là đây là confirm của 
             if (cr.DepartmentId!=IdConfig.ID_DEPARTMENT_DA_KHOA)
             {
-                var doctor = _unitOfWork.DepartmentRepository.Get().Where(x => x.Id == (long)doctorId).FirstOrDefault();
                 if (doctor==null)
                 {
                     throw new Exception("Invalid doctor");
@@ -562,7 +582,7 @@ namespace BusinessLayer.Services.Doctor
             //không cần kiểm tra id bác sĩ
             var doc = _unitOfWork.DoctorRepository.Get().Where(x => x.Id == doctorId).FirstOrDefault();
             //kiểm tra bệnh nhân
-            var patient = _unitOfWork.PatientRepository.Get().Where(x => x.Id == model.PatientId).FirstOrDefault();
+            var patient = _unitOfWork.PatientRepository.Get().Include(x=>x.Account).Where(x => x.Id == model.PatientId).FirstOrDefault();
             if (patient==null)
             {
                 throw new Exception("Patient doesn't exist");
@@ -611,6 +631,7 @@ namespace BusinessLayer.Services.Doctor
                 Status = BillStatus.CHUA_TT,
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
+                AccountPhoneNo = patient.Account.PhoneNumber
             };
             await _unitOfWork.BillRepository.Add(bill);
             //tạo mới CR
@@ -619,6 +640,7 @@ namespace BusinessLayer.Services.Doctor
                 DoctorId = doctorId,
                 EstimatedDate = model.ReExamDate,
                 DepartmentId = model.DepartmentId,
+                DepartmentName = department.Name,
                 Status = CheckupRecordStatus.CHO_TAI_KHAM,
                 IsReExam = true,
                 PatientId = model.PatientId,
@@ -681,6 +703,8 @@ namespace BusinessLayer.Services.Doctor
             await _unitOfWork.BillDetailRepository.Add(bdCR);
             bill.TotalInWord = MoneyHelper.NumberToText(bill.Total);
             await _unitOfWork.SaveChangesAsync();
+            //noti cho mobile
+
             //_scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
         }
     }

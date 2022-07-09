@@ -127,6 +127,8 @@ namespace DataAccessLayer.Models
             {
                 entity.ToTable("CheckupRecord");
 
+                entity.HasIndex(e => e.EstimatedDate, "EstimatedDateCheckupRecordIndex");
+
                 entity.Property(e => e.Date).HasColumnType("datetime");
 
                 entity.Property(e => e.EstimatedDate).HasColumnType("datetime");

@@ -30,6 +30,7 @@ namespace DataAccessLayer.Models
         public long? CashierId { get; set; }
         public long? PatientId { get; set; }
         public string PhoneNo { get; set; }
+        public string AccountPhoneNo { get; set; }
 
         public virtual Cashier Cashier { get; set; }
         public virtual Patient Patient { get; set; }

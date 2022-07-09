@@ -151,6 +151,9 @@ namespace HASB_Doctor
             services.AddTransient<BusinessLayer.Interfaces.User.IScheduleService, BusinessLayer.Services.User.ScheduleService>();
             services.AddTransient<ITestRecordService, TestRecordService>();
             services.AddTransient<IFileService, FileService>();
+            services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<BusinessLayer.Interfaces.User.ICheckupRecordService, 
+                BusinessLayer.Services.User.CheckupRecordService>();
 
 
 

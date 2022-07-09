@@ -61,6 +61,10 @@ namespace BusinessLayer.Services.User
             var dbSetData = _unitOfWork.CheckupRecordRepository.Get().Include(x => x.Patient);
             IQueryable<CheckupRecord> queryableData = dbSetData;
             queryableData = queryableData.Where(x => x.Patient.AccountId == accountId);
+            queryableData = queryableData.Where(x => x.Status == CheckupRecordStatus.KET_THUC
+           || x.Status == CheckupRecordStatus.NHAP_VIEN
+           || x.Status == CheckupRecordStatus.CHUYEN_KHOA
+           );
             if (patientId != null)
             {
                 queryableData = queryableData.Where(x => x.PatientId == patientId);
@@ -86,7 +90,8 @@ namespace BusinessLayer.Services.User
                    DepartmentName = x.DepartmentName,
                    DoctorName = x.DoctorName,
                    NumericalOrder = x.NumericalOrder,
-                   PatientName = x.PatientName
+                   PatientName = x.PatientName,
+                   IsReExam = (bool)x.IsReExam
                }
                ).ToList();
 
@@ -98,13 +103,13 @@ namespace BusinessLayer.Services.User
             data = _unitOfWork.CheckupRecordRepository.Get()
                 .Include(x => x.Patient)
                 .Include(x => x.Prescriptions)
-                    .ThenInclude(x => x.PrescriptionDetails)
+                .ThenInclude(x => x.PrescriptionDetails)
                 .Include(x => x.TestRecords)
-                .Where(x => x.Id == recordId)
-                .Where(x=>x.Patient.AccountId==accountId) .AsEnumerable().Select
+                .Where(x => x.Id == recordId).AsEnumerable()
+                .Select
                 (x =>
                 {
-                    var _prescription = x.Prescriptions.ToArray()[0];
+                    var _prescription = (x.Prescriptions.ToArray().Length > 0) ? x.Prescriptions.ToArray()[0] : null;
                     return new PatientRecordFullDataResponseModel()
                     {
                         Id = x.Id,
@@ -122,6 +127,7 @@ namespace BusinessLayer.Services.User
                         DoctorId = x.DoctorId,
                         EstimatedStartTime = x.EstimatedStartTime,
                         IcdCode = x.IcdDiseaseCode,
+                        IsReExam = (bool)x.IsReExam,
                         IcdDiseaseId = x.IcdDiseaseId,
                         IcdDiseaseName = x.IcdDiseaseName,
                         PatientData = new PatientResponseModel()
@@ -135,7 +141,7 @@ namespace BusinessLayer.Services.User
                             Name = x.Patient.Name,
                         },
                         PatientId = x.PatientId,
-                        Prescription = new PrescriptionResponseModel()
+                        Prescription = (_prescription != null) ? new PrescriptionResponseModel()
                         {
                             CheckupRecordId = _prescription.CheckupRecordId,
                             Id = _prescription.Id,
@@ -155,7 +161,8 @@ namespace BusinessLayer.Services.User
                                 Unit = dt.Unit,
                                 Usage = dt.Usage,
                             }).ToList()
-                        },
+                        }
+                        : null,
                         Pulse = x.Pulse,
                         EstimatedDate = x.EstimatedDate,
                         Temperature = x.Temperature,
@@ -326,6 +333,7 @@ namespace BusinessLayer.Services.User
             }
             //kiểm tra bệnh nhân
             var patient = _unitOfWork.PatientRepository.Get()
+                .Include(x=>x.Account)
              .Where(x => x.Status == Patient.PatientStatus.HOAT_DONG)
              .Where(x => x.Id == patientId)
              .Where(x => x.AccountId == accountId)
@@ -426,7 +434,8 @@ namespace BusinessLayer.Services.User
                 PatientName = patient.Name,
                 TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
                 PatientId = patient.Id,
-                PhoneNo = patient.PhoneNumber
+                PhoneNo = patient.PhoneNumber,
+                AccountPhoneNo = patient.Account.PhoneNumber
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();

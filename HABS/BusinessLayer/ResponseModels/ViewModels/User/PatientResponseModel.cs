@@ -15,5 +15,6 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
         public DateTime DateOfBirth { get; set; }
         public string Address { get; set; }
         public string Bhyt { get; set; }
+        public long AccountId { get; set; }
     }
 }

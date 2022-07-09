@@ -146,6 +146,12 @@ namespace HASB_Cashier
             services.AddTransient<IBillService, BillService>();
             services.AddTransient<ILoginService, LoginService>();
             services.AddTransient<IScheduleService, ScheduleService>();
+            services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<BusinessLayer.Interfaces.User.ICheckupRecordService, BusinessLayer.Services.User.CheckupRecordService>();
+            services.AddTransient<BusinessLayer.Interfaces.User.IScheduleService, BusinessLayer.Services.User.ScheduleService>();
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.IDepartmentService, BusinessLayer.Services.Doctor.DepartmentService>();
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.IOperationService, BusinessLayer.Services.Doctor.OperationService>();
+            services.AddTransient<BusinessLayer.Interfaces.Common.INumercialOrderService, BusinessLayer.Services.Common.NumercialOrderService>();
 
 
             //Firebase messaging
