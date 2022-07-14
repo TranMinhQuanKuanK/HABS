@@ -82,7 +82,7 @@ namespace HASB_User.Controllers
                 {
                     accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                var data = _checkupRecordService.GetCheckupRecordFullData(id, accountId);
+                var data = _checkupRecordService.GetCheckupRecordFullData(id, accountId,true);
                 if (data == null)
                 {
                     return NotFound();

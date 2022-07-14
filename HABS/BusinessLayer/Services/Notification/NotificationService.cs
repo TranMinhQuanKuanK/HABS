@@ -37,7 +37,7 @@ namespace BusinessLayer.Services.Notification
         }
         public async Task SendUpdateCheckupInfoReminder(long checkupRecordId,long accountId)
         {
-            var cr = _checkupService.GetCheckupRecordFullData(checkupRecordId,accountId);
+            var cr = _checkupService.GetCheckupRecordFullData(checkupRecordId,accountId,true);
             GeneralFirebaseNotificationModel<PatientRecordFullDataResponseModel> data =
                 new GeneralFirebaseNotificationModel<PatientRecordFullDataResponseModel>()
             {

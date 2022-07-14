@@ -9,6 +9,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
 {
     public class PatientRecordFullDataResponseModel
     {
+        public List<BillViewModel> Bill { get; set; }
         public PatientResponseModel PatientData { get; set; }
         public List<TestRecordResponseModel> TestRecords { get; set; }
         public PrescriptionResponseModel Prescription { get; set; }

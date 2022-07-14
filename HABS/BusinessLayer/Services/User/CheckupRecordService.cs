@@ -97,8 +97,9 @@ namespace BusinessLayer.Services.User
 
             return data;
         }
-        public PatientRecordFullDataResponseModel GetCheckupRecordFullData(long recordId, long accountId)
+        public PatientRecordFullDataResponseModel GetCheckupRecordFullData(long recordId, long accountId, bool includeBills)
         {
+           
             PatientRecordFullDataResponseModel data = new PatientRecordFullDataResponseModel();
             data = _unitOfWork.CheckupRecordRepository.Get()
                 .Include(x => x.Patient)
@@ -184,8 +185,51 @@ namespace BusinessLayer.Services.User
                             DoctorId = tr.DoctorId,
                             DoctorName = tr.DoctorName
                         }).ToList(),
+
                     };
                 }).FirstOrDefault();
+            if (includeBills)
+            {
+                var billIds= _unitOfWork.BillDetailRepository.Get()
+                    .Where(x => (x.CheckupRecordId==null? true : x.CheckupRecordId == data.Id) &&
+                    (x.TestRecordId == null ? true : 
+                    data.TestRecords.Select(x => x.Id).ToList().Contains((long)x.TestRecordId)
+                    ))
+                    .Select(x => x.BillId)
+                    .Distinct()
+                    .ToList();
+                var bills = _unitOfWork.BillRepository.Get()
+                    .Include(x=>x.BillDetails)
+                    .Include(x=>x.Patient)
+                    .Where(x => billIds.Contains(x.Id)).Select(x=>new BillViewModel()
+                    {
+                        Id = x.Id,
+                        AccountPhoneNo = x.AccountPhoneNo,
+                        Details = x.BillDetails.Select(detail=>new BillDetailViewModel()
+                        {
+                            Id = detail.Id,
+                            InsuranceStatus = (int)detail.InsuranceStatus,
+                            OperationName = detail.OperationName,
+                            OperationId = detail.OperationId,
+                            Price = detail.Price,
+                            SubTotal = detail.SubTotal,
+                            Quantity = detail.Quantity,
+                        }).ToList(),
+                        Content = x.Content,
+                        Gender = (int)x.Patient.Gender,
+                        PatientName = x.PatientName,
+                        Status = (int)x.Status,
+                        PhoneNo = x.PhoneNo,
+                        TotalInWord = x.TotalInWord,
+                        Total = x.Total,
+                        PatientId = (long)x.PatientId,
+                        DateOfBirth =x.Patient.DateOfBirth,
+                        TimeCreated = x.TimeCreated,
+                        CashierName = x.CashierName,
+                        CashierId   =x.CashierId,
+                    }).ToList();
+                data.Bill = bills;
+            }
             return data;
         }
         public async Task CreatReExamAppointment(long patientId, long previousCrId, DateTime date,
