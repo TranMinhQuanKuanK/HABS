@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.ResponseModels.ViewModels;
 using BusinessLayer.ResponseModels.ViewModels.Doctor;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
@@ -12,7 +13,7 @@ namespace HASB_Doctor.Controllers
 {
     [Route(DoctorRoute)]
     [ApiController]
-    //[Authorize(Roles = "Doctor")]
+    [Authorize(Roles = "Doctor")]
     public class CheckupQueueController : BaseDoctorController
     {
 

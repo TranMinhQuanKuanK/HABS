@@ -15,7 +15,7 @@ namespace HASB_Doctor.Controllers
 {
     [Route(DoctorRoute)]
     [ApiController]
-    //[Authorize(Roles = "Doctor")]
+    [Authorize(Roles = "Doctor")]
     public class MedicinesController : BaseDoctorController
     {
 

@@ -26,6 +26,7 @@ namespace BusinessLayer.Services.User
         {
             List<PatientResponseModel> data = new List<PatientResponseModel>();
             data = _unitOfWork.PatientRepository.Get()
+                .Include(x=>x.Account)
                 .Where(x => x.AccountId == accountId)
                 .Where(x => x.Status == PatientStatus.HOAT_DONG)
                 .Select(x => new PatientResponseModel()
@@ -36,7 +37,9 @@ namespace BusinessLayer.Services.User
                     DateOfBirth = x.DateOfBirth,
                     Gender = (int)x.Gender,
                     Name = x.Name,
-                    PhoneNumber = x.PhoneNumber
+                    PhoneNumber = x.PhoneNumber,
+                    AccountPhoneNo = x.Account.PhoneNumber,
+                    AccountId = x.AccountId
                 })
                 .ToList();
             return data;
@@ -55,7 +58,8 @@ namespace BusinessLayer.Services.User
                     Gender = (int)x.Gender,
                     Name = x.Name,
                     PhoneNumber = x.PhoneNumber,
-                    AccountId = x.AccountId
+                    AccountId = x.AccountId,
+                    AccountPhoneNo = x.Account.PhoneNumber,
                 }).FirstOrDefault();
             return data;
         }
@@ -63,12 +67,12 @@ namespace BusinessLayer.Services.User
         {
             //check patient
             var prePatient = _unitOfWork.PatientRepository.Get()
-                .Where(x => x.Bhyt == model.Bhyt || x.PhoneNumber == model.PhoneNumber)
+                .Where(x => x.Bhyt == model.Bhyt)
                 .Where(x => x.Status == PatientStatus.HOAT_DONG)
                 .FirstOrDefault();
             if (prePatient != null)
             {
-                throw new Exception("Health Insurance code is used.");
+                throw new Exception("Health insurance code is used.");
             }
             //không cần check account
             //tạo patient

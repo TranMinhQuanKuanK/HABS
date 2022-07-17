@@ -2,6 +2,7 @@
 using BusinessLayer.RequestModels.CreateModels.User;
 using BusinessLayer.RequestModels.SearchModels.User;
 using BusinessLayer.ResponseModels.SearchModels.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -13,7 +14,7 @@ namespace HASB_User.Controllers
 {
     [Route(UserRoute)]
     [ApiController]
-    //[Authorize(Roles = "User")]
+    [Authorize(Roles = "User")]
     public class AppointmentController : BaseUserController
     {
 
@@ -85,13 +86,13 @@ namespace HASB_User.Controllers
                 //create new checkup record or return error
                 if (model.IsReExam && model.Id!=null)
                 {
-                    await _checkupRecordService.CreatReExamAppointment(model.PatientId,(int)model.Id,model.Date,model.DoctorId,
-                        model.NumericalOrder,model.ClinicalSymptom,accountId);
+                    return Ok(await _checkupRecordService.CreatReExamAppointment(model.PatientId, (int)model.Id, model.Date, model.DoctorId,
+                        model.NumericalOrder, model.ClinicalSymptom, accountId));
                 }
                 else
                 {
-                    await _checkupRecordService.CreatNewAppointment(model.PatientId, model.Date, model.DoctorId,
-                  model.NumericalOrder, model.ClinicalSymptom, accountId);
+                    return Ok(await _checkupRecordService.CreatNewAppointment(model.PatientId, model.Date, model.DoctorId,
+                  model.NumericalOrder, model.ClinicalSymptom, accountId));
                 }
               
                 return Ok();

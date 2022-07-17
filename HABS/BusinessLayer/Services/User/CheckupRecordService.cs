@@ -93,21 +93,20 @@ namespace BusinessLayer.Services.User
                    PatientName = x.PatientName,
                    IsReExam = (bool)x.IsReExam
                }
-               ).ToList();
+               ).OrderByDescending(x=>x.Date).ToList();
 
             return data;
         }
         public PatientRecordFullDataResponseModel GetCheckupRecordFullData(long recordId, long accountId, bool includeBills)
         {
            
-            PatientRecordFullDataResponseModel data = new PatientRecordFullDataResponseModel();
-            data = _unitOfWork.CheckupRecordRepository.Get()
+            PatientRecordFullDataResponseModel data = _unitOfWork.CheckupRecordRepository.Get()
                 .Include(x => x.Patient)
+                .ThenInclude(x=>x.Account)
                 .Include(x => x.Prescriptions)
                 .ThenInclude(x => x.PrescriptionDetails)
                 .Include(x => x.TestRecords)
-                .Where(x => x.Id == recordId).AsEnumerable()
-                .Select
+                .Where(x => x.Id == recordId).AsEnumerable().Select
                 (x =>
                 {
                     var _prescription = (x.Prescriptions.ToArray().Length > 0) ? x.Prescriptions.ToArray()[0] : null;
@@ -139,6 +138,7 @@ namespace BusinessLayer.Services.User
                             DateOfBirth = x.Patient.DateOfBirth,
                             Gender = (int)x.Patient.Gender,
                             PhoneNumber = x.Patient.PhoneNumber,
+                            AccountPhoneNo = x.Patient.Account.PhoneNumber,
                             Name = x.Patient.Name,
                         },
                         PatientId = x.PatientId,
@@ -188,7 +188,8 @@ namespace BusinessLayer.Services.User
 
                     };
                 }).FirstOrDefault();
-            if (includeBills)
+
+            if (includeBills && data!=null)
             {
                 var billIds= _unitOfWork.BillDetailRepository.Get()
                     .Where(x => (x.CheckupRecordId==null? true : x.CheckupRecordId == data.Id) &&
@@ -232,7 +233,7 @@ namespace BusinessLayer.Services.User
             }
             return data;
         }
-        public async Task CreatReExamAppointment(long patientId, long previousCrId, DateTime date,
+        public async Task<AppointmenAfterBookingResponseModel> CreatReExamAppointment(long patientId, long previousCrId, DateTime date,
             long doctorId, int? numericalOrder, string clinicalSymptom,long accountId)
         {
             //kiểm tra ngày có hợp lệ, có thuộc phiên làm việc chính thức ko
@@ -343,7 +344,7 @@ namespace BusinessLayer.Services.User
                 .ToList();
             foreach (var _tr in prevCrTRList)
             {
-                var room = _numService.GetAppropriateRoomForOperation(_tr.Operation);
+                var room = _numService.GetAppropriateRoomForOperation(_tr.Operation,true);
                 if (room == null)
                 {
                     throw new Exception("Rooms for this operation haven't been configured");
@@ -357,8 +358,17 @@ namespace BusinessLayer.Services.User
                 _tr.Date = date.Date;
             }
             await _unitOfWork.SaveChangesAsync();
+            return new AppointmenAfterBookingResponseModel()
+            {
+                DepartmentName = prevCr.RoomNumber,
+                DoctorName = doctor.Name,
+                Date = (DateTime)prevCr.Date,
+                Floor = prevCr.Floor,
+                NumericalOrder = (int)prevCr.NumericalOrder,
+                RoomNumber = prevCr.RoomNumber,
+            };
         }
-        public async Task CreatNewAppointment(long patientId, DateTime date, long doctorId, int? numericalOrder, string clinicalSymptom, long accountId)
+        public async Task<AppointmenAfterBookingResponseModel> CreatNewAppointment(long patientId, DateTime date, long doctorId, int? numericalOrder, string clinicalSymptom, long accountId)
         {
             //kiểm tra ngày có hợp lệ, có thuộc phiên làm việc chính thức ko
             var reqSession = getSession(date);
@@ -500,6 +510,15 @@ namespace BusinessLayer.Services.User
             {
                 _scheduleServiceDoctor.UpdateRedis_CheckupQueue((long)cr.RoomId);
             }
+            return new AppointmenAfterBookingResponseModel()
+            {
+                Floor = cr.Floor,
+                DoctorName = doctor.Name,
+                DepartmentName = cr.DepartmentName,
+                NumericalOrder = (int)cr.NumericalOrder,
+                Date = (DateTime)cr.EstimatedStartTime,
+                RoomNumber = cr.RoomNumber,
+            };
         }
         private SessionType? getSession(DateTime time)
         {

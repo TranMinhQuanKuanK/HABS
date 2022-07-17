@@ -35,15 +35,27 @@ namespace BusinessLayer.Services.Common
         }
         private static readonly object padlock = new object();
         //Lấy phòng available cho PK chuyên khoa hoặc phòng xét nghiệm
-        public Room GetAppropriateRoomForOperation(Operation op)
+        public Room GetAppropriateRoomForOperation(Operation op, bool isTestRoom)
         {
             //tìm các phòng có roomType = operationRoomType
-            var roomList = _unitOfWork.RoomRepository
+            List<Room> roomList = null;
+            if (isTestRoom)
+            {
+                roomList = _unitOfWork.RoomRepository
                 .Get()
                 .Include(x => x.TestRecords)
                 .Where(x => x.RoomTypeId == op.RoomTypeId)
                 .Where(x => op.DepartmentId != null ? x.DepartmentId == op.DepartmentId : true)
                 .ToList();
+            } else
+            {
+                roomList = _unitOfWork.RoomRepository
+               .Get()
+               .Include(x => x.CheckupRecords)
+               .Where(x => x.RoomTypeId == op.RoomTypeId)
+               .Where(x => op.DepartmentId != null ? x.DepartmentId == op.DepartmentId : true)
+               .ToList();
+            }
 
             if (roomList.Count == 0)
             {
@@ -104,7 +116,7 @@ namespace BusinessLayer.Services.Common
             }
             return roomWithLeastPeople;
         }
-        //lấy số thứ tự cho phòng xét nghiệm TRONG NGÀY HÔM NAY
+        //lấy số thứ tự tự tăng cho phòng xét nghiệm 
         public int GetNumOrderForAutoIncreaseRoom(Room room, DateTime date)
         {
             lock (padlock)
@@ -123,7 +135,7 @@ namespace BusinessLayer.Services.Common
                 else
                 {
                     curNumOfPeople = room.CheckupRecords
-                       .Where(x => x.Date != null ? ((DateTime)x.Date).Day == date.Day : false)
+                    .Where(x => x.Date != null ? ((DateTime)x.Date).Day == date.Day : false)
                     .Where(x => x.Status == CheckupRecord.CheckupRecordStatus.CHO_KQXN
                      || x.Status == CheckupRecord.CheckupRecordStatus.CHUYEN_KHOA
                      || x.Status == CheckupRecord.CheckupRecordStatus.DANG_KHAM

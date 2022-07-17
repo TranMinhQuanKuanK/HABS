@@ -14,7 +14,7 @@ namespace HASB_Doctor.Controllers
 {
     [Route(DoctorRoute)]
     [ApiController]
-    //[Authorize(Roles = "Doctor")]
+    [Authorize(Roles = "Doctor")]
     public class DepartmentsController : BaseDoctorController
     {
         private readonly IDepartmentService _departmentService;

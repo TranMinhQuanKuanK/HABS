@@ -12,7 +12,7 @@ namespace BusinessLayer.Interfaces.Common
 {
     public interface INumercialOrderService
     {
-        Room GetAppropriateRoomForOperation(Operation op);
+        Room GetAppropriateRoomForOperation(Operation op, bool isTestRoom);
         int GetNumOrderForAutoIncreaseRoom(Room room, DateTime date);
     }
 }

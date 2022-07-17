@@ -2,6 +2,7 @@
 using BusinessLayer.RequestModels.CreateModels.Doctor;
 using BusinessLayer.ResponseModels.ViewModels;
 using BusinessLayer.ResponseModels.ViewModels.Doctor;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -14,7 +15,7 @@ namespace HASB_Doctor.Controllers
 {
     [Route(DoctorRoute)]
     [ApiController]
-    //[Authorize(Roles = "Doctor")]
+    [Authorize(Roles = "Doctor")]
     public class TestQueueController : BaseDoctorController
     {
 

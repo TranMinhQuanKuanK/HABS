@@ -4,6 +4,7 @@ using BusinessLayer.RequestModels.SearchModels.User;
 using BusinessLayer.ResponseModels.ViewModels;
 using BusinessLayer.ResponseModels.ViewModels.User;
 using BusinessLayer.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -15,7 +16,7 @@ namespace HASB_User.Controllers
 {
     [Route(UserRoute)]
     [ApiController]
-    //[Authorize(Roles = "User")]
+    [Authorize(Roles = "User")]
     public class CheckupRecordsController : BaseUserController
     {
 

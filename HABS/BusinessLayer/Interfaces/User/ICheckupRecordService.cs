@@ -12,9 +12,9 @@ namespace BusinessLayer.Interfaces.User
         List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, 
             DateTime? toTime, long? departmentId, long accountId);
         PatientRecordFullDataResponseModel GetCheckupRecordFullData(long recordId, long accountId, bool includeBills);
-        Task CreatNewAppointment(long patientId, DateTime date, 
-            long doctorId, int? numericalOrder, string clinicalSymptom, long accountId);
-        Task CreatReExamAppointment(long patientId, long previousCrId, DateTime date,
+        Task<AppointmenAfterBookingResponseModel> CreatNewAppointment(long patientId, DateTime date, long doctorId,
+            int? numericalOrder, string clinicalSymptom, long accountId);
+        Task<AppointmenAfterBookingResponseModel> CreatReExamAppointment(long patientId, long previousCrId, DateTime date,
            long doctorId, int? numericalOrder, string clinicalSymptom, long accountId);
     }
 }

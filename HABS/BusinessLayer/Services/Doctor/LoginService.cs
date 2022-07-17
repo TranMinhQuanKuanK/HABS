@@ -51,15 +51,18 @@ namespace BusinessLayer.Services.Doctor
             var endAfternoonShift = new DateTime(now.Year, now.Month, now.Day,
                WorkingShiftConfig.EndAfternoonShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
-            if (now >= beginMorningShift && now <= endMorningShift)
+            if (now >= beginMorningShift
+                .AddMinutes((-1)*WorkingShiftConfig.LoginTimeBeforeWorkingShift) && now <= endMorningShift)
             {
                 session = SessionType.SANG;
             }
-            else if (now >= beginEveningShift && now <= endEveningShift)
+            else if (now >= beginEveningShift
+                .AddMinutes((-1) * WorkingShiftConfig.LoginTimeBeforeWorkingShift) && now <= endEveningShift)
             {
                 session = SessionType.TOI;
             }
-            else if (now >= beginAfternoonShift && now <= endAfternoonShift)
+            else if (now >= beginAfternoonShift
+                .AddMinutes((-1) * WorkingShiftConfig.LoginTimeBeforeWorkingShift) && now <= endAfternoonShift)
             {
                 session = SessionType.CHIEU;
             }
@@ -94,7 +97,13 @@ namespace BusinessLayer.Services.Doctor
                     return doctor;
                 } 
             }
-
+            if (room.RoomTypeId == IdConfig.ID_ROOMTYPE_PHONG_KHAM && room.DepartmentId!=null)
+            {
+                if (doctor.Type == (int)DoctorType.BS_CHUYEN_KHOA)
+                {
+                    return doctor;
+                }
+            }
             #region Sau này xóa
             if (login.Username == "doctor" && login.Password == "123123")
             {

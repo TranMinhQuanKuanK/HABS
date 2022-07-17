@@ -14,7 +14,7 @@ namespace HASB_User.Controllers
 {
     [Route(UserRoute)]
     [ApiController]
-    //[Authorize(Roles = "Doctor")]
+    [Authorize(Roles = "User")]
     public class DepartmentsController : BaseUserController
     {
 

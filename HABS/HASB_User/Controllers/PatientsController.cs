@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interfaces.User;
 using BusinessLayer.RequestModels.CreateModels.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -11,7 +12,7 @@ namespace HASB_User.Controllers
 {
     [Route(UserRoute)]
     [ApiController]
-    //[Authorize(Roles = "User")]
+    [Authorize(Roles = "User")]
     public class PatientsController : BaseUserController
     {
 

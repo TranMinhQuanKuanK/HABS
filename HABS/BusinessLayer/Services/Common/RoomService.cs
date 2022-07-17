@@ -38,6 +38,7 @@ namespace BusinessLayer.Services.Common
             List<RoomViewModel> data = new List<RoomViewModel>();
             data = _unitOfWork.RoomRepository
                 .Get()
+                .Include(x=>x.Department)
                 .Where(x => isTestRoom ? x.RoomTypeId != IdConfig.ID_ROOMTYPE_PHONG_KHAM : x.RoomTypeId == IdConfig.ID_ROOMTYPE_PHONG_KHAM)
                 .Select
                (x => new RoomViewModel()
@@ -47,7 +48,10 @@ namespace BusinessLayer.Services.Common
                    Note = x.Note,
                    RoomNumber = x.RoomNumber,
                    RoomTypeId = (long)x.RoomTypeId,
-                   RoomTypeName =x.RoomType.Name
+                   RoomTypeName =x.RoomType.Name,
+                   DepartmentId = x.DepartmentId,
+                   DepartmentName = x.Department.Name,
+                   IsGeneralRoom = x.DepartmentId == IdConfig.ID_DEPARTMENT_DA_KHOA
                }
                ).ToList();
             return data;

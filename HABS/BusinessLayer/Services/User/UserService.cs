@@ -45,10 +45,10 @@ namespace BusinessLayer.Services.User
                 Password = model.Password,
                 PhoneNumber = model.PhoneNumber,
                 Email = model.Email,
+                Status = Account.UserStatus.BINH_THUONG
             };
             await _unitOfWork.AccountRepository.Add(user);
             await _unitOfWork.SaveChangesAsync();
-
         }
         public async Task EditUser(long userId, UserCreateEditModel edit)
         {

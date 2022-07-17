@@ -80,7 +80,7 @@ namespace BusinessLayer.Services.Doctor
                     {
                         foreach (var _tr in cr.TestRecords)
                         {
-                            if (_tr.Id != tr.Id && tr.Status != TestRecordStatus.HOAN_THANH)
+                            if (_tr.Id != tr.Id && _tr.Status != TestRecordStatus.HOAN_THANH)
                             {
                                 doneAll = false;
                             }

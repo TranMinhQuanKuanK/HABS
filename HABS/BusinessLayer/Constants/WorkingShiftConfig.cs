@@ -8,6 +8,8 @@ namespace BusinessLayer.Constants
 {
     public class WorkingShiftConfig
     {
+        public const int LoginTimeBeforeWorkingShift = 15;
+
         public const int BeginMorningShiftHour = 7;
         public const int BeginMorningShiftMinute = 0;
 
@@ -19,7 +21,6 @@ namespace BusinessLayer.Constants
 
         public const int EndAfternoonShiftHour = 16;
         public const int EndAfternoonShiftMinute = 0;
-
 
         public const int BeginEveningShiftHour = 19;
         public const int BeginEveningShiftMinute = 0;

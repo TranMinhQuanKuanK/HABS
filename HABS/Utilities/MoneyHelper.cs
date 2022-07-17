@@ -90,7 +90,8 @@ namespace Utilities
             }
             result = result.Trim();
             if (isNegative) result = "Âm " + result;
-            return result + (suffix ? " đồng chẵn" : "");
+
+            return char.ToUpper(result[0]) + result[1..]+" đồng";
         }
 
     }

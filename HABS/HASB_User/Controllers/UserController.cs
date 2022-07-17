@@ -18,7 +18,7 @@ namespace HASB_User.Controllers
 {
     [Route(UserRoute)]
     [ApiController]
-    //[Authorize(Roles = "User")]
+    [Authorize(Roles = "User")]
     public class UserController : BaseUserController
     {
 
@@ -28,6 +28,7 @@ namespace HASB_User.Controllers
         {
             _userService = service;
         }
+        [AllowAnonymous]
         [SwaggerOperation(Summary = "Đăng kí một người dùng mới")]
         [HttpPost]
         public async Task<IActionResult> RegisterNewAccount([FromBody] UserCreateEditModel model)

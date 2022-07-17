@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Interfaces.Cashier;
 using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.SearchModels.Cashier;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -12,7 +13,7 @@ namespace HASB_Cashier.Controllers
 {
     [Route(CashierRoute)]
     [ApiController]
-    //[Authorize(Roles = "Cashier")]
+    [Authorize(Roles = "Cashier")]
     public class BillsController : BaseCashierController
     {
         private readonly IBillService _billService;

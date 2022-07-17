@@ -16,7 +16,7 @@ namespace HASB_User.Controllers
     [Route(UserRoute)]
     [ApiController]
     //[ApiExplorerSettings(GroupName = Role)]
-    //[Authorize(Roles = "User")]
+    [Authorize(Roles = "User")]
     public class SchedulesController : BaseUserController
     {
 

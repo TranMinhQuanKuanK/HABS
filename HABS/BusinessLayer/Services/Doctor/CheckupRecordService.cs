@@ -57,7 +57,7 @@ namespace BusinessLayer.Services.Doctor
             _departmentService = departmentService;
             _redisService = new RedisService(_distributedCache);
         }
-        public List<PatientRecordMetadataViewModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, 
+        public List<PatientRecordMetadataViewModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime,
             DateTime? toTime, long? departmentId)
         {
             List<PatientRecordMetadataViewModel> data = new List<PatientRecordMetadataViewModel>();
@@ -95,7 +95,7 @@ namespace BusinessLayer.Services.Doctor
                    PatientName = x.PatientName,
                    IsReExam = (bool)x.IsReExam
                }
-               ).ToList();
+               ).OrderByDescending(x=>x.Date).ToList();
             return data;
         }
         public PatientRecordFullDataViewModel GetCheckupRecordFullData(long recordId)
@@ -110,7 +110,7 @@ namespace BusinessLayer.Services.Doctor
                 .Select
                 (x =>
                 {
-                    var _prescription = (x.Prescriptions.ToArray().Length>0)? x.Prescriptions.ToArray()[0]:null;
+                    var _prescription = (x.Prescriptions.ToArray().Length > 0) ? x.Prescriptions.ToArray()[0] : null;
                     return new PatientRecordFullDataViewModel()
                     {
                         Id = x.Id,
@@ -142,7 +142,7 @@ namespace BusinessLayer.Services.Doctor
                             Name = x.Patient.Name,
                         },
                         PatientId = x.PatientId,
-                        Prescription =(_prescription!=null)? new PrescriptionViewModel()
+                        Prescription = (_prescription != null) ? new PrescriptionViewModel()
                         {
                             CheckupRecordId = _prescription.CheckupRecordId,
                             Id = _prescription.Id,
@@ -163,7 +163,7 @@ namespace BusinessLayer.Services.Doctor
                                 Usage = dt.Usage,
                             }).ToList()
                         }
-                        :null,
+                        : null,
                         Pulse = x.Pulse,
                         EstimatedDate = x.EstimatedDate,
                         Temperature = x.Temperature,
@@ -194,7 +194,7 @@ namespace BusinessLayer.Services.Doctor
             //kiểm tra CR
             var cr = _unitOfWork.CheckupRecordRepository.Get()
            .Where(x => x.Id == recordId).FirstOrDefault();
-            if (cr==null)
+            if (cr == null)
             {
                 throw new Exception("Record id invalid");
             }
@@ -202,7 +202,7 @@ namespace BusinessLayer.Services.Doctor
             Prescription presc = null;
             presc = _unitOfWork.PrescriptionRepository
                .Get()
-               .Include(x=>x.PrescriptionDetails)
+               .Include(x => x.PrescriptionDetails)
                .Where(x => x.CheckupRecordId == recordId)
                .FirstOrDefault();
             //chưa có thì tạo một cái mới
@@ -215,7 +215,9 @@ namespace BusinessLayer.Services.Doctor
                     TimeCreated = DateTime.Now.AddHours(7),
                 };
                 await _unitOfWork.PrescriptionRepository.Add(presc);
-            } else
+                await _unitOfWork.SaveChangesAsync();
+            }
+            else
             {
                 //clear hết presc detail
                 foreach (var presDetail in presc.PrescriptionDetails)
@@ -223,32 +225,32 @@ namespace BusinessLayer.Services.Doctor
                     await _unitOfWork.PrescriptionDetailRepository.Delete(presDetail.Id);
                 }
                 await _unitOfWork.SaveChangesAsync();
-                //tạo từng cái presc detail add vào presc
-                foreach (var detail in model.Details)
-                {
-                    var med = _unitOfWork.MedicineRepository.Get()
-                        .Where(x => x.Id == detail.MedicineId).FirstOrDefault();
-                    if (med == null)
-                    {
-                        throw new Exception("Invalid medicine with id" + detail.MedicineId);
-                    }
-                    var presDetail = new PrescriptionDetail()
-                    {
-                        MedicineId = detail.MedicineId,
-                        MedicineName = med.Name,
-                        EveningDose = detail.EveningDose,
-                        MiddayDose = detail.MiddayDose,
-                        MorningDose = detail.MorningDose,
-                        NightDose = detail.NightDose,
-                        Quantity = detail.Quantity,
-                        Unit = med.Unit,
-                        Usage = detail.Usage,
-                        PrescriptionId = presc.Id,
-                    };
-                    await _unitOfWork.PrescriptionDetailRepository.Add(presDetail);
-                }
-                presc.Note = model.Note;
             }
+            //tạo từng cái presc detail add vào presc
+            foreach (var detail in model.Details)
+            {
+                var med = _unitOfWork.MedicineRepository.Get()
+                    .Where(x => x.Id == detail.MedicineId).FirstOrDefault();
+                if (med == null)
+                {
+                    throw new Exception("Invalid medicine with id" + detail.MedicineId);
+                }
+                var presDetail = new PrescriptionDetail()
+                {
+                    MedicineId = detail.MedicineId,
+                    MedicineName = med.Name,
+                    EveningDose = detail.EveningDose,
+                    MiddayDose = detail.MiddayDose,
+                    MorningDose = detail.MorningDose,
+                    NightDose = detail.NightDose,
+                    Quantity = detail.Quantity,
+                    Unit = med.Unit,
+                    Usage = detail.Usage,
+                    PrescriptionId = presc.Id,
+                };
+                await _unitOfWork.PrescriptionDetailRepository.Add(presDetail);
+            }
+            presc.Note = model.Note;
             await _unitOfWork.SaveChangesAsync();
         }
         public async Task<List<RedirectViewModel>> RedirectPatient(RedirectCreateModel model, long recordId)
@@ -280,43 +282,45 @@ namespace BusinessLayer.Services.Doctor
 
             //lấy các operation khám tương ứng và tạo thành một bill
             var checkupOpList = _unitOfWork.OperationRepository.Get()
-                .Where(x=>x.DepartmentId!=null)
+                .Where(x => x.DepartmentId != null)
                 .Where(x => depIdList.Contains((long)x.DepartmentId))
                 .ToList();
             Bill bill = new Bill()
             {
-                Content = "Thu tiền cho các khoảng khám chuyển khoa",
+                Content = "Thu tiền cho các khoản khám chuyên khoa",
                 Status = BillStatus.CHUA_TT,
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
                 Total = 0,
-                PatientId = patient.Id
+                PatientId = patient.Id,
+                PhoneNo = patient.PhoneNumber,
+                AccountPhoneNo = patient.AccountPhoneNo,
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
             //tạo các checkup record tương ứng
             var listDepartmentResp = new List<DepartmentChangeNoti>();
-            foreach (var checkup in checkupOpList)
+            foreach (var op in checkupOpList)
             {
                 string symptom = "";
                 foreach (var item in model.Details)
                 {
-                    if (item.DepartmentId == checkup.DepartmentId)
+                    if (item.DepartmentId == op.DepartmentId)
                     {
                         symptom = item.ClinicalSymptom;
                     }
                 }
                 //lấy department tương úng của checkup thay vì include
-                var dep = _departmentService.GetDepartmentById((long)checkup.DepartmentId);
+                var dep = _departmentService.GetDepartmentById((long)op.DepartmentId);
                 //lấy lịch và phòng
-                var room = _numService.GetAppropriateRoomForOperation(checkup);
-                var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room,DateTime.Now.AddHours(7));
+                var room = _numService.GetAppropriateRoomForOperation(op,false);
+                var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room, DateTime.Now.AddHours(7));
                 //lấy bác sĩ làm việc tương ứng trong khung giờ + phòng
 
                 //tạo record
                 CheckupRecord _cr = new CheckupRecord()
                 {
-                    DepartmentId = checkup.DepartmentId,
+                    DepartmentId = op.DepartmentId,
                     Date = DateTime.Now.AddHours(7),
                     Status = CheckupRecordStatus.DA_DAT_LICH,
                     IsReExam = false,
@@ -327,7 +331,7 @@ namespace BusinessLayer.Services.Doctor
                     EstimatedDate = DateTime.Now.AddHours(7),
                     PatientName = patient.Name,
                     NumericalOrder = numOrd,
-                    ClinicalSymptom = "Chuyển khoa từ đa khoa sang. Triệu chứng báo cáo từ bác sĩ đa khoa: \""+ symptom + "\".",
+                    ClinicalSymptom = "Chuyển khoa từ đa khoa sang. Triệu chứng báo cáo từ bác sĩ đa khoa: \"" + symptom + "\".",
                     DepartmentName = dep.Name,
                     //NHỚ BỔ SUNG
                     //DoctorId = null,
@@ -340,15 +344,15 @@ namespace BusinessLayer.Services.Doctor
                 BillDetail detail = new BillDetail()
                 {
                     BillId = bill.Id,
-                    InsuranceStatus = checkup.InsuranceStatus,
-                    OperationId = checkup.Id,
-                    Price = checkup.Price,
-                    OperationName = checkup.Name,
+                    InsuranceStatus = op.InsuranceStatus,
+                    OperationId = op.Id,
+                    Price = op.Price,
+                    OperationName = op.Name,
                     Quantity = 1,
-                    SubTotal = checkup.Price,
+                    SubTotal = op.Price,
                     CheckupRecordId = _cr.Id,
                 };
-                bill.Total = bill.Total + checkup.Price;
+                bill.Total = bill.Total + op.Price;
                 await _unitOfWork.BillDetailRepository.Add(detail);
 
                 //tạo response model tương ứng
@@ -394,7 +398,9 @@ namespace BusinessLayer.Services.Doctor
                 Content = "Hóa đơn thanh toán viện phí cho bệnh nhân " + patient.Name + " cho " + testReqModel.ExamOperationIds.Count + " mục.",
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
-                PatientId = patient.Id
+                PatientId = patient.Id,
+                PhoneNo = patient.PhoneNumber,
+                AccountPhoneNo = patient.AccountPhoneNo,
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
@@ -410,8 +416,8 @@ namespace BusinessLayer.Services.Doctor
                     }
                 }
                 //Tìm phòng tương ứng cho bệnh nhân
-                var room = _numService.GetAppropriateRoomForOperation(_op);
-                if (room==null)
+                var room = _numService.GetAppropriateRoomForOperation(_op,true);
+                if (room == null)
                 {
                     throw new Exception("Rooms for this operation haven't been configured");
                 }
@@ -456,7 +462,7 @@ namespace BusinessLayer.Services.Doctor
                     Floor = room.Floor,
                     RoomNumber = room.RoomNumber,
                     OperationId = _op.Id,
-                    OperationName =_op.Name,
+                    OperationName = _op.Name,
                     NumericalOrder = numOrd,
                 });
             }
@@ -492,7 +498,7 @@ namespace BusinessLayer.Services.Doctor
             }
             if (model.Status != null)
             {
-                if (model.Status== (int)CheckupRecordStatus.KET_THUC 
+                if (model.Status == (int)CheckupRecordStatus.KET_THUC
                     || model.Status == (int)CheckupRecordStatus.NHAP_VIEN
                     )
                 {
@@ -536,8 +542,8 @@ namespace BusinessLayer.Services.Doctor
         public async Task ConfirmCheckup(long crId, long? doctorId)
         {
             var cr = _unitOfWork.CheckupRecordRepository.Get().Where(x => x.Id == crId).FirstOrDefault();
-            
-            if (cr==null)
+
+            if (cr == null)
             {
                 throw new Exception("Invalid checkup record id");
             }
@@ -545,11 +551,11 @@ namespace BusinessLayer.Services.Doctor
             var queue = _scheduleService.GetCheckupQueue((long)cr.RoomId);
             //kiểm tra xem có thật sự trong hàng đợi không
             var crInQueue = queue.SingleOrDefault(x => x.Id == cr.Id);
-            if (crInQueue==null)
+            if (crInQueue == null)
             {
                 throw new Exception("Invalid checkup record id");
             }
-            if (queue[0].Status==(int)CheckupRecordStatus.DANG_KHAM)
+            if (queue[0].Status == (int)CheckupRecordStatus.DANG_KHAM)
             {
                 throw new Exception("A patient is currently in the checkup room");
             }
@@ -557,16 +563,19 @@ namespace BusinessLayer.Services.Doctor
             crInQueue.Status = (int)CheckupRecordStatus.DANG_KHAM;
             cr.Status = CheckupRecordStatus.DANG_KHAM;
             cr.Date = DateTime.Now.AddHours(7);
-            cr.DoctorId = doctorId;
-            cr.DoctorName = doctor.Name;
+            if (cr.DepartmentId!= IdConfig.ID_DEPARTMENT_DA_KHOA)
+            {
+                cr.DoctorId = doctorId;
+                cr.DoctorName = doctor.Name;
+            }
             //sai
             queue.Remove(crInQueue);
             queue.Insert(0, crInQueue);
 
             //nếu có doctor id, tức là đây là confirm của 
-            if (cr.DepartmentId!=IdConfig.ID_DEPARTMENT_DA_KHOA)
+            if (cr.DepartmentId != IdConfig.ID_DEPARTMENT_DA_KHOA)
             {
-                if (doctor==null)
+                if (doctor == null)
                 {
                     throw new Exception("Invalid doctor");
                 }
@@ -582,8 +591,8 @@ namespace BusinessLayer.Services.Doctor
             //không cần kiểm tra id bác sĩ
             var doc = _unitOfWork.DoctorRepository.Get().Where(x => x.Id == doctorId).FirstOrDefault();
             //kiểm tra bệnh nhân
-            var patient = _unitOfWork.PatientRepository.Get().Include(x=>x.Account).Where(x => x.Id == model.PatientId).FirstOrDefault();
-            if (patient==null)
+            var patient = _unitOfWork.PatientRepository.Get().Include(x => x.Account).Where(x => x.Id == model.PatientId).FirstOrDefault();
+            if (patient == null)
             {
                 throw new Exception("Patient doesn't exist");
             }
@@ -613,10 +622,11 @@ namespace BusinessLayer.Services.Doctor
             for (int i = 0; i < listOp.Count; i++)
             {
                 preCr.DoctorAdvice = preCr.DoctorAdvice + listOp[i].Name;
-                if (i== listOp.Count-1)
+                if (i == listOp.Count - 1)
                 {
                     preCr.DoctorAdvice = preCr.DoctorAdvice + ". ";
-                } else
+                }
+                else
                 {
                     preCr.DoctorAdvice = preCr.DoctorAdvice + ", ";
                 }
@@ -684,7 +694,7 @@ namespace BusinessLayer.Services.Doctor
                 .Where(x => x.DepartmentId != null)
                 .Where(x => x.DepartmentId == model.DepartmentId)
                 .FirstOrDefault();
-            if (checkupOp==null)
+            if (checkupOp == null)
             {
                 throw new Exception("Checkup operation corressponding with department doesn't exist");
             }

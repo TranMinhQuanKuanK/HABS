@@ -110,21 +110,20 @@ namespace BusinessLayer.Services.User
 
             #region Thêm lịch
             DateTime searchDate = search.Date.Date;
-
-            DateTime start = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
-                WorkingShiftConfig.BeginMorningShiftHour,
-                WorkingShiftConfig.BeginAfternoonShiftMinute,
-                0);
-            DateTime end = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
-                WorkingShiftConfig.EndMorningShiftHour,
-                WorkingShiftConfig.EndMorningShiftMinute,
-                0);
-            DateTime temp = start;
-            int _curSlot = 1;
-
             //thêm lịch buổi sáng
             if (morningRoom != null)
             {
+                int _curSlot = 1;
+                var start = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
+               WorkingShiftConfig.BeginMorningShiftHour,
+               WorkingShiftConfig.BeginAfternoonShiftMinute,
+               0);
+                var end = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
+                    WorkingShiftConfig.EndMorningShiftHour,
+                    WorkingShiftConfig.EndMorningShiftMinute,
+                    0);
+                var temp = start;
+
                 while (temp <= end)
                 {
                     var slot = new CheckupSlotResponseModel()
@@ -145,16 +144,16 @@ namespace BusinessLayer.Services.User
             //thêm lịch buổi chiều
             if (afternoonRoom != null)
             {
-                _curSlot = 1;
-                start = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
+               int _curSlot = 1;
+                var start = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                     WorkingShiftConfig.BeginAfternoonShiftHour,
                     WorkingShiftConfig.BeginAfternoonShiftMinute,
                     0);
-                end = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
+                var end = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                     WorkingShiftConfig.EndAfternoonShiftHour,
                     WorkingShiftConfig.EndAfternoonShiftMinute,
                     0);
-                temp = start;
+                var temp = start;
                 while (temp <= end)
                 {
                     var slot = new CheckupSlotResponseModel()
@@ -174,16 +173,16 @@ namespace BusinessLayer.Services.User
             //thêm lịch buổi tối
             if (eveningRoom != null)
             {
-                _curSlot = 1;
-                start = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
+                int _curSlot = 1;
+                var start = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                     WorkingShiftConfig.BeginEveningShiftHour,
                     WorkingShiftConfig.BeginEveningShiftMinute,
                     0);
-                end = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
+                var end = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                     WorkingShiftConfig.EndEveningShiftHour,
                     WorkingShiftConfig.EndEveningShiftMinute,
                     0);
-                temp = start;
+                var temp = start;
                 while (temp <= end)
                 {
                     var slot = new CheckupSlotResponseModel()

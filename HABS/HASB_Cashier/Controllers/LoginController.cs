@@ -10,7 +10,6 @@ namespace HASB_Cashier.Controllers
 {
     [Route(CashierRoute)]
     [ApiController]
-    //[Authorize(Roles = "Doctor")]
     public class LoginController : BaseCashierController
     {
 
