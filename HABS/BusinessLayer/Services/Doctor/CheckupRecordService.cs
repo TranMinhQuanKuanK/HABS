@@ -466,7 +466,7 @@ namespace BusinessLayer.Services.Doctor
                     NumericalOrder = numOrd,
                 });
             }
-            cr.Status = CheckupRecordStatus.CHO_KQXN;
+            cr.Status = CheckupRecordStatus.CHO_THANH_TOAN_PHI_XN;
             bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
             await _unitOfWork.SaveChangesAsync();
             _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
@@ -529,6 +529,8 @@ namespace BusinessLayer.Services.Doctor
                     throw new Exception("Invalid ICD with id" + model.IcdDiseaseId);
                 }
                 cr.IcdDiseaseId = model.IcdDiseaseId;
+                cr.IcdDiseaseName = icd.Name;
+                cr.IcdDiseaseCode = icd.Code;
             }
             await _unitOfWork.SaveChangesAsync();
             if (model.Status == (int)CheckupRecordStatus.KET_THUC
@@ -641,13 +643,14 @@ namespace BusinessLayer.Services.Doctor
                 Status = BillStatus.CHUA_TT,
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
-                AccountPhoneNo = patient.Account.PhoneNumber
+                AccountPhoneNo = patient.Account.PhoneNumber,
             };
             await _unitOfWork.BillRepository.Add(bill);
             //tạo mới CR
             var cr = new CheckupRecord()
             {
                 DoctorId = doctorId,
+                DoctorName = doc.Name,
                 EstimatedDate = model.ReExamDate,
                 DepartmentId = model.DepartmentId,
                 DepartmentName = department.Name,

@@ -17,5 +17,8 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
         public string PatientName { get; set; }
         public string DepartmentName { get; set; }
         public bool IsReExam { get; set; }
+        public long RoomId { get; set; }
+        public string RoomNumber { get; set; }
+        public string Floor { get; set; }
     }
 }

@@ -27,18 +27,22 @@ namespace BusinessLayer.Services.User
             _redisService = new RedisService(_distributedCache);
 
         }
-        public List<CheckupAppointmentResponseModel> GetCheckupAppointment(CheckupAppointmentSearchModel searchModel)
+        public List<CheckupAppointmentResponseModel> GetCheckupAppointment(CheckupAppointmentSearchModel searchModel,
+            long accountId)
         {
             var result = _unitOfWork.CheckupRecordRepository.Get()
+                            .Include(x=>x.Room).ThenInclude(x=>x.RoomType)
                             .Where(x => searchModel.FromTime == null || ((DateTime)x.EstimatedDate).Date >= ((DateTime)searchModel.FromTime).Date)
                             .Where(x => searchModel.ToTime == null || ((DateTime)x.EstimatedDate).Date <= ((DateTime)searchModel.ToTime).Date)
                             .Where(x => searchModel.DepartmentId == null || x.DepartmentId == searchModel.DepartmentId)
                             .Where(x => searchModel.PatientId == null || x.PatientId == searchModel.PatientId)
-                            .Where(x => x.Status != CheckupRecordStatus.CHUYEN_KHOA
-                            && x.Status != CheckupRecordStatus.DA_HUY
-                            && x.Status != CheckupRecordStatus.DA_XOA
-                            && x.Status != CheckupRecordStatus.NHAP_VIEN
-                            && x.Status != CheckupRecordStatus.KET_THUC
+                            .Where(x => x.Patient.AccountId == accountId)
+                            .Where(x => searchModel.IsFutureReExam ? x.Status == CheckupRecordStatus.CHO_TAI_KHAM 
+                                : (x.Status != CheckupRecordStatus.CHUYEN_KHOA
+                                && x.Status != CheckupRecordStatus.DA_HUY
+                                && x.Status != CheckupRecordStatus.DA_XOA
+                                && x.Status != CheckupRecordStatus.NHAP_VIEN
+                                && x.Status != CheckupRecordStatus.KET_THUC)
                             )
                             .Select(x => new CheckupAppointmentResponseModel()
                             {
@@ -54,6 +58,10 @@ namespace BusinessLayer.Services.User
                                 NumericalOrder = x.NumericalOrder,
                                 PatientName = x.PatientName,
                                 Status = (int)x.Status,
+                                RoomNumber = x.RoomNumber,
+                                RoomId = x.RoomId,
+                                Floor = x.Floor,
+                                RoomType = x.Room.RoomType.Name,
                             }).ToList();
             return result;
         }

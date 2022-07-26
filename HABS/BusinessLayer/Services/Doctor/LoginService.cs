@@ -105,7 +105,7 @@ namespace BusinessLayer.Services.Doctor
                 }
             }
             #region Sau này xóa
-            if (login.Username == "doctor" && login.Password == "123123")
+            if (login.Username == "doctor" && login.Password == "123")
             {
                 return doctor;
             }
@@ -116,8 +116,9 @@ namespace BusinessLayer.Services.Doctor
             {
                 return null;
             }
+            var now = DateTime.Now.AddHours(7);
             var schedule = _unitOfWork.ScheduleRepository.Get().
-                Where(x => x.DoctorId == doctor.Id && x.RoomId == login.RoomId
+                Where(x => x.DoctorId == doctor.Id && x.RoomId == login.RoomId && x.Weekday == now.DayOfWeek
                 && x.Session == (SessionType)currSess).FirstOrDefault();
             if (schedule == null) { return null; }
             return doctor;

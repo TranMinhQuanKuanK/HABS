@@ -39,7 +39,13 @@ namespace HASB_User.Controllers
         {
             try
             {
-                await _fcmService.AddToken(model.TokenId, model.AccountId);
+                int accountId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                await _fcmService.AddToken(model.TokenId, accountId);
                 return Ok();
             }
             catch (Exception e)
@@ -74,7 +80,13 @@ namespace HASB_User.Controllers
         {
             try
             {
-                await _fcmService.DeleteToken(model.TokenId, model.AccountId);
+                int accountId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                await _fcmService.DeleteToken(model.TokenId, accountId);
                 return NoContent();
             }
             catch (Exception e)

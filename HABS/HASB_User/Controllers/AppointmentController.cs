@@ -39,7 +39,13 @@ namespace HASB_User.Controllers
 
             try
             {
-                var result = _scheduleService.GetCheckupAppointment(searchModel);
+                int accountId = 0;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                var result = _scheduleService.GetCheckupAppointment(searchModel, accountId);
                 return Ok(result);
             }
             catch (Exception e)
@@ -94,8 +100,6 @@ namespace HASB_User.Controllers
                     return Ok(await _checkupRecordService.CreatNewAppointment(model.PatientId, model.Date, model.DoctorId,
                   model.NumericalOrder, model.ClinicalSymptom, accountId));
                 }
-              
-                return Ok();
             }
             catch (Exception e)
             {

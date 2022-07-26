@@ -35,6 +35,10 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
         public string IcdCode { get; set; }
         public string IcdDiseaseName { get; set; }
         public bool IsReExam { get; set; }
+        public long RoomId { get; set; }
+        public string RoomNumber { get; set; }
+        public string Floor { get; set; }
+        public string RoomType { get; set; }
 
     }
 }

@@ -12,5 +12,6 @@ namespace BusinessLayer.RequestModels.SearchModels.User
         public DateTime? ToTime { get; set; }
         public long? DepartmentId { get; set; }
         public long? PatientId { get; set; }
+        public bool IsFutureReExam { get; set; }
     }
 }

@@ -21,6 +21,10 @@ namespace BusinessLayer.ResponseModels.SearchModels.User
         public long? DepartmentId { get; set; }
         public string DepartmentName { get; set; }
         public bool IsReExam { get; set; }
+        public long? RoomId { get; set; }
+        public string RoomNumber { get; set; }
+        public string Floor { get; set; }
+        public string RoomType { get; set; }
 
     }
 }

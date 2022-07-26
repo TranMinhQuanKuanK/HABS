@@ -11,6 +11,6 @@ namespace BusinessLayer.Interfaces.User
     public interface IScheduleService
     {
         List<CheckupSlotResponseModel> GetAvailableSlots(SlotSearchModel search);
-        List<CheckupAppointmentResponseModel> GetCheckupAppointment(CheckupAppointmentSearchModel searchModel);
+        List<CheckupAppointmentResponseModel> GetCheckupAppointment(CheckupAppointmentSearchModel searchModel, long accountId);
     }
 }

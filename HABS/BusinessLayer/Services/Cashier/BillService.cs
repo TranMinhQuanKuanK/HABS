@@ -95,6 +95,8 @@ namespace BusinessLayer.Services.Cashier
                     CashierName = x.CashierName,
                     DateOfBirth = x.Patient.DateOfBirth,
                     Gender = (int)x.Patient.Gender,
+                    PhoneNo = x.PhoneNo,
+                    AccountPhoneNo = x.AccountPhoneNo,
                     Details = x.BillDetails.Select(d=>new BillDetailViewModel()
                     {
                         Id = d.Id,

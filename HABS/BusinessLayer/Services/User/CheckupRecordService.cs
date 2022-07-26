@@ -91,7 +91,10 @@ namespace BusinessLayer.Services.User
                    DoctorName = x.DoctorName,
                    NumericalOrder = x.NumericalOrder,
                    PatientName = x.PatientName,
-                   IsReExam = (bool)x.IsReExam
+                   IsReExam = (bool)x.IsReExam,
+                   Floor = x.Floor,
+                   RoomId = (long)x.RoomId,
+                   RoomNumber = x.RoomNumber,
                }
                ).OrderByDescending(x=>x.Date).ToList();
 
@@ -106,6 +109,7 @@ namespace BusinessLayer.Services.User
                 .Include(x => x.Prescriptions)
                 .ThenInclude(x => x.PrescriptionDetails)
                 .Include(x => x.TestRecords)
+                .Include(x=>x.Room).ThenInclude(x=>x.RoomType)
                 .Where(x => x.Id == recordId).AsEnumerable().Select
                 (x =>
                 {
@@ -161,7 +165,7 @@ namespace BusinessLayer.Services.User
                                 Quantity = dt.Quantity,
                                 Unit = dt.Unit,
                                 Usage = dt.Usage,
-                            }).ToList()
+                            }).ToList(),
                         }
                         : null,
                         Pulse = x.Pulse,
@@ -183,9 +187,12 @@ namespace BusinessLayer.Services.User
                             RoomNumber = tr.RoomNumber,
                             Status = (int)tr.Status,
                             DoctorId = tr.DoctorId,
-                            DoctorName = tr.DoctorName
+                            DoctorName = tr.DoctorName,
                         }).ToList(),
-
+                        RoomId = (long)x.RoomId,
+                        Floor = x.Floor,
+                        RoomNumber = x.RoomNumber,
+                        RoomType = x.Room.RoomType.Name
                     };
                 }).FirstOrDefault();
 
@@ -320,12 +327,14 @@ namespace BusinessLayer.Services.User
                             prevCr.Date = slot.EstimatedStartTime;
                             prevCr.NumericalOrder = slot.NumericalOrder;
                             prevCr.EstimatedStartTime = slot.EstimatedStartTime;
+                            prevCr.DoctorId = doctor.Id;
+                            prevCr.DoctorName = doctor.Name;
+                            prevCr.EstimatedDate = slot.EstimatedStartTime;
                             break;
                         }
                         else
                         {
                             slotExisted = true;
-
                         }
                     }
                 }
@@ -473,6 +482,7 @@ namespace BusinessLayer.Services.User
                 DepartmentId = IdConfig.ID_DEPARTMENT_DA_KHOA,
                 DepartmentName = dakhoaDep.Name,
                 DoctorId = doctorId,
+                DoctorName = doctor.Name,
                 ClinicalSymptom = clinicalSymptom,
             };
             await _unitOfWork.CheckupRecordRepository.Add(cr);
