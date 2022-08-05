@@ -26,7 +26,6 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using Utilities;
-
 namespace HASB_Doctor
 {
     public class Startup
