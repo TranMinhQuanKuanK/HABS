@@ -440,7 +440,8 @@ namespace BusinessLayer.Services.Doctor
                     NumericalOrder = numOrd,
                     RoomId = room.Id,
                     RoomNumber = room.RoomNumber,
-                    Floor = room.Floor
+                    Floor = room.Floor,
+                    QrCode = Guid.NewGuid().ToString()
                 };
                 await _unitOfWork.TestRecordRepository.Add(tc);
                 await _unitOfWork.SaveChangesAsync();

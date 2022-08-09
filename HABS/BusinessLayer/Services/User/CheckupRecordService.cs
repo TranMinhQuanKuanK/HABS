@@ -503,7 +503,7 @@ namespace BusinessLayer.Services.User
                 TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
                 PatientId = patient.Id,
                 PhoneNo = patient.PhoneNumber,
-                AccountPhoneNo = patient.Account.PhoneNumber
+                AccountPhoneNo = patient.Account.PhoneNumber,
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();

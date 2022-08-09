@@ -27,22 +27,31 @@ namespace HASB_Screen.Controllers
         {
             _checkinService = service;
         }
-        [SwaggerOperation(Summary = "Checkin phòng khám hoặc phòng xét nghiệm")]
+        [SwaggerOperation(Summary = "Checkin phòng khám hoặc phòng xét nghiệ (giả)")]
         [HttpPost]
         public async Task<IActionResult> CheckinCheckupRoom([FromBody] CheckinModel model)
         {
-            long roomId = 0;
-            ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null)
+            //sau enable lên lại
+            try
             {
-                roomId = long.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
-            }
-            if (model == null)
+                long roomId = 0;
+                ClaimsIdentity identity = HttpContext.User.Identity as ClaimsIdentity;
+                if (identity != null)
+                {
+                    roomId = long.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                if (model == null)
+                {
+                    return BadRequest();
+                }
+                await _checkinService.Checkin(model.QrCode, roomId);
+                return Ok();
+            } catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
-            await _checkinService.Checkin(model.QrCode,roomId);
-            return Ok();
+
+
         }
     }
 }

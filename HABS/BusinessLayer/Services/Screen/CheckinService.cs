@@ -9,6 +9,7 @@ using BusinessLayer.Interfaces.Notification;
 using BusinessLayer.Interfaces.Screen;
 using static DataAccessLayer.Models.CheckupRecord;
 using BusinessLayer.Constants;
+using static DataAccessLayer.Models.TestRecord;
 
 namespace BusinessLayer.Services.Screen
 {
@@ -32,17 +33,24 @@ namespace BusinessLayer.Services.Screen
         public async Task Checkin(string qrCode, long roomId)
         {
             var cr = _unitOfWork.CheckupRecordRepository.Get()
+                .Include(x => x.Room)
                 .Include(x => x.Patient)
-                .Include(x=>x.Room)
                 .Where(x => x.QrCode == qrCode)
                 .Where(x => x.RoomId == roomId)
                 .FirstOrDefault();
-            if (cr == null)
+            var tr = _unitOfWork.TestRecordRepository.Get()
+              .Include(x => x.Room)
+                .Include(x => x.Patient)
+              .Where(x => x.QrCode == qrCode)
+              .Where(x => x.RoomId == roomId)
+              .FirstOrDefault();
+            if (cr == null && tr == null)
             {
                 throw new Exception("QR doesn't exist");
             }
-            if ((long)cr.Room.RoomTypeId== IdConfig.ID_ROOMTYPE_PHONG_KHAM)
+            if (cr != null)
             {
+                //Checkin phòng khám
                 if (cr.Status == CheckupRecordStatus.DA_THANH_TOAN)
                 {
                     cr.Status = CheckupRecordStatus.CHECKED_IN;
@@ -56,26 +64,32 @@ namespace BusinessLayer.Services.Screen
                 {
                     return;
                 };
+                await _unitOfWork.SaveChangesAsync();
                 //cập nhật queue
                 if (cr.RoomId != null)
                 {
                     _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
                 }
-                //}
-                //if (doUpdateTestQueue)
-                //{
-                //    foreach(var id in tempRoomForTest)
-                //    {
-                //        _scheduleService.UpdateRedis_TestQueue(id, false);
-                //    }
-                //}
                 //remind mobile
                 await _notiService.SendUpdateCheckupInfoReminder(cr.Id, cr.Patient.AccountId);
-            } else
+            }
+            else if (tr != null)
             {
+                //Checkin phòng xét nghiệm
                 //đổi status
+                tr.Status = TestRecordStatus.CHECKED_IN;
                 //cập nhật queue
+                if (tr.RoomId != null)
+                {
+                    _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, false);
+                }
+                await _unitOfWork.SaveChangesAsync();
                 //remind mobile
+                if (tr.CheckupRecordId != null)
+                {
+                    await _notiService.SendUpdateCheckupInfoReminder((long)tr.CheckupRecordId,
+                        tr.Patient.AccountId);
+                }
             }
 
         }
