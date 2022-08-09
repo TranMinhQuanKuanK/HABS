@@ -12,6 +12,7 @@ namespace DataAccessLayer.Models
             CHUA_DAT_LICH,
             DA_DAT_LICH,
             DA_THANH_TOAN,
+            CHECKED_IN,
             DANG_TIEN_HANH,
             CHO_KET_QUA,
             HOAN_THANH,
@@ -39,6 +40,7 @@ namespace DataAccessLayer.Models
         public string OperationName { get; set; }
         public long? DoctorId { get; set; }
         public string DoctorName { get; set; }
+        public string QrCode { get; set; }
 
         public virtual CheckupRecord CheckupRecord { get; set; }
         public virtual Doctor Doctor { get; set; }

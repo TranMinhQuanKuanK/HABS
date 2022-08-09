@@ -62,6 +62,7 @@ namespace BusinessLayer.Services.User
                                 RoomId = x.RoomId,
                                 Floor = x.Floor,
                                 RoomType = x.Room.RoomType.Name,
+                                QrCode =x.QrCode
                             }).ToList();
             return result;
         }

@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLayer.Interfaces.Doctor
+namespace BusinessLayer.Interfaces.Screen
 {
     public interface ICheckinService
     {
-       
+        Task Checkin(string qrCode,long roomId);
     }
 }

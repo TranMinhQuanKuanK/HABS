@@ -93,7 +93,8 @@ namespace BusinessLayer.Services.Doctor
                    DoctorName = x.DoctorName,
                    NumericalOrder = x.NumericalOrder,
                    PatientName = x.PatientName,
-                   IsReExam = (bool)x.IsReExam
+                   IsReExam = (bool)x.IsReExam,
+                   QrCode = x.QrCode
                }
                ).OrderByDescending(x=>x.Date).ToList();
             return data;
@@ -129,6 +130,7 @@ namespace BusinessLayer.Services.Doctor
                         EstimatedStartTime = x.EstimatedStartTime,
                         IcdCode = x.IcdDiseaseCode,
                         IsReExam = (bool)x.IsReExam,
+                        QrCode = x.QrCode,
                         IcdDiseaseId = x.IcdDiseaseId,
                         IcdDiseaseName = x.IcdDiseaseName,
                         PatientData = new PatientViewModel()
@@ -183,7 +185,8 @@ namespace BusinessLayer.Services.Doctor
                             RoomNumber = tr.RoomNumber,
                             Status = (int)tr.Status,
                             DoctorId = tr.DoctorId,
-                            DoctorName = tr.DoctorName
+                            DoctorName = tr.DoctorName,
+                            QrCode = x.QrCode,
                         }).ToList(),
                     };
                 }).FirstOrDefault();
@@ -658,7 +661,8 @@ namespace BusinessLayer.Services.Doctor
                 IsReExam = true,
                 PatientId = model.PatientId,
                 PatientName = patient.Name,
-                TestRecords = new List<TestRecord>()
+                TestRecords = new List<TestRecord>(),
+                QrCode = Guid.NewGuid().ToString()
             };
             await _unitOfWork.CheckupRecordRepository.Add(cr);
             await _unitOfWork.SaveChangesAsync();

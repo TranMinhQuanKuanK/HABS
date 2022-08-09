@@ -23,6 +23,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public long? CheckupRecordId { get; set; }
         public long? DoctorId { get; set; }
         public string DoctorName { get; set; }
+        public string QrCode { get; set; }
 
     }
 }

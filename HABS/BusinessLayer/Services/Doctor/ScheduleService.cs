@@ -29,8 +29,8 @@ namespace BusinessLayer.Services.Doctor
             var queue = _unitOfWork.CheckupRecordRepository.Get()
             .Where(x => x.RoomId == RoomId)
             .Where(x => x.Status == CheckupRecordStatus.DANG_KHAM
-            || x.Status == CheckupRecordStatus.DA_THANH_TOAN
-            || x.Status == CheckupRecordStatus.DA_CO_KQXN
+            || x.Status == CheckupRecordStatus.CHECKED_IN
+            || x.Status == CheckupRecordStatus.CHECKED_IN_SAU_XN
             )
             .Where(x => ((DateTime)x.EstimatedDate).Date == DateTime.Now.AddHours(7).Date)
             .OrderBy(x => ((DateTime)x.EstimatedStartTime).TimeOfDay)
@@ -42,10 +42,11 @@ namespace BusinessLayer.Services.Doctor
                 PatientName = x.PatientName,
                 NumericalOrder = x.NumericalOrder,
                 Status = (int)x.Status,
-                IsReExam = (bool)x.IsReExam
+                IsReExam = (bool)x.IsReExam,
 
             }).ToList();
-            var gotResultPatients = queue.Where(x => x.Status == (int)CheckupRecordStatus.DA_CO_KQXN).OrderBy(x => x.NumericalOrder);
+            //lấy những đứa vừa có kết quả xét nghiệm bỏ lên đầu
+            var gotResultPatients = queue.Where(x => x.Status == (int)CheckupRecordStatus.CHECKED_IN_SAU_XN).OrderBy(x => x.NumericalOrder);
             if (gotResultPatients.Count() > 0)
             {
                 foreach (var item in gotResultPatients)
@@ -60,7 +61,6 @@ namespace BusinessLayer.Services.Doctor
                 queue.Remove(checkingUpPatient);
                 queue.Insert(0, checkingUpPatient);
             }
-            //lấy những đứa vừa có kết quả xét nghiệm bỏ lên đầu
             
             _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue));
             return queue;
@@ -91,7 +91,7 @@ namespace BusinessLayer.Services.Doctor
                    .Where(x => (isWaitingForResult) ?
                     x.Status == TestRecordStatus.CHO_KET_QUA
                     :
-                   x.Status == TestRecordStatus.DA_THANH_TOAN
+                   x.Status == TestRecordStatus.CHECKED_IN
                    || x.Status == TestRecordStatus.DANG_TIEN_HANH
                    )
                    .Where(x => ((DateTime)x.Date).Date == DateTime.Now.AddHours(7).Date)
@@ -105,6 +105,7 @@ namespace BusinessLayer.Services.Doctor
                        Status = (int)x.Status,
                        OperationId = (long)x.OperationId,
                        OperationName = x.OperationName,
+                       QrCode = x.QrCode,
                        Date = x.Date,
                        Patient = new PatientViewModel()
                        {
@@ -152,6 +153,7 @@ namespace BusinessLayer.Services.Doctor
                     {
                         Id = x.Id,
                         PatientId = x.PatientId,
+                        QrCode = x.QrCode,
                         PatientName = x.PatientName,
                         NumericalOrder = x.NumericalOrder,
                         Status = (int)x.Status,

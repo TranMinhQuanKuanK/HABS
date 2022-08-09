@@ -35,5 +35,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public string IcdDiseaseName { get; set; }
         public string IcdCode { get; set; }
         public bool IsReExam { get; set; }
+        public string QrCode { get; set; }
+
     }
 }

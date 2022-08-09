@@ -1,5 +1,11 @@
+using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Interfaces.Notification;
+using BusinessLayer.Interfaces.User;
+using BusinessLayer.Services.Common;
 using BusinessLayer.Services.Notification;
+using BusinessLayer.Services.User;
+using BusinessLayer.Services.Screen;
+
 using DataAccessLayer.Models;
 using DataAcessLayer;
 using DataAcessLayer.Interfaces;
@@ -23,6 +29,7 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using Utilities;
+using BusinessLayer.Interfaces.Screen;
 
 namespace HASB_Screen
 {
@@ -133,7 +140,22 @@ namespace HASB_Screen
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             //screen app
-            //services.AddTransient<IScheduleService, ScheduleService>();
+            services.AddTransient<ICheckupRecordService, CheckupRecordService>();
+            services.AddTransient<IDoctorService, DoctorService>();
+            services.AddTransient<IPatientService, PatientService>();
+            services.AddTransient<IScheduleService, ScheduleService>();
+            services.AddTransient<ICheckinService, CheckinService>();
+            //services.AddTransient<ILoginService, LoginService>();
+            services.AddTransient<BusinessLayer.Interfaces.Screen.ILoginService,
+               BusinessLayer.Services.Screen.LoginService>();
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.IDepartmentService,
+                BusinessLayer.Services.Doctor.DepartmentService>();
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.IScheduleService,
+                BusinessLayer.Services.Doctor.ScheduleService>();
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.IOperationService,
+               BusinessLayer.Services.Doctor.OperationService>();
+            services.AddTransient<INumercialOrderService, NumercialOrderService>();
+            //services.AddTransient<IDoctorService, DoctorService>();
 
             //Firebase messaging
             services.AddTransient<INotificationService, NotificationService>();

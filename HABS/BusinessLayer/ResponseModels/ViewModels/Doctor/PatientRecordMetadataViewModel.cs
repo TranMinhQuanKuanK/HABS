@@ -17,6 +17,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public string PatientName { get; set; }
         public string DepartmentName { get; set; }
         public bool IsReExam { get; set; }
+        public string QrCode { get; set; }
 
     }
 }

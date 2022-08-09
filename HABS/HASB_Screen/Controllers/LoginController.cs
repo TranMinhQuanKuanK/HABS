@@ -1,8 +1,7 @@
-﻿using BusinessLayer.Interfaces.Doctor;
+﻿using BusinessLayer.Interfaces.Screen;
 using BusinessLayer.RequestModels;
-using BusinessLayer.RequestModels.CreateModels.Doctor;
+using BusinessLayer.RequestModels.CreateModels.Screen;
 using BusinessLayer.ResponseModels.ViewModels;
-using BusinessLayer.ResponseModels.ViewModels.Doctor;
 using BusinessLayer.ResponseModels.ViewModels.Screen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,11 +13,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Utilities;
 
-namespace HASB_Doctor.Controllers
+namespace HASB_Screen.Controllers
 {
-    [Route(DoctorRoute)]
+    [Route(ScreenRoute)]
     [ApiController]
-    public class LoginController : BaseDoctorController
+    public class LoginController : BaseScreenController
     {
 
         private readonly ILoginService _loginService;
@@ -27,7 +26,7 @@ namespace HASB_Doctor.Controllers
         {
             _loginService = service;
         }
-        [SwaggerOperation(Summary = "Đăng nhập bằng mật khẩu/password và id phòng (default \"doctor\"-\"123123\")")]
+        [SwaggerOperation(Summary = "Đăng nhập bằng password và id phòng (MK: ABC123)")]
         [HttpPost]
         public IActionResult Login([FromBody] LoginModel model)
         {
@@ -35,15 +34,15 @@ namespace HASB_Doctor.Controllers
             {
                 return BadRequest();
             }
-            var doc = _loginService.Login(model);
-            if (doc != null)
+            var room = _loginService.LoginRoom(model.RoomId,model.Password);
+            if (room != null)
             {
                 //Lấy secret từ secret của ứng dụng
-                string tokenString = CreateAuthenToken.GetToken(Role,doc.Id,"Secretttttt@#$@#$@#$@#$23423423423$@#$@#$@#$");
-                return Ok(new BaseLoginViewModel<DoctorLoginViewModel>()
+                string tokenString = CreateAuthenToken.GetToken(Role, room.Id,"Secretttttt@#$@#$@#$@#$23423423423$@#$@#$@#$");
+                return Ok(new BaseLoginViewModel<ScreenLoginViewModel>()
                 {
                     Token = tokenString,
-                    Information = doc
+                    Information = room
                 });
             }
             else

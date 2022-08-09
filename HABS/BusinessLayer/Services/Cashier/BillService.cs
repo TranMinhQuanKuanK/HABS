@@ -187,17 +187,17 @@ namespace BusinessLayer.Services.Cashier
             bill.CashierName = cashier.Name;
 
             await _unitOfWork.SaveChangesAsync();
-            if (doUpdateCheckupQueue)
-            {
-                _scheduleService.UpdateRedis_CheckupQueue(tempRoomForCheckup);
-            }
-            if (doUpdateTestQueue)
-            {
-                foreach(var id in tempRoomForTest)
-                {
-                    _scheduleService.UpdateRedis_TestQueue(id, false);
-                }
-            }
+            //if (doUpdateCheckupQueue)
+            //{
+            //    _scheduleService.UpdateRedis_CheckupQueue(tempRoomForCheckup);
+            //}
+            //if (doUpdateTestQueue)
+            //{
+            //    foreach(var id in tempRoomForTest)
+            //    {
+            //        _scheduleService.UpdateRedis_TestQueue(id, false);
+            //    }
+            //}
             await _notiService.SendUpdateCheckupInfoReminder(cr.Id,cr.Patient.AccountId);
         }
         public async Task CancelABill(long billId, long cashierId)

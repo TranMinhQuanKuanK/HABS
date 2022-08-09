@@ -20,5 +20,6 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
         public long RoomId { get; set; }
         public string RoomNumber { get; set; }
         public string Floor { get; set; }
+        public string QrCode { get; set; }
     }
 }

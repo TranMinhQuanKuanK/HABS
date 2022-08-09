@@ -66,6 +66,7 @@ namespace BusinessLayer.Services.Common
             int min = roomList[0].TestRecords.Where(x => x.Date!=null ? ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day :false )
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
+                      || x.Status == TestRecord.TestRecordStatus.CHECKED_IN
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
                       || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH
                       ).Where(x => x.RoomId == roomList[0].Id)
@@ -78,6 +79,7 @@ namespace BusinessLayer.Services.Common
                     int cur = room.TestRecords.Where(x => x.Date != null ? ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day : false)
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
+                      || x.Status == TestRecord.TestRecordStatus.CHECKED_IN
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
                       || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH
                       ).Where(x => x.RoomId == room.Id)
@@ -100,6 +102,8 @@ namespace BusinessLayer.Services.Common
                      .Where(x => x.Status == CheckupRecord.CheckupRecordStatus.CHO_KQXN
                       || x.Status == CheckupRecord.CheckupRecordStatus.CHUYEN_KHOA
                       || x.Status == CheckupRecord.CheckupRecordStatus.DANG_KHAM
+                      || x.Status == CheckupRecord.CheckupRecordStatus.CHECKED_IN
+                      || x.Status == CheckupRecord.CheckupRecordStatus.CHECKED_IN_SAU_XN
                       || x.Status == CheckupRecord.CheckupRecordStatus.DA_CO_KQXN
                       || x.Status == CheckupRecord.CheckupRecordStatus.DA_THANH_TOAN
                       || x.Status == CheckupRecord.CheckupRecordStatus.KET_THUC
@@ -128,6 +132,7 @@ namespace BusinessLayer.Services.Common
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
+                      || x.Status == TestRecord.TestRecordStatus.CHECKED_IN
                       || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH
                       ).Where(x => x.RoomId == room.Id)
                      .ToList().Count;
@@ -140,6 +145,8 @@ namespace BusinessLayer.Services.Common
                      || x.Status == CheckupRecord.CheckupRecordStatus.CHUYEN_KHOA
                      || x.Status == CheckupRecord.CheckupRecordStatus.DANG_KHAM
                      || x.Status == CheckupRecord.CheckupRecordStatus.DA_CO_KQXN
+                     || x.Status == CheckupRecord.CheckupRecordStatus.CHECKED_IN
+                     || x.Status == CheckupRecord.CheckupRecordStatus.CHECKED_IN_SAU_XN
                      || x.Status == CheckupRecord.CheckupRecordStatus.DA_THANH_TOAN
                      || x.Status == CheckupRecord.CheckupRecordStatus.KET_THUC
                      || x.Status == CheckupRecord.CheckupRecordStatus.NHAP_VIEN

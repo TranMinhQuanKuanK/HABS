@@ -12,8 +12,10 @@ namespace DataAccessLayer.Models
             CHO_TAI_KHAM,
             DA_DAT_LICH,
             DA_THANH_TOAN,
+            CHECKED_IN,
             DANG_KHAM,
             CHO_THANH_TOAN_PHI_XN,
+            CHECKED_IN_SAU_XN,
             CHO_KQXN,
             DA_CO_KQXN,
             KET_THUC,
@@ -54,6 +56,7 @@ namespace DataAccessLayer.Models
         public long? RoomId { get; set; }
         public string RoomNumber { get; set; }
         public string Floor { get; set; }
+        public string QrCode { get; set; }
 
         public virtual Department Department { get; set; }
         public virtual Doctor Doctor { get; set; }

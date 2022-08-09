@@ -6,8 +6,6 @@
 
   <ItemGroup>
     <Folder Include="Interfaces\Admin\" />
-    <Folder Include="Interfaces\Screen\" />
-    <Folder Include="RequestModels\CreateModels\Screen\" />
     <Folder Include="RequestModels\SearchModels\Admin\" />
     <Folder Include="RequestModels\SearchModels\Screen\" />
     <Folder Include="ResponseModels\ErrorModels\Admin\" />
@@ -16,9 +14,7 @@
     <Folder Include="ResponseModels\ErrorModels\Screen\" />
     <Folder Include="ResponseModels\ErrorModels\User\" />
     <Folder Include="ResponseModels\ViewModels\Admin\" />
-    <Folder Include="ResponseModels\ViewModels\Screen\" />
     <Folder Include="Services\Admin\" />
-    <Folder Include="Services\Screen\" />
   </ItemGroup>
 
   <ItemGroup>

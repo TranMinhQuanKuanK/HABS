@@ -25,6 +25,7 @@ namespace BusinessLayer.ResponseModels.SearchModels.User
         public string RoomNumber { get; set; }
         public string Floor { get; set; }
         public string RoomType { get; set; }
+        public string QrCode { get; set; }
 
     }
 }

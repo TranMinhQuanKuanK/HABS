@@ -94,6 +94,7 @@ namespace BusinessLayer.Services.User
                    IsReExam = (bool)x.IsReExam,
                    Floor = x.Floor,
                    RoomId = (long)x.RoomId,
+                   QrCode = x.QrCode,
                    RoomNumber = x.RoomNumber,
                }
                ).OrderByDescending(x=>x.Date).ToList();
@@ -188,11 +189,13 @@ namespace BusinessLayer.Services.User
                             Status = (int)tr.Status,
                             DoctorId = tr.DoctorId,
                             DoctorName = tr.DoctorName,
+                            QrCode = tr.QrCode
                         }).ToList(),
                         RoomId = (long)x.RoomId,
                         Floor = x.Floor,
                         RoomNumber = x.RoomNumber,
-                        RoomType = x.Room.RoomType.Name
+                        RoomType = x.Room.RoomType.Name,
+                        QrCode = x.QrCode
                     };
                 }).FirstOrDefault();
 
@@ -484,6 +487,7 @@ namespace BusinessLayer.Services.User
                 DoctorId = doctorId,
                 DoctorName = doctor.Name,
                 ClinicalSymptom = clinicalSymptom,
+                QrCode = Guid.NewGuid().ToString()
             };
             await _unitOfWork.CheckupRecordRepository.Add(cr);
             await _unitOfWork.SaveChangesAsync();

@@ -18,5 +18,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public string OperationName { get; set; }
         public long? PatientId { get; set; }
         public PatientViewModel Patient { get; set; }
+        public string QrCode { get; set; }
+
     }
 }
