@@ -1,8 +1,10 @@
 using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Interfaces.Notification;
+using BusinessLayer.Interfaces.Payment;
 using BusinessLayer.Interfaces.User;
 using BusinessLayer.Services.Common;
 using BusinessLayer.Services.Notification;
+using BusinessLayer.Services.Payment.VnPay;
 using BusinessLayer.Services.User;
 using DataAccessLayer.Models;
 using DataAcessLayer;
@@ -19,9 +21,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Utilities;
@@ -145,6 +149,10 @@ namespace HASB_User
                BusinessLayer.Services.Doctor.OperationService>();
             services.AddTransient<INumercialOrderService, NumercialOrderService>();
 
+            services.AddTransient<IVnPayService, VnPayService>();
+
+            services.AddLogging();
+
             //Firebase messaging
             services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<IUserService, UserService>();
@@ -156,8 +164,11 @@ namespace HASB_User
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            var path = Directory.GetCurrentDirectory();
+            loggerFactory.AddFile($"{path}\\Logs\\Log.txt");
+
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HASB_User v1"));
 

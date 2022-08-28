@@ -11,6 +11,7 @@ using BusinessLayer.Services.Redis;
 using Newtonsoft.Json;
 using BusinessLayer.Interfaces.User;
 using BusinessLayer.ResponseModels.ViewModels.User;
+using Utilities;
 
 namespace BusinessLayer.Services.User
 {
@@ -24,7 +25,19 @@ namespace BusinessLayer.Services.User
             _redisService = new RedisService(_distributedCache);
 
         }
-        public List<DoctorResponseModel> GetDoctors(DateTime? date, long departmentId)
+        public List<DoctorResponseModel> GetDoctorsLBySearchTerm(string searchTerm)
+        {
+            var drList = _unitOfWork.DoctorRepository.Get()
+                .Where(x=>x.Type == DataAccessLayer.Models.Doctor.DoctorType.BS_DA_KHOA)
+                .Select(x=>new DoctorResponseModel()
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
+            return drList.Where(x => StringNormalizer.VietnameseNormalize(x.Name).
+            Contains(StringNormalizer.VietnameseNormalize(searchTerm))).ToList();
+        }
+            public List<DoctorResponseModel> GetDoctors(DateTime? date, long departmentId)
         {
             List<DoctorResponseModel> data = new List<DoctorResponseModel>();
             string redisKey = $"doctor-list-date{((DateTime)date).Date}-department-{departmentId}";
@@ -53,5 +66,34 @@ namespace BusinessLayer.Services.User
 
             return data;
         }
+        public List<DateTime> GetDoctorWorkingDay(long doctorId,int maxDateAhead)
+        {
+            var doctor = _unitOfWork.DoctorRepository.Get().Where(x => x.Id == doctorId).FirstOrDefault();
+            if (doctor == null
+                || doctor.Type == DataAccessLayer.Models.Doctor.DoctorType.BS_CHUYEN_KHOA
+                || doctor.Type == DataAccessLayer.Models.Doctor.DoctorType.BS_XET_NGHIEM)
+            {
+                return null;
+            }
+
+            var weekday = _unitOfWork.ScheduleRepository.Get()
+           .Where(x => x.DoctorId == doctorId)
+           .Select(x => x.Weekday)
+           .Distinct()
+           .ToList();
+
+            var result = new List<DateTime>();
+            var today = DateTime.Now.Date;
+            for (int i=0;i<=maxDateAhead;i++)
+            {
+                var date = today.AddDays(i);
+                if (weekday.Contains(date.DayOfWeek))
+                {
+                    result.Add(date);          
+                }
+            }
+            return result;
+        }
+
     }
 }

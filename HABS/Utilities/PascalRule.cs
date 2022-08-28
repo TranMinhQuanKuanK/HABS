@@ -13,6 +13,14 @@ namespace Utilities
     {
         public void ApplyRule(RewriteContext context)
         {
+            if (context.HttpContext.Request.Path.HasValue)
+            {
+                var path = context.HttpContext.Request.Path.Value;
+                if (path.Contains("payments/vnpay"))
+                {
+                    return;
+                }
+            }
             Dictionary<string, StringValues> newQueryCollection = context.HttpContext.Request.Query.ToDictionary(
                 kv => ToPascalCase(kv.Key),
                 kv => kv.Value

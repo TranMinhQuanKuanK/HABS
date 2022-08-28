@@ -140,7 +140,7 @@ namespace HASB_Screen
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             //screen app
-            services.AddTransient<ICheckupRecordService, CheckupRecordService>();
+            services.AddSingleton<ICheckupRecordService, CheckupRecordService>();
             services.AddTransient<IDoctorService, DoctorService>();
             services.AddTransient<IPatientService, PatientService>();
             services.AddTransient<IScheduleService, ScheduleService>();

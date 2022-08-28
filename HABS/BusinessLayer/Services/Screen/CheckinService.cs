@@ -79,11 +79,11 @@ namespace BusinessLayer.Services.Screen
                 //đổi status
                 tr.Status = TestRecordStatus.CHECKED_IN;
                 //cập nhật queue
+                await _unitOfWork.SaveChangesAsync();
                 if (tr.RoomId != null)
                 {
                     _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, false);
                 }
-                await _unitOfWork.SaveChangesAsync();
                 //remind mobile
                 if (tr.CheckupRecordId != null)
                 {

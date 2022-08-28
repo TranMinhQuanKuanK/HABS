@@ -47,7 +47,8 @@ namespace BusinessLayer.Services.Common
                 .Where(x => x.RoomTypeId == op.RoomTypeId)
                 .Where(x => op.DepartmentId != null ? x.DepartmentId == op.DepartmentId : true)
                 .ToList();
-            } else
+            }
+            else
             {
                 roomList = _unitOfWork.RoomRepository
                .Get()
@@ -63,7 +64,7 @@ namespace BusinessLayer.Services.Common
             }
             Room roomWithLeastPeople = roomList[0];
             //chuyển thành testRecord service
-            int min = roomList[0].TestRecords.Where(x => x.Date!=null ? ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day :false )
+            int min = roomList[0].TestRecords.Where(x => x.Date != null ? ((DateTime)x.Date).Day == DateTime.Now.AddHours(7).Day : false)
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.CHECKED_IN
@@ -81,6 +82,7 @@ namespace BusinessLayer.Services.Common
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
                       || x.Status == TestRecord.TestRecordStatus.CHECKED_IN
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
+                      || x.Status == TestRecord.TestRecordStatus.DANG_TIEN_HANH
                       || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH
                       ).Where(x => x.RoomId == room.Id)
                      .ToList().Count;
@@ -128,9 +130,10 @@ namespace BusinessLayer.Services.Common
                 int curNumOfPeople = 0;
                 if (room.RoomTypeId != IdConfig.ID_ROOMTYPE_PHONG_KHAM)
                 {
-                    curNumOfPeople = room.TestRecords.Where(x => x.Date != null ? ((DateTime)x.Date).Day == date.Day:false)
+                    curNumOfPeople = room.TestRecords.Where(x => x.Date != null ? ((DateTime)x.Date).Day == date.Day : false)
                      .Where(x => x.Status == TestRecord.TestRecordStatus.DA_THANH_TOAN
                       || x.Status == TestRecord.TestRecordStatus.CHO_KET_QUA
+                      || x.Status == TestRecord.TestRecordStatus.DANG_TIEN_HANH
                       || x.Status == TestRecord.TestRecordStatus.HOAN_THANH
                       || x.Status == TestRecord.TestRecordStatus.CHECKED_IN
                       || x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH

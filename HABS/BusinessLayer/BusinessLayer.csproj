@@ -14,6 +14,7 @@
     <Folder Include="ResponseModels\ErrorModels\Screen\" />
     <Folder Include="ResponseModels\ErrorModels\User\" />
     <Folder Include="ResponseModels\ViewModels\Admin\" />
+    <Folder Include="ResponseModels\ViewModels\Payment\VnPay\" />
     <Folder Include="Services\Admin\" />
   </ItemGroup>
 
@@ -22,6 +23,7 @@
     <PackageReference Include="FirebaseAuthentication.net" Version="3.7.2" />
     <PackageReference Include="FirebaseStorage.net" Version="1.0.3" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>

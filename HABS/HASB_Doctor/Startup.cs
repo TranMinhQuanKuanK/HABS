@@ -20,17 +20,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Utilities;
 namespace HASB_Doctor
 {
-    public class Startup
+    public class Startupp
     {
-        public Startup(IConfiguration configuration)
+        public Startupp(IConfiguration configuration)
         {
             Configuration = configuration;
         }
@@ -155,6 +157,9 @@ namespace HASB_Doctor
                 BusinessLayer.Services.User.CheckupRecordService>();
 
 
+            services.AddLogging();
+
+
 
 
             //Firebase messaging
@@ -164,8 +169,11 @@ namespace HASB_Doctor
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,ILoggerFactory loggerFactory)
         {
+            var path = Directory.GetCurrentDirectory();
+            loggerFactory.AddFile($"{path}\\Logs\\Log.txt");
+
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HASB_Doctor v1"));
 

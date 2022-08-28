@@ -30,25 +30,33 @@ namespace HASB_Screen.Controllers
         [HttpPost]
         public IActionResult Login([FromBody] LoginModel model)
         {
+            
             if (model == null)
             {
                 return BadRequest();
             }
-            var room = _loginService.LoginRoom(model.RoomId,model.Password);
-            if (room != null)
+            try
             {
-                //Lấy secret từ secret của ứng dụng
-                string tokenString = CreateAuthenToken.GetToken(Role, room.Id,"Secretttttt@#$@#$@#$@#$23423423423$@#$@#$@#$");
-                return Ok(new BaseLoginViewModel<ScreenLoginViewModel>()
+                var room = _loginService.LoginRoom(model.RoomId, model.Password);
+                if (room != null)
                 {
-                    Token = tokenString,
-                    Information = room
-                });
-            }
-            else
+                    //Lấy secret từ secret của ứng dụng
+                    string tokenString = CreateAuthenToken.GetToken(Role, room.Id, "Secretttttt@#$@#$@#$@#$23423423423$@#$@#$@#$");
+                    return Ok(new BaseLoginViewModel<ScreenLoginViewModel>()
+                    {
+                        Token = tokenString,
+                        Information = room
+                    });
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+            } catch (Exception e)
             {
                 return Unauthorized();
             }
+
         }
     }
 }

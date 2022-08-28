@@ -9,6 +9,8 @@ namespace BusinessLayer.Interfaces.User
 {
     public interface IDoctorService
     {
+        List<DoctorResponseModel> GetDoctorsLBySearchTerm(string searchTerm);
         List<DoctorResponseModel> GetDoctors(DateTime? date, long departmentId);
+        List<DateTime> GetDoctorWorkingDay(long doctorId, int maxDateAhead);
     }
 }

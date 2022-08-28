@@ -7,6 +7,7 @@ using BusinessLayer.Services.Test;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
@@ -23,8 +24,10 @@ namespace HASB_Doctor.Controllers
         private readonly TestService ts;
         private readonly IScheduleService _scheduleServce;
 
-        public TestController(TestService service, IScheduleService scheduleServce)
+        private readonly ILogger<TestController> _logger;
+        public TestController(TestService service, IScheduleService scheduleServce, ILogger<TestController> logger)
         {
+            _logger = logger;
             _scheduleServce = scheduleServce;
             ts = service;
         }
@@ -32,6 +35,7 @@ namespace HASB_Doctor.Controllers
         [HttpGet("checkup-book-3")]
         public async Task<IActionResult> CreateThreePatientsAppointment()
         {
+            _logger.LogInformation("Da tao 3 lich kham");
             try
             {
                 await ts.CreatNewAppointment(10000,

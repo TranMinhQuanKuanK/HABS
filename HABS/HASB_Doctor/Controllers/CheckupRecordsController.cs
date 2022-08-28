@@ -83,7 +83,7 @@ namespace HASB_Doctor.Controllers
                 return BadRequest(e.Message);
             }
         }
-
+       
         [SwaggerOperation(Summary = "Chỉnh sửa bệnh án của bệnh nhân (chỉ gửi những field cần edit)")]
         [HttpPut("{id}")]
         public async Task<IActionResult> ChangeCheckupRecord([FromBody] CheckupRecordEditModel model)

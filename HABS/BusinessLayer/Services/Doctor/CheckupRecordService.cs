@@ -1,19 +1,11 @@
-﻿using BusinessLayer.RequestModels;
-using BusinessLayer.RequestModels.CreateModels;
-using BusinessLayer.RequestModels.SearchModels;
-using BusinessLayer.ResponseModels.ViewModels;
-using BusinessLayer.Services;
-using DataAcessLayer.Interfaces;
+﻿using DataAcessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using BusinessLayer.Services.Redis;
-using Newtonsoft.Json;
 using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.ResponseModels.ViewModels.Doctor;
 using DataAccessLayer.Models;
@@ -21,7 +13,6 @@ using BusinessLayer.RequestModels.CreateModels.Doctor;
 using static DataAccessLayer.Models.CheckupRecord;
 using BusinessLayer.Interfaces.User;
 using static DataAccessLayer.Models.Bill;
-using BusinessLayer.ResponseModels.ViewModels.User;
 using BusinessLayer.Interfaces.Common;
 using Utilities;
 using BusinessLayer.Constants;
@@ -35,16 +26,14 @@ namespace BusinessLayer.Services.Doctor
         private readonly Interfaces.Doctor.IScheduleService _scheduleService;
         private readonly IDepartmentService _departmentService;
         private readonly INotificationService _notiService;
-
         private readonly INumercialOrderService _numService;
-
         private readonly RedisService _redisService;
         private readonly IDistributedCache _distributedCache;
         public CheckupRecordService(IUnitOfWork unitOfWork,
             IDistributedCache distributedCache,
             IPatientService patientService,
-             IDepartmentService departmentService,
-             Interfaces.Doctor.IScheduleService scheduleService,
+            IDepartmentService departmentService,
+            Interfaces.Doctor.IScheduleService scheduleService,
             INumercialOrderService numService,
             INotificationService notiService) : base(unitOfWork)
 
@@ -334,8 +323,9 @@ namespace BusinessLayer.Services.Doctor
                     EstimatedDate = DateTime.Now.AddHours(7),
                     PatientName = patient.Name,
                     NumericalOrder = numOrd,
-                    ClinicalSymptom = "Chuyển khoa từ đa khoa sang. Triệu chứng báo cáo từ bác sĩ đa khoa: \"" + symptom + "\".",
+                    ClinicalSymptom = "Chuyển khoa từ đa khoa, triệu chứng báo cáo từ bác sĩ đa khoa: \"" + symptom + "\".",
                     DepartmentName = dep.Name,
+                    QrCode = Guid.NewGuid().ToString(),
                     //NHỚ BỔ SUNG
                     //DoctorId = null,
                     //DoctorName = "Nhớ nhắc Quân bổ sung DoctorName trong trường hợp tụi mày vẫn thấy cái này",

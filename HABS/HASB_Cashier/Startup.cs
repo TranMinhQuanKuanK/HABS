@@ -180,10 +180,10 @@ namespace HASB_Cashier
             app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
             app.UseAuthentication();
-            if (!env.IsDevelopment())
-            {
+            //if (!env.IsDevelopment())
+            //{
                 app.UseAuthorization();
-            }
+            //}
 
             app.UseEndpoints(endpoints =>
             {

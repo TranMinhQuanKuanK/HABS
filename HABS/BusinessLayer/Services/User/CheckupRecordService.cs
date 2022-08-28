@@ -24,6 +24,8 @@ using BusinessLayer.Interfaces.Doctor;
 using Utilities;
 using static DataAccessLayer.Models.Operation;
 using BusinessLayer.Interfaces.Common;
+using BusinessLayer.Services.Common;
+using System.Transactions;
 
 namespace BusinessLayer.Services.User
 {
@@ -382,8 +384,14 @@ namespace BusinessLayer.Services.User
         }
         public async Task<AppointmenAfterBookingResponseModel> CreatNewAppointment(long patientId, DateTime date, long doctorId, int? numericalOrder, string clinicalSymptom, long accountId)
         {
-            //kiểm tra ngày có hợp lệ, có thuộc phiên làm việc chính thức ko
-            var reqSession = getSession(date);
+            using (TransactionScope scope = new TransactionScope())
+            {
+                //do something in here
+                Console.WriteLine("Hello");
+                scope.Complete();
+            }
+                //kiểm tra ngày có hợp lệ, có thuộc phiên làm việc chính thức ko
+                var reqSession = getSession(date);
             if (reqSession == null)
             {
                 throw new Exception("Invalid time");

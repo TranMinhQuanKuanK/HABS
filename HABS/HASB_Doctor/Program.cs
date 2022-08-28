@@ -20,7 +20,7 @@ namespace HASB_Doctor
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startupp>();
                 });
     }
 }

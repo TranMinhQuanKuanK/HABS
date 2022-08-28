@@ -50,8 +50,6 @@ namespace HASB_Screen.Controllers
             {
                 return BadRequest(e.Message);
             }
-
-
         }
     }
 }

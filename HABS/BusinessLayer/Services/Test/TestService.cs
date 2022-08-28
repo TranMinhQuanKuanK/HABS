@@ -5,6 +5,7 @@ using DataAccessLayer.Models;
 using DataAcessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,13 +25,16 @@ namespace BusinessLayer.Services.Test
 
         private readonly IDepartmentService _departmentService;
         private readonly IOperationService _operationService;
+        private readonly ILogger<TestService> _logger;
         public TestService(IUnitOfWork unitOfWork, IDistributedCache distributedCache,
             Interfaces.User.IScheduleService scheduleService,
              IDepartmentService departmentService,
             Interfaces.Doctor.IScheduleService scheduleServiceDoctor,
-             IOperationService operationService
+             IOperationService operationService,
+              ILogger<TestService> logger
             ) : base(unitOfWork)
         {
+            _logger = logger;
             _scheduleServiceDoctor = scheduleServiceDoctor;
             _operationService = operationService;
             _scheduleService = scheduleService;
@@ -71,6 +75,7 @@ namespace BusinessLayer.Services.Test
         public async Task<string> CreatNewAppointment(long patientId, DateTime date,
             long doctorId, int? numericalOrder, string clinicalSymptom)
         {
+            _logger.LogDebug($"Toi debug from create an appointment for patient {patientId}");
             var reqSession = SessionType.SANG;
             //kiểm tra bác sĩ
             var doctor = _unitOfWork.DoctorRepository.Get()

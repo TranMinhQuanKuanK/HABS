@@ -10,9 +10,10 @@ namespace DataAccessLayer.Models
         public enum BillStatus
         {
             CHUA_TT,
-            TT_EBANKING,
-            TT_TIEN_MAT,
-            HUY
+            DA_TT_EBANKING,
+            DA_TT_TIEN_MAT,
+            HUY,
+            DANG_XU_LI_EBANKING
         }
         public Bill()
         {
