@@ -203,7 +203,8 @@ namespace BusinessLayer.Services.User
 
             if (includeBills && data!=null)
             {
-                var billIds= _unitOfWork.BillDetailRepository.Get()
+                var billIds= _unitOfWork.BillDetailRepository
+                    .Get()
                     .Where(x => (x.CheckupRecordId==null? true : x.CheckupRecordId == data.Id) &&
                     (x.TestRecordId == null ? true : 
                     data.TestRecords.Select(x => x.Id).ToList().Contains((long)x.TestRecordId)
@@ -240,6 +241,14 @@ namespace BusinessLayer.Services.User
                         TimeCreated = x.TimeCreated,
                         CashierName = x.CashierName,
                         CashierId   =x.CashierId,
+                        BankCode = x.BankCode,
+                        BankName = x.BankName,
+                        BankLogoLink = x.BankLogoLink,
+                        BankTranNo = x.BankTranNo,
+                        CardType = x.CardType,
+                        VnPayTranNo = x.VnPayTransactionNo,
+                        PaymentMethod = x.PaymentMethod==null?0:(int)x.PaymentMethod,
+                        TransactionStatus = x.TransactionStatus 
                     }).ToList();
                 data.Bill = bills;
             }
@@ -502,8 +511,7 @@ namespace BusinessLayer.Services.User
             //tạo một bill detail và 1 bill tương ứng
             Bill bill = new Bill()
             {
-                Content = "Thanh toán viện phí khám tổng quát đa khoa",
-                //tính luôn
+                Content = "Thanh toán viện phí khám tổng quát đa khoa cho bệnh nhân "+patient.Name,
                 Total = dakhoaOp.Price,
                 Status = Bill.BillStatus.CHUA_TT,
                 TimeCreated = DateTime.Now.AddHours(7),
@@ -512,6 +520,7 @@ namespace BusinessLayer.Services.User
                 PatientId = patient.Id,
                 PhoneNo = patient.PhoneNumber,
                 AccountPhoneNo = patient.Account.PhoneNumber,
+                PaymentMethod = Bill.PaymentMethodEnum.TIEN_MAT
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();

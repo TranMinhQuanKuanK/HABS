@@ -10,6 +10,6 @@ namespace BusinessLayer.ResponseModels.ViewModels
     {
         public string Token { get; set; }
 
-        public RoleViewModel Information { get; set; }
+        public RoleViewModel User { get; set; }
     }
 }

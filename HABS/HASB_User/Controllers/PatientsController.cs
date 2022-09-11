@@ -38,7 +38,7 @@ namespace HASB_User.Controllers
                 var result = _patientService.GetPatients(accountId);
                 if (result.Count==0)
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 return Ok(result);
             }
@@ -57,7 +57,7 @@ namespace HASB_User.Controllers
                 var result = _patientService.GetPatientById(id);
                 if (result == null)
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 return Ok(result);
             }

@@ -15,6 +15,11 @@ namespace DataAccessLayer.Models
             HUY,
             DANG_XU_LI_EBANKING
         }
+        public enum PaymentMethodEnum
+        {
+           TIEN_MAT,
+           VNPAY
+        }
         public Bill()
         {
             BillDetails = new HashSet<BillDetail>();
@@ -32,6 +37,15 @@ namespace DataAccessLayer.Models
         public long? PatientId { get; set; }
         public string PhoneNo { get; set; }
         public string AccountPhoneNo { get; set; }
+        public PaymentMethodEnum? PaymentMethod { get; set; }
+        public string BankCode { get; set; }
+        public string BankName { get; set; }
+        public string BankLogoLink { get; set; }
+        public string BankTranNo { get; set; }
+        public string CardType { get; set; }
+        public DateTime? PayDate { get; set; }
+        public string VnPayTransactionNo { get; set; }
+        public string TransactionStatus { get; set; }
 
         public virtual Cashier Cashier { get; set; }
         public virtual Patient Patient { get; set; }

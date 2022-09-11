@@ -19,9 +19,7 @@ namespace HASB_User.Controllers
     [Authorize(Roles = "User")]
     public class CheckupRecordsController : BaseUserController
     {
-
         private readonly ICheckupRecordService _checkupRecordService;
-
         public CheckupRecordsController(ICheckupRecordService service)
         {
             _checkupRecordService = service;
@@ -50,7 +48,7 @@ namespace HASB_User.Controllers
                 int totalItem = data.Count;
                 if (totalItem == 0)
                 {
-                    return NotFound();
+                    return NoContent();
                 }
 
                 data = data.Skip((paging.PageIndex - 1) * paging.PageSize)
@@ -86,7 +84,7 @@ namespace HASB_User.Controllers
                 var data = _checkupRecordService.GetCheckupRecordFullData(id, accountId,true);
                 if (data == null)
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 return Ok(data);
             }

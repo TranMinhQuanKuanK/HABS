@@ -110,14 +110,20 @@ namespace BusinessLayer.Services.User
             }
             //check phone no exist
             var prePatient = _unitOfWork.PatientRepository.Get()
-               .Where(x => x.Bhyt == edit.Bhyt || x.PhoneNumber == edit.PhoneNumber)
+               .Where(x => x.Bhyt == edit.Bhyt 
+               || x.PhoneNumber == edit.PhoneNumber)
                .FirstOrDefault();
-            if (prePatient != null && prePatient.PhoneNumber == edit.PhoneNumber)
+            if (prePatient != null && 
+                prePatient.PhoneNumber == edit.PhoneNumber
+                && prePatient.Id != user.Id)
             {
                 throw new Exception("Phone number is used.");
             }
             //check bảo hiểm exist
-            if (prePatient != null && prePatient.Bhyt == edit.Bhyt)
+            if (prePatient != null 
+                && edit.Bhyt!=null 
+                && prePatient.Bhyt == edit.Bhyt
+                 && prePatient.Id != user.Id)
             {
                 throw new Exception("Health Insurance code is used.");
             }

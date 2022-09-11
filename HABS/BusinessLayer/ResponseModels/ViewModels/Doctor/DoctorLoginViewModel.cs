@@ -14,5 +14,6 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public int Type { get; set; }
         public string Name { get; set; }
         public string PhoneNo { get; set; }
+        public RoomViewModel Room { get; set; }
     }
 }

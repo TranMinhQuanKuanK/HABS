@@ -52,7 +52,7 @@ namespace BusinessLayer.Services.Doctor
                WorkingShiftConfig.EndAfternoonShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
             if (now >= beginMorningShift
-                .AddMinutes((-1)*WorkingShiftConfig.LoginTimeBeforeWorkingShift) && now <= endMorningShift)
+                .AddMinutes((-1) * WorkingShiftConfig.LoginTimeBeforeWorkingShift) && now <= endMorningShift)
             {
                 session = SessionType.SANG;
             }
@@ -70,7 +70,7 @@ namespace BusinessLayer.Services.Doctor
         }
         public DoctorLoginViewModel Login(LoginModel login)
         {
-           
+
             var doctor = _unitOfWork.DoctorRepository
                 .Get()
                 .Where(_doc => _doc.Username == login.Username && _doc.Password == login.Password)
@@ -80,24 +80,27 @@ namespace BusinessLayer.Services.Doctor
                     Name = _doc.Name,
                     PhoneNo = _doc.PhoneNo,
                     Username = _doc.Username,
-                    Type = (int) _doc.Type
+                    Type = (int)_doc.Type
                 })
                 .FirstOrDefault();
             if (doctor == null) return null;
 
-            var room = _unitOfWork.RoomRepository.Get().Where(x => x.Id == login.RoomId).FirstOrDefault();
-            if (room==null)
+            var room = _unitOfWork.RoomRepository.Get()
+                .Include(x => x.Department)
+                .Include(x => x.RoomType)
+                .Where(x => x.Id == login.RoomId).FirstOrDefault();
+            if (room == null)
             {
                 throw new Exception("Room invalid");
             }
-            if (room.RoomTypeId!= IdConfig.ID_ROOMTYPE_PHONG_KHAM)
+            if (room.RoomTypeId != IdConfig.ID_ROOMTYPE_PHONG_KHAM)
             {
                 if (doctor.Type == (int)DoctorType.BS_XET_NGHIEM)
                 {
                     return doctor;
-                } 
+                }
             }
-            if (room.RoomTypeId == IdConfig.ID_ROOMTYPE_PHONG_KHAM && room.DepartmentId!=null)
+            if (room.RoomTypeId == IdConfig.ID_ROOMTYPE_PHONG_KHAM && room.DepartmentId != null)
             {
                 if (doctor.Type == (int)DoctorType.BS_CHUYEN_KHOA)
                 {
@@ -107,6 +110,21 @@ namespace BusinessLayer.Services.Doctor
             #region Sau này xóa
             if (login.Username == "doctor" && login.Password == "123")
             {
+                if (room != null)
+                {
+                    doctor.Room = new RoomViewModel()
+                    {
+                        Id = room.Id,
+                        DepartmentId = room.DepartmentId == null ? null : room.DepartmentId,
+                        DepartmentName = room.Department == null ? null : room.Department.Name,
+                        Floor = room.Floor,
+                        IsGeneralRoom = room.DepartmentId == null ?false: room.DepartmentId == IdConfig.ID_DEPARTMENT_DA_KHOA,
+                        RoomTypeId = (long)room.RoomTypeId,
+                        RoomNumber = room.RoomNumber,
+                        Note = room.Note,
+                        RoomTypeName = room.RoomType.Name,
+                    };
+                }
                 return doctor;
             }
             #endregion Sau này xóa
@@ -121,6 +139,18 @@ namespace BusinessLayer.Services.Doctor
                 Where(x => x.DoctorId == doctor.Id && x.RoomId == login.RoomId && x.Weekday == now.DayOfWeek
                 && x.Session == (SessionType)currSess).FirstOrDefault();
             if (schedule == null) { return null; }
+            doctor.Room = new RoomViewModel()
+            {
+                Id = room.Id,
+                DepartmentId = room.DepartmentId == null ? null : room.DepartmentId,
+                DepartmentName = room.Department == null ? null : room.Department.Name,
+                Floor = room.Floor,
+                IsGeneralRoom = room.DepartmentId == null ? false : room.DepartmentId == IdConfig.ID_DEPARTMENT_DA_KHOA,
+                RoomTypeId = (long)room.RoomTypeId,
+                RoomNumber = room.RoomNumber,
+                Note = room.Note,
+                RoomTypeName = room.RoomType.Name,
+            };
             return doctor;
         }
     }

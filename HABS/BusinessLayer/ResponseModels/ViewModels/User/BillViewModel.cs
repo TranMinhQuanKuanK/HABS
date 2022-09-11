@@ -21,6 +21,16 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
         public int Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
 
+        //VnPay
+        public int PaymentMethod { get; set; } //0 là tiền mặt, 1 là vnpay
+        public string BankCode { get; set; } // "NCB", "VIETCOMBANK"
+        public string BankName { get; set; } // "Ngân hàng nhà nước Việt Nam"
+        public string BankLogoLink { get; set; } // má từ từ xài cái này, lỗi mẹ r  :'(
+        public string BankTranNo { get; set; } // Mã giao dịch từ ngân hàng
+        public string CardType { get; set; } // Loại thẻ thanh toán
+        public string  VnPayTranNo { get; set; } //Mã giao dịch VnPay
+        public string TransactionStatus { get; set; } //Tình trạng của giao dịch (tra discord)
+
         public string CashierName { get; set; }
         public long? CashierId { get; set; }
         public List<BillDetailViewModel> Details { get; set; }

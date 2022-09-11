@@ -119,13 +119,13 @@ namespace BusinessLayer.Services.Doctor
                 {
                     await _notiService.SendUpdateCheckupInfoReminder(cr.Id, cr.Patient.AccountId);
                 }
-                //không cần cập nhật queue nữa 
-                //if (doneAll)
-                //{
-                //    _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
-                //}
+                //cập nhật cache
                 _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, false);
                 _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, true);
+                if (model.Status == (int)TestRecordStatus.HOAN_THANH)
+                {
+                    _scheduleService.UpdateRedis_FinishedTestQueue((long)tr.RoomId);
+                }
             }
         }
         public async Task ConfirmTest(long doctorId, long tId)

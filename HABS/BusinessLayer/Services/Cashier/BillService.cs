@@ -182,7 +182,7 @@ namespace BusinessLayer.Services.Cashier
                     tempRoomForTest.Add((long)tr.RoomId);
                 }
             }
-            bill.Status = DataAccessLayer.Models.Bill.BillStatus.TT_TIEN_MAT;
+            bill.Status = DataAccessLayer.Models.Bill.BillStatus.DA_TT_TIEN_MAT;
             bill.CashierId = cashierId;
             bill.CashierName = cashier.Name;
 

@@ -14,5 +14,11 @@ namespace BusinessLayer.Interfaces.Doctor
         List<CheckupAppointmentViewModel> GetCheckupQueue(long RoomId);
         List<TestAppointmentViewModel> GetTestQueue(long RoomId, bool isWaitingForResult);
         TestAppointmentViewModel GetItemInTestQueue(long testId);
+        List<CheckupAppointmentViewModel> GetFinishedCheckupQueue(long RoomId);
+        List<CheckupAppointmentViewModel> GetTestingCheckupQueue(long RoomId);
+        List<CheckupAppointmentViewModel> UpdateRedis_FinishedCheckupQueue(long RoomId);
+        List<CheckupAppointmentViewModel> UpdateRedis_TestingCheckupQueue(long RoomId);
+        List<TestRecordViewModel> UpdateRedis_FinishedTestQueue(long RoomId);
+        List<TestRecordViewModel> GetFinishedTestQueue(long RoomId);
     }
 }

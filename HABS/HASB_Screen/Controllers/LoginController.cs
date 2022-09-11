@@ -45,7 +45,7 @@ namespace HASB_Screen.Controllers
                     return Ok(new BaseLoginViewModel<ScreenLoginViewModel>()
                     {
                         Token = tokenString,
-                        Information = room
+                        User = room
                     });
                 }
                 else

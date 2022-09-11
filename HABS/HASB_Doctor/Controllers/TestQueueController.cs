@@ -44,6 +44,20 @@ namespace HASB_Doctor.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [SwaggerOperation(Summary = "Lấy danh sách các xét nghiệm đã hoàn thành")]
+        [HttpGet("finished")]
+        public IActionResult GetFinishedTestQueue([FromQuery] long RoomId)
+        {
+            try
+            {
+                var queue = _scheduleService.GetFinishedTestQueue(RoomId);
+                return Ok(queue);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
         [SwaggerOperation(Summary = "Lấy thông tin một xét nghiệm")]
         [HttpGet("{id}")]
         public IActionResult GetTestQueueItem(long Id)

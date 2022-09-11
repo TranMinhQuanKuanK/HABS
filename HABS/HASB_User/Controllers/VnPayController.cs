@@ -7,6 +7,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace HASB_User.Controllers
 {
@@ -27,17 +28,18 @@ namespace HASB_User.Controllers
 
         [SwaggerOperation(Summary = "Tạo giao dịch thanh toán VnPay")]
         [HttpPost]
-        public IActionResult CreateVnPayRequest([FromBody] VnPayCreateModel model)
+        public async Task<IActionResult> CreateVnPayRequest([FromBody] VnPayCreateModel model)
         {
             try
             {
+                var remoteIpAddress = HttpContext.Connection.RemoteIpAddress.ToString();
                 int accountId = 0;
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 if (identity != null)
                 {
                     accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                var url = _vnPayService.CreateVnPayRequest(model.BillId, accountId);
+                var url = await _vnPayService.CreateVnPayRequest(model.BillId, accountId, remoteIpAddress);
                 return Ok(url);
             }
             catch (Exception e)

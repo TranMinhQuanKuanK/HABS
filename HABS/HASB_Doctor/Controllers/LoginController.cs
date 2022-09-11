@@ -27,7 +27,7 @@ namespace HASB_Doctor.Controllers
         {
             _loginService = service;
         }
-        [SwaggerOperation(Summary = "Đăng nhập bằng mật khẩu/password và id phòng (default \"doctor\"-\"123123\")")]
+        [SwaggerOperation(Summary = "Đăng nhập bằng mật khẩu/password và id phòng (default \"doctor\"-\"123\")")]
         [HttpPost]
         public IActionResult Login([FromBody] LoginModel model)
         {
@@ -43,7 +43,7 @@ namespace HASB_Doctor.Controllers
                 return Ok(new BaseLoginViewModel<DoctorLoginViewModel>()
                 {
                     Token = tokenString,
-                    Information = doc
+                    User = doc
                 });
             }
             else

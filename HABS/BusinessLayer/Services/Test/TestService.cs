@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Constants;
+using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.Services.Redis;
 using DataAccessLayer.Models;
@@ -22,19 +23,23 @@ namespace BusinessLayer.Services.Test
     {
         private readonly Interfaces.User.IScheduleService _scheduleService;
         private readonly Interfaces.Doctor.IScheduleService _scheduleServiceDoctor;
-
         private readonly IDepartmentService _departmentService;
         private readonly IOperationService _operationService;
+        private readonly INumercialOrderService _numService;
         private readonly ILogger<TestService> _logger;
+        private readonly RedisService _redisService;
         public TestService(IUnitOfWork unitOfWork, IDistributedCache distributedCache,
             Interfaces.User.IScheduleService scheduleService,
              IDepartmentService departmentService,
             Interfaces.Doctor.IScheduleService scheduleServiceDoctor,
              IOperationService operationService,
+            INumercialOrderService numService,
               ILogger<TestService> logger
             ) : base(unitOfWork)
         {
+            _redisService = new RedisService(distributedCache);
             _logger = logger;
+            _numService = numService;
             _scheduleServiceDoctor = scheduleServiceDoctor;
             _operationService = operationService;
             _scheduleService = scheduleService;
@@ -137,7 +142,7 @@ namespace BusinessLayer.Services.Test
                 PatientName = patient.Name,
                 //mặc định phòng 10001 test
                 RoomId = 10001,
-                RoomNumber = "002",
+                RoomNumber = "001",
                 Floor = "1",
                 //đã thanh toán luôn
                 Status = CheckupRecordStatus.CHECKED_IN,
@@ -159,7 +164,7 @@ namespace BusinessLayer.Services.Test
                 Content = "Thanh toán viện phí khám tổng quát đa khoa",
                 //tính luôn
                 Total = dakhoaOp.Price,
-                Status = Bill.BillStatus.TT_TIEN_MAT,
+                Status = Bill.BillStatus.DA_TT_TIEN_MAT,
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
                 TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
@@ -271,7 +276,7 @@ namespace BusinessLayer.Services.Test
                 Content = "Thanh toán viện phí khám tổng quát đa khoa",
                 //tính luôn
                 Total = dakhoaOp.Price,
-                Status = Bill.BillStatus.TT_TIEN_MAT,
+                Status = Bill.BillStatus.DA_TT_TIEN_MAT,
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
                 TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
@@ -362,7 +367,7 @@ namespace BusinessLayer.Services.Test
                 PatientName = patient.Name,
                 //mặc định phòng 10001 test
                 RoomId = 10001,
-                RoomNumber = "002",
+                RoomNumber = "001",
                 Floor = "1",
                 //đã thanh toán luôn
                 Status = CheckupRecordStatus.CHO_KQXN,
@@ -405,41 +410,51 @@ namespace BusinessLayer.Services.Test
             //    BillId = bill.Id
             //};
             //await _unitOfWork.BillDetailRepository.Add(bd);
+            var operation = _unitOfWork.OperationRepository
+                .Get()
+                .Where(x => x.Id == 10010)
+                .FirstOrDefault();
+            var room = _unitOfWork.RoomRepository
+               .Get()
+               .Where(x => x.Id == 10008)
+               .FirstOrDefault();
+            var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room, DateTime.Now.AddHours(7));
             TestRecord tr = new TestRecord()
             {
                 QrCode = Guid.NewGuid().ToString(),
                 RoomId = 10008,
-                EstimatedDate = DateTime.Now.AddYears(-2),
-                Date = DateTime.Now.AddYears(-2),
+                EstimatedDate = DateTime.Now,
+                Date = DateTime.Now,
                 Floor = "23",
-                NumericalOrder = 9999,
+                NumericalOrder = numOrd,
                 OperationId = 10010,
                 OperationName = "Xét nghiệm máu",
                 PatientId = patient.Id,
                 PatientName = patient.Name,
                 CheckupRecordId = cr.Id,
-                Status = TestRecord.TestRecordStatus.DA_THANH_TOAN,
+                Status = TestRecord.TestRecordStatus.CHECKED_IN,
             };
             TestRecord tr2 = new TestRecord()
             {
                 QrCode = Guid.NewGuid().ToString(),
                 RoomId = 10008,
-                EstimatedDate = DateTime.Now.AddYears(-2),
-                Date = DateTime.Now.AddYears(-2),
+                EstimatedDate = DateTime.Now,
+                Date = DateTime.Now,
                 Floor = "23",
-                NumericalOrder = 9999,
+                NumericalOrder = numOrd + 1,
                 OperationId = 10011,
                 OperationName = "Xét nghiệm mỡ trong máu",
                 PatientId = patient.Id,
                 PatientName = patient.Name,
                 CheckupRecordId = cr.Id,
-                Status = TestRecord.TestRecordStatus.DA_THANH_TOAN,
+                Status = TestRecord.TestRecordStatus.CHECKED_IN,
             };
             await _unitOfWork.TestRecordRepository.Add(tr2);
             await _unitOfWork.TestRecordRepository.Add(tr);
             await _unitOfWork.SaveChangesAsync();
             _scheduleServiceDoctor.UpdateRedis_CheckupQueue((long)cr.RoomId);
             _scheduleServiceDoctor.UpdateRedis_TestQueue(10007, false);
+            _scheduleServiceDoctor.UpdateRedis_TestQueue(10008, false);
             return newUUid;
         }
         public async Task<string> CreatNewAppointmentWithPreviousTestFinished(long patientId, DateTime date,
@@ -585,6 +600,7 @@ namespace BusinessLayer.Services.Test
             await _unitOfWork.SaveChangesAsync();
             _scheduleServiceDoctor.UpdateRedis_CheckupQueue((long)cr.RoomId);
             _scheduleServiceDoctor.UpdateRedis_TestQueue(10007, false);
+            _scheduleServiceDoctor.UpdateRedis_TestQueue(10008, false);
             return newUUid;
         }
         public async Task RemoveAllPatientThatDay(long roomId)
@@ -599,7 +615,34 @@ namespace BusinessLayer.Services.Test
             }
             await _unitOfWork.SaveChangesAsync();
         }
-        public async Task RemoveAllBill()
+        public void ClearAllCache(long? RoomId)
+        {
+            var roomList = _unitOfWork.RoomRepository.Get().Include(x => x.RoomType)
+            .Where(x => (RoomId == null || RoomId == 0) ? true : x.Id == RoomId)
+            .ToList();
+            foreach (var room in roomList)
+            {
+                if (room.RoomType.Id == IdConfig.ID_ROOMTYPE_PHONG_KHAM)
+                {
+                    //_scheduleServiceDoctor.UpdateRedis_FinishedCheckupQueue(room.Id);
+                    _redisService.RemoveValueToKey($"finished-checkup-queue-for-room-{room.Id}");
+                    //_scheduleServiceDoctor.UpdateRedis_TestingCheckupQueue(room.Id);
+                    _redisService.RemoveValueToKey($"testing-checkup-queue-for-room-{room.Id}");
+                    //_scheduleServiceDoctor.UpdateRedis_CheckupQueue(room.Id);
+                    _redisService.RemoveValueToKey($"checkup-queue-for-room-{room.Id}");
+                }
+                else
+                {
+                    //_scheduleServiceDoctor.UpdateRedis_FinishedCheckupQueue(room.Id);
+                    _redisService.RemoveValueToKey($"finished-test-queue-for-room-{room.Id}");
+                    //_scheduleServiceDoctor.UpdateRedis_TestQueue(room.Id, true);
+                    _redisService.RemoveValueToKey($"test-queue-for-room-{room.Id}-{true}");
+                    //_scheduleServiceDoctor.UpdateRedis_TestQueue(room.Id, false);
+                    _redisService.RemoveValueToKey($"test-queue-for-room-{room.Id}-{false}");
+                }
+            }
+        }
+        public async Task RemoveEverything()
         {
             var billList = _unitOfWork.BillRepository.Get()
                 .ToList();
@@ -620,6 +663,23 @@ namespace BusinessLayer.Services.Test
                 item.Status = TestRecord.TestRecordStatus.DA_XOA;
             }
             await _unitOfWork.SaveChangesAsync();
+            ClearAllCache(null);
+            //var roomList = _unitOfWork.RoomRepository.Get().Include(x => x.RoomType).ToList();
+            //foreach (var room in roomList)
+            //{
+            //    if (room.RoomType.Id == IdConfig.ID_ROOMTYPE_PHONG_KHAM)
+            //    {
+            //        _scheduleServiceDoctor.UpdateRedis_FinishedCheckupQueue(room.Id);
+            //        _scheduleServiceDoctor.UpdateRedis_TestingCheckupQueue(room.Id);
+            //        _scheduleServiceDoctor.UpdateRedis_CheckupQueue(room.Id);
+            //    }
+            //    else
+            //    {
+            //        _scheduleServiceDoctor.UpdateRedis_FinishedCheckupQueue(room.Id);
+            //        _scheduleServiceDoctor.UpdateRedis_TestQueue(room.Id, true);
+            //        _scheduleServiceDoctor.UpdateRedis_TestQueue(room.Id, false);
+            //    }
+            //}
         }
         public async Task CreateAHistory(long patientId, DateTime date,
           long doctorId, int? numericalOrder, string clinicalSymptom, long departmentId)
@@ -667,7 +727,7 @@ namespace BusinessLayer.Services.Test
                 IcdDiseaseName = "Tiêu chảy, viêm dạ dày - ruột",
                 //nhớ cho đơn thuốc
                 Temperature = 23,
-                Pulse=231,
+                Pulse = 231,
                 IsReExam = false,
                 PatientId = patientId,
                 PatientName = patient.Name,
@@ -682,11 +742,11 @@ namespace BusinessLayer.Services.Test
                 EstimatedStartTime = DateTime.Now,
                 DepartmentId = departmentId,
                 DepartmentName = dep.Name,
-                DoctorId =10005,
+                DoctorId = 10005,
                 ClinicalSymptom = clinicalSymptom,
                 DoctorName = "Ngô Trần Thanh Long",
             };
-            
+
             await _unitOfWork.CheckupRecordRepository.Add(cr);
             await _unitOfWork.SaveChangesAsync();
             var pr = new Prescription()
@@ -730,7 +790,7 @@ namespace BusinessLayer.Services.Test
             {
                 Content = "Thanh toán viện phí khám tổng quát đa khoa",
                 Total = dakhoaOp.Price,
-                Status = Bill.BillStatus.TT_TIEN_MAT,
+                Status = Bill.BillStatus.DA_TT_TIEN_MAT,
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
                 TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),

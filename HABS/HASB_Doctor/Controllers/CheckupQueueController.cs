@@ -40,6 +40,34 @@ namespace HASB_Doctor.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [SwaggerOperation(Summary = "Lấy danh sách bệnh án đã khám xong")]
+        [HttpGet("finished")]
+        public IActionResult GetFinishedCheckupQueue([FromQuery] long RoomId)
+        {
+            try
+            {
+                var queue = _scheduleService.GetFinishedCheckupQueue(RoomId);
+                return Ok(queue);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [SwaggerOperation(Summary = "Lấy bệnh án đang chờ xét nghiệm")]
+        [HttpGet("testing")]
+        public IActionResult GetTestingCheckupQueue([FromQuery] long RoomId)
+        {
+            try
+            {
+                var queue = _scheduleService.GetTestingCheckupQueue(RoomId);
+                return Ok(queue);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
         [SwaggerOperation(Summary = "Xác nhận khám cho bệnh nhân trong hàng đợi")]
         [HttpPost("confirm/{id}")]
         public async Task<IActionResult> ConfirmCheckup(long id)

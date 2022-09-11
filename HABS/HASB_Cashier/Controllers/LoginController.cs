@@ -35,7 +35,7 @@ namespace HASB_Cashier.Controllers
                 return Ok(new BaseLoginViewModel<CashierLoginViewModel>()
                 {
                     Token = tokenString,
-                    Information = doc
+                    User = doc
                 });
             }
             else

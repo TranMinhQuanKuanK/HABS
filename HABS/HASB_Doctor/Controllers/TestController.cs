@@ -18,7 +18,6 @@ namespace HASB_Doctor.Controllers
 {
     [Route(DoctorRoute)]
     [ApiController]
-    //[ApiExplorerSettings(GroupName = Role)]
     public class TestController : BaseDoctorController
     {
         private readonly TestService ts;
@@ -31,11 +30,11 @@ namespace HASB_Doctor.Controllers
             _scheduleServce = scheduleServce;
             ts = service;
         }
-        [SwaggerOperation(Summary = "Tạo 3 bệnh nhân đặt khám trong ngày hôm đấy, đã thanh toán, room 10001")]
-        [HttpGet("checkup-book-3")]
+        [SwaggerOperation(Summary = "Tạo 5 bệnh nhân đặt khám trong ngày hôm đấy, đã thanh toán, room 10001")]
+        [HttpGet("checkup-book-5")]
         public async Task<IActionResult> CreateThreePatientsAppointment()
         {
-            _logger.LogInformation("Da tao 3 lich kham");
+            _logger.LogInformation("Da tao 5 lich kham");
             try
             {
                 await ts.CreatNewAppointment(10000,
@@ -44,6 +43,10 @@ namespace HASB_Doctor.Controllers
                     DateTime.Now.AddHours(7), 10007, null, "Sốt cao 39 độ, quá bất ổn luôn");
                 await ts.CreatNewAppointment(10006,
                     DateTime.Now.AddHours(7), 10007, null, "Tự nhiên ra máu hơi nhiều ở vùng lưng");
+                await ts.CreatNewAppointment(10008,
+                   DateTime.Now.AddHours(7), 10007, null, "Đứng dậy là ngồi xuống chứ không thể đứng dậy");
+                await ts.CreatNewAppointment(10008,
+                  DateTime.Now.AddHours(7), 10007, null, "Ngồi xuống là đau lưng, đứng dậy là mất người yêu");
                 return Ok();
             }
             catch (Exception e)
@@ -51,8 +54,8 @@ namespace HASB_Doctor.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [SwaggerOperation(Summary = "Tạo 3 bệnh nhân đặt khám nhưng chưa checkin, room 10001")]
-        [HttpGet("checkup-book-3-without-checkin")]
+        [SwaggerOperation(Summary = "Tạo 5 bệnh nhân đặt khám nhưng chưa checkin, room 10001")]
+        [HttpGet("checkup-book-5-without-checkin")]
         public async Task<IActionResult> CreateThreePatientsAppointmentWithoutCheckin()
         {
             try
@@ -64,9 +67,15 @@ namespace HASB_Doctor.Controllers
                     DateTime.Now.AddHours(7), 10007, null, "Sốt cao 39 độ, quá bất ổn luôn");
                 var qr3 = await ts.CreatNewAppointmentWithoutCheckin(10006,
                     DateTime.Now.AddHours(7), 10007, null, "Tự nhiên ra máu hơi nhiều ở vùng lưng");
+                var qr4 = await ts.CreatNewAppointment(10008,
+                  DateTime.Now.AddHours(7), 10007, null, "Đứng dậy là ngồi xuống chứ không thể đứng dậy");
+                var qr5 = await ts.CreatNewAppointment(10013,
+                  DateTime.Now.AddHours(7), 10007, null, "Ngồi xuống là đau lưng, đứng dậy là mất người yêu");
                 QrList.Add(qr1);
                 QrList.Add(qr2);
                 QrList.Add(qr3);
+                QrList.Add(qr4);
+                QrList.Add(qr5);
                 return Ok(QrList);
             }
             catch (Exception e)
@@ -74,7 +83,7 @@ namespace HASB_Doctor.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [SwaggerOperation(Summary = "Tạo 1 bệnh nhân đã xong hết KQXN nhưng chưa checkin quay về, room 10001")]
+        [SwaggerOperation(Summary = "Tạo 1 bệnh nhân đã có KQXN nhưng CHƯA CHECKIN quay về (trả QR để checkin), room 10001")]
         [HttpGet("book-comeback")]
         public async Task<IActionResult> CreatePatientComeback()
         {
@@ -89,16 +98,22 @@ namespace HASB_Doctor.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [SwaggerOperation(Summary = "Tạo 2 bệnh nhân đã được đưa vào phòng chờ xét nghiệm, room 10001")]
-        [HttpGet("test-book-2")]
+        [SwaggerOperation(Summary = "Tạo 5 bệnh nhân chuẩn bị xét nghiệm, đã checkin, phòng xét nghiệm 115 tầng 3")]
+        [HttpGet("test-book-5")]
         public async Task<IActionResult> CreateTwoPatientsIntoExamRoom()
         {
             try
             {
-                await ts.CreatNewAppointmentWithPreviousTest(10006,
+                await ts.CreatNewAppointmentWithPreviousTest(10000,
                    DateTime.Now.AddHours(7), 10007, null, "Khóc la om sòm vì mãi không chạy được");
-                await ts.CreatNewAppointmentWithPreviousTest(10006,
+                await ts.CreatNewAppointmentWithPreviousTest(10003,
                  DateTime.Now.AddHours(7), 10007, null, "Bực quá vậy ta?");
+                await ts.CreatNewAppointmentWithPreviousTest(10006,
+                 DateTime.Now.AddHours(7), 10007, null, "Ngồi xuống là đau lưng, đứng dậy là mất người yêu");
+                await ts.CreatNewAppointmentWithPreviousTest(10008,
+                 DateTime.Now.AddHours(7), 10007, null, "Ói mửa lung tung, khóc la om xòm, con tôi quấy khóc quá");
+                await ts.CreatNewAppointmentWithPreviousTest(10013,
+                 DateTime.Now.AddHours(7), 10007, null, "Sốt cao 39 độ, quá bất ổn luôn");
                 return Ok();
             }
             catch (Exception e)
@@ -108,11 +123,11 @@ namespace HASB_Doctor.Controllers
         }
         [SwaggerOperation(Summary = "Xóa everything !!! Dangerous!!!")]
         [HttpGet("clear-everything")]
-        public async Task<IActionResult> df()
+        public async Task<IActionResult> RemoveEverything()
         {
             try
             {
-                await ts.RemoveAllBill();
+                await ts.RemoveEverything();
                 return Ok();
             }
             catch (Exception e)
@@ -123,7 +138,7 @@ namespace HASB_Doctor.Controllers
 
         [SwaggerOperation(Summary = "Tạo 5 bệnh án cho Trần Minh Quân")]
         [HttpGet("make-quan-sick")]
-        public async Task<IActionResult> dfdfdsdsfdf()
+        public async Task<IActionResult> CreateFiveHistoryForQuan()
         {
             try
             {
@@ -156,13 +171,13 @@ namespace HASB_Doctor.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Refresh queue của phòng 10001 nếu có gì sai sót")]
+        [SwaggerOperation(Summary = "Clear all cache, or specific room")]
         [HttpGet("refresh-queue")]
-        public async Task<IActionResult> reset()
+        public IActionResult ResetCache([FromQuery] long RoomId)
         {
             try
             {
-                _scheduleServce.UpdateRedis_CheckupQueue(10001);
+                ts.ClearAllCache(RoomId);
                 return Ok();
             }
             catch (Exception e)

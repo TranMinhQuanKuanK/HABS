@@ -68,6 +68,7 @@ namespace BusinessLayer.Services.Screen
                 //cập nhật queue
                 if (cr.RoomId != null)
                 {
+                    _scheduleService.UpdateRedis_TestingCheckupQueue((long)cr.RoomId);
                     _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
                 }
                 //remind mobile

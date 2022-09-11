@@ -46,6 +46,7 @@ namespace BusinessLayer.Services.Doctor
             _departmentService = departmentService;
             _redisService = new RedisService(_distributedCache);
         }
+        //Lấy metadata của các bệnh án trong khoảng thời gian
         public List<PatientRecordMetadataViewModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime,
             DateTime? toTime, long? departmentId)
         {
@@ -88,6 +89,7 @@ namespace BusinessLayer.Services.Doctor
                ).OrderByDescending(x=>x.Date).ToList();
             return data;
         }
+        //Lấy thông tin chi tiết của một bệnh án
         public PatientRecordFullDataViewModel GetCheckupRecordFullData(long recordId)
         {
             PatientRecordFullDataViewModel data = new PatientRecordFullDataViewModel();
@@ -181,6 +183,7 @@ namespace BusinessLayer.Services.Doctor
                 }).FirstOrDefault();
             return data;
         }
+        //Tạo đơn thuốc cho bệnh nhân
         public async Task CreatePrescription(long recordId, PrescriptionCreateModel model)
         {
             //kiểm tra CR
@@ -245,6 +248,7 @@ namespace BusinessLayer.Services.Doctor
             presc.Note = model.Note;
             await _unitOfWork.SaveChangesAsync();
         }
+        //Chuyển khoa bệnh nhân
         public async Task<List<RedirectViewModel>> RedirectPatient(RedirectCreateModel model, long recordId)
         {
             List<RedirectViewModel> result = new List<RedirectViewModel>();
@@ -287,6 +291,7 @@ namespace BusinessLayer.Services.Doctor
                 PatientId = patient.Id,
                 PhoneNo = patient.PhoneNumber,
                 AccountPhoneNo = patient.AccountPhoneNo,
+                PaymentMethod= PaymentMethodEnum.TIEN_MAT
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
@@ -371,10 +376,12 @@ namespace BusinessLayer.Services.Doctor
             bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
             await _unitOfWork.SaveChangesAsync();
 
+            _scheduleService.UpdateRedis_FinishedCheckupQueue((long)cr.RoomId);
             _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
             await _notiService.SendDepartmentChangeNoti(listDepartmentResp, patient.AccountId);
             return result;
         }
+        //Yêu cầu xét nghiệm
         public async Task<List<IncomingTestResponseModel>> RequestExamination(long recordId, TestRequestCreateModel testReqModel)
         {
             var cr = _unitOfWork.CheckupRecordRepository.Get()
@@ -388,12 +395,13 @@ namespace BusinessLayer.Services.Doctor
             Bill bill = new Bill()
             {
                 Status = BillStatus.CHUA_TT,
-                Content = "Hóa đơn thanh toán viện phí cho bệnh nhân " + patient.Name + " cho " + testReqModel.ExamOperationIds.Count + " mục.",
+                Content = "Thanh toán viện phí cho bệnh nhân " + patient.Name + " cho " + testReqModel.ExamOperationIds.Count + " mục.",
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
                 PatientId = patient.Id,
                 PhoneNo = patient.PhoneNumber,
                 AccountPhoneNo = patient.AccountPhoneNo,
+                PaymentMethod = PaymentMethodEnum.TIEN_MAT
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
@@ -463,10 +471,14 @@ namespace BusinessLayer.Services.Doctor
             cr.Status = CheckupRecordStatus.CHO_THANH_TOAN_PHI_XN;
             bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
             await _unitOfWork.SaveChangesAsync();
+
+            ///update cache
+            _scheduleService.UpdateRedis_TestingCheckupQueue((long)cr.RoomId);
             _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
             await _notiService.SendUpdateCheckupInfoReminder(cr.Id, patient.AccountId);
             return result;
         }
+        //Edit bệnh án
         public async Task EditCheckupRecord(CheckupRecordEditModel model)
         {
             var cr = _unitOfWork.CheckupRecordRepository.Get()
@@ -531,10 +543,13 @@ namespace BusinessLayer.Services.Doctor
                   || model.Status == (int)CheckupRecordStatus.NHAP_VIEN
                   )
             {
+                //sau improve thành chỉ xóa một item thay vì fetch hết lại
+                _scheduleService.UpdateRedis_FinishedCheckupQueue((long)cr.RoomId);
                 _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
                 await _notiService.SendUpdateCheckupInfoReminder(cr.Id, patient.AccountId);
             }
         }
+        //Bắt đầu khám cho một bệnh án
         public async Task ConfirmCheckup(long crId, long? doctorId)
         {
             var cr = _unitOfWork.CheckupRecordRepository.Get().Where(x => x.Id == crId).FirstOrDefault();
@@ -582,6 +597,7 @@ namespace BusinessLayer.Services.Doctor
             _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
             //Cập nhật lại cache hàng đợi tương ứng của phòng trong cr
         }
+        //Tạo một bệnh án tái khám cho bệnh nhân
         public async Task CreateReExamCheckupRecord(long previousCrId, long doctorId, ReExamCreateModel model)
         {
             //không cần kiểm tra id bác sĩ
@@ -638,6 +654,7 @@ namespace BusinessLayer.Services.Doctor
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
                 AccountPhoneNo = patient.Account.PhoneNumber,
+                PaymentMethod = PaymentMethodEnum.TIEN_MAT
             };
             await _unitOfWork.BillRepository.Add(bill);
             //tạo mới CR

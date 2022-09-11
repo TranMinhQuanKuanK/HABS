@@ -47,7 +47,7 @@ namespace HASB_Doctor.Controllers
                 int totalItem = data.Count;
                 if (totalItem == 0)
                 {
-                    return NotFound();
+                    return NoContent();
                 }
 
                 data = data.Skip((paging.PageIndex - 1) * paging.PageSize)

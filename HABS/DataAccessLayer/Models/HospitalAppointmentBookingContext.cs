@@ -72,6 +72,8 @@ namespace DataAccessLayer.Models
             {
                 entity.ToTable("Bill");
 
+                entity.Property(e => e.PayDate).HasColumnType("datetime");
+
                 entity.Property(e => e.TimeCreated).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Cashier)

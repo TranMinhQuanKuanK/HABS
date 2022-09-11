@@ -109,7 +109,7 @@ namespace HASB_User.Controllers
                     return Ok(new BaseLoginViewModel<UserLoginViewModel>()
                     {
                         Token = tokenString,
-                        Information = user
+                        User = user
                     });
                 }
                 else
