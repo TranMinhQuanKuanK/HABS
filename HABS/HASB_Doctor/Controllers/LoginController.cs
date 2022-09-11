@@ -43,7 +43,7 @@ namespace HASB_Doctor.Controllers
                 return Ok(new BaseLoginViewModel<DoctorLoginViewModel>()
                 {
                     Token = tokenString,
-                    User = doc
+                    Information = doc
                 });
             }
             else

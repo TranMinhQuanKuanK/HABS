@@ -142,7 +142,7 @@ namespace HASB_Cashier
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            //doctor app
+            //cashier app
             services.AddTransient<IBillService, BillService>();
             services.AddTransient<ILoginService, LoginService>();
             services.AddTransient<IScheduleService, ScheduleService>();

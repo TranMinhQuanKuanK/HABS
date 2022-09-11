@@ -18,7 +18,7 @@ namespace BusinessLayer.Constants
         {
             get
             {
-                return int.Parse(_cfgService.GetValueFromConfig("ExpireTime"));
+                return int.Parse(_cfgService.GetValueFromConfig("VNPAY_EXPIRE_TIME"));
             }
             set
             {

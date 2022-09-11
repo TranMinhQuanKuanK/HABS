@@ -1,3 +1,4 @@
+using BusinessLayer.Constants;
 using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Interfaces.Notification;
 using BusinessLayer.Interfaces.Payment;
@@ -137,11 +138,15 @@ namespace HASB_User
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            //config
+            services.AddTransient<VnPayConfig, VnPayConfig>();
+            services.AddTransient<ConfigService, ConfigService>();
             //user app
             services.AddTransient<ICheckupRecordService, CheckupRecordService>();
             services.AddTransient<IDoctorService, DoctorService>();
             services.AddTransient<IPatientService, PatientService>();
             services.AddTransient<IScheduleService, ScheduleService>();
+
             services.AddTransient<ILoginService, LoginService>();
             services.AddTransient<BusinessLayer.Interfaces.Doctor.IDepartmentService, 
                 BusinessLayer.Services.Doctor.DepartmentService>();

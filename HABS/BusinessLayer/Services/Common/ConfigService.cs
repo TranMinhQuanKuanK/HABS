@@ -21,6 +21,7 @@ using BusinessLayer.RequestModels.SearchModels.Doctor;
 using DataAccessLayer.Models;
 using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Constants;
+using BusinessLayer.ResponseModels.ViewModels.Admin;
 
 namespace BusinessLayer.Services.Common
 {
@@ -33,19 +34,56 @@ namespace BusinessLayer.Services.Common
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
-        public string UpdateRedis_Config(string cfgKey, ConfigObjecT???)
+        private string UpdateRedis_Config(string cfgKey)
         {
-
-            return "???";
+            string redisKey = $"config-{cfgKey}";
+            var cfgValue = _unitOfWork.ConfigRepository.Get().Where(x => x.Key == cfgKey).FirstOrDefault();
+            _redisService.SetValueToKey(redisKey, cfgValue.Value);
+            return cfgValue.Value;
         }
         public string GetValueFromConfig(string cfgKey)
         {
-            //lấy config từ database và trả về hoặc lấy từ redis
-            return "???";
+            string resultValue;
+            string redisKey = $"config-{cfgKey}";
+            string dataFromRedis = _redisService.GetValueFromKey(redisKey);
+            if (!String.IsNullOrEmpty(dataFromRedis))
+            {
+                resultValue = dataFromRedis;
+            }
+            else
+            {
+                resultValue = UpdateRedis_Config(cfgKey);
+            }
+
+            return resultValue;
         }
-        public void EditConfigValue(string cfgKey, string value)
+        public List<ConfigViewModel> GetConfigsList()
         {
-            //lấy config từ database và trả về
+            //get config list
+            var configList = _unitOfWork.ConfigRepository
+                .Get()
+                .Select(x => new ConfigViewModel()
+                {
+                    Id = x.Id,
+                    Description = x.Description,
+                    Key = x.Key,
+                    Name = x.Name,
+                    Type = x.Type == null ? 0 : (int)x.Type,
+                    Value = x.Value,
+                })
+                .ToList();
+            return configList;
+        }
+        public async Task EditConfigValue(string cfgKey, string value)
+        {
+            var config = _unitOfWork.ConfigRepository.Get().Where(x => x.Key == cfgKey).FirstOrDefault();
+            if (config == null)
+            {
+                throw new Exception("Config key doesn't exist");
+            }
+            config.Value = value;
+            await _unitOfWork.SaveChangesAsync();
+            UpdateRedis_Config(cfgKey);
         }
     }
 }

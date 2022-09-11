@@ -20,8 +20,10 @@ namespace BusinessLayer.Services.Payment.VnPay
 {
     public class VnPayService : BaseService, IVnPayService
     {
-        public VnPayService(IUnitOfWork unitOfWork) : base(unitOfWork)
+        private readonly VnPayConfig _vnpayConfig;
+        public VnPayService(IUnitOfWork unitOfWork, VnPayConfig vnpayConfig) : base(unitOfWork)
         {
+            _vnpayConfig = vnpayConfig;
         }
         public async Task<string> CreateVnPayRequest(long billId, long accountId, string remoteIpAddress)
         {
@@ -41,7 +43,7 @@ namespace BusinessLayer.Services.Payment.VnPay
             long ORDER_ID = billId; // Giả lập mã giao dịch merchant gửi cho VNPAY
             long AMOUNT = bill.Total; // Số tiền cần thanh toán
             DateTime CREATED_DATE = DateTime.Now.AddHours(7); // Thời gian tạo hóa đơn
-            int EXPIRED_MIN = VnPayConfig.ExpireTime; // Thời gian tối đa để thanh toán trước khi hết hạn.
+            int EXPIRED_MIN = _vnpayConfig.ExpireTime; // Thời gian tối đa để thanh toán trước khi hết hạn.
             string MOBILE = bill.PhoneNo; // SĐT bệnh nhân 
             string FULL_NAME = bill.PatientName; // Tên bệnh nhân
 

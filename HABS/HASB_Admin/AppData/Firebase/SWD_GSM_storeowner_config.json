@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "hospitalmanagement-42da9",
+  "private_key_id": "199846d82224aacb7f4c865d9101f64cb3da8c1d",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCeWg8L1tSC1tM2\nFMFZwvhvLv8lVx7KBuI+QCDQ03w7u/C5hDf8zB3W6THIoaR7uaoVS3mimLnagoPu\nfuhRBVGxsK0uyoRriy8EiRtipKvzRpKuVARrgfdPat53JKpC7u9km6T+fakp6YXe\nhB1QkODVlMm/Zc3i4DBOprS/igRaUtao/PVqNyXv20hKA8lY2WI3tLlY1neBl1d+\n6o9gvAzmVYKVcnvqG9QrsliYPluXsbdPrnjVT+D31MCMzgIqrQ08ZuVkhNHD5zqi\nPJmXmQdWtZWkWqHJxhg1vOeH+zKs9hoP1y2++kHggFSZzgtNY+A1+lb5THsj9N7x\n1rY6fOpNAgMBAAECggEAPPUlOqUCHLXvC7AUuGWuNjrMvIabkyDwQg90sn7fIa2Z\nHwlPdjDrQbp2UCotg/V2jIkH83hAf2XjvNE8xEe8aZ8+I7eRH0cum9vd32zNxrJB\nr/sm0m3vErLsncfPBUIuhLfH3bHpB3neb0jDciq7amzC9zuM9MvhvL0+8kcCovQK\nWkRAd/5fgrIZ8iENKELcRzk/sy7pyfzBZgUflfxVhdGAnm3ayghzoInbuBWGxCuC\nHHN8r3MfS2iWegY0343OP7ra8w9IBL1zGXWty10zFSWCwqXTGHOOJE0qjKWc701L\nXVdfofDUjSs+By+LeCuoTxLYiWHlbWLGGHwCK1GYrwKBgQDWqIF0oIky0fGz5nm9\n2nYnuJsf+rPN/5l5eXzQ9v1+z4OpTLUeOJoYjq3pRkaHpil9i/LMX6T+939ZEQQU\n6uv48XxXYf3QqSUZUe/SdkHwZ/zW6P9bsmQuqeioRgYohQU0EUBW7sF256LWhvSb\n8Y4O5PLmtUcDul/cr1/V/Jp0awKBgQC82WyyIvEAsCdMg3PPMg9OJAXmIzBYkwSv\n+F0m5z8Uf4TSVDI8Gh9dH0m1IPmCQEMLPBlNDki/CeNxC9PCrwmO2xuPHzIypfVr\nylVCJRwmWQX6C8hmZG8iGndGPvT/jZGJtC6bVk2PLe/73WNHXwz1QXjEW9e8FhAk\nEAV0FXsKJwKBgQDM40W9ZkXOZinIRyLIni7NNx2J5qec5m09T0JdyoKnebb376mo\n0On0qqtAz70eWPGdTelQPbKlUuMQxncY6CqYERdX6MZ1Vh19D4JTZmEF8JubHgYv\nJhUNnUve4geawWz4B8dbssSik/IPxfzQpD2t5cYbg8fmvQwm/pYBD/z1RQKBgBY2\nySdnHsxC7Ex+xfegXtaFPEBm8T/qA0ojv+lcmDn0Cg6nosUZGYldrdDlkRP2NSy0\nJBHBVWNLaXqZto4XAtvQADzkoYX9qZHFWiQOs3H7VM2l5yvMMppjXJZhv3X0FCOL\nk1PoYfUupSUOVKhHkQGkcu0+FHFmcv2a+Nk/0ZpPAoGAfqB5iY8LJlkbEyQAISsL\noJPGakPTz0RaiX9HdjUIXRqLV57AuzF5J0Be2sxfZG4Wq4i7cmaY70N+zIUdHMy+\nefekRFnswhp9RXD5g8WyebLigTE73br7j06jMQAGE4f9oxqZg0FLP3mwcUhJpl97\nhccm+vEBQOd9aWWu6pd4kxM=\n-----END PRIVATE KEY-----\n",
+  "client_email": "hospitalmanagement-42da9@appspot.gserviceaccount.com",
+  "client_id": "103852993132124948850",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/hospitalmanagement-42da9%40appspot.gserviceaccount.com"
+}

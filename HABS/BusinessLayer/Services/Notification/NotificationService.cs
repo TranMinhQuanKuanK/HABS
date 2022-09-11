@@ -53,9 +53,9 @@ namespace BusinessLayer.Services.Notification
             {
                 Data = listDepartment,
                 Type = GeneralFirebaseNotificationModel<List<DepartmentChangeNoti>>
-                        .NotiType.CheckupStatusChangeReminder
+                        .NotiType.DepartmentChangeReminder
             };
-            await sendNotification(data, "", "Trạng thái khám thay đổi", "Trạng thái khám đã thay đổi.", accountId);
+            await sendNotification(data, "", "Thông báo chuyển khoa", "Thông báo chuyển khoa.", accountId);
         }
         private async Task sendNotification(object data, string topic, string title, string body, long accountId)
         {

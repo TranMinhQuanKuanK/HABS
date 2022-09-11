@@ -12,9 +12,8 @@ namespace DataAcessLayer
     {
         private readonly HospitalAppointmentBookingContext _dbContext;
 
-
-
         public IGenericRepository<Account> AccountRepository { get; }
+        public IGenericRepository<Config> ConfigRepository { get; }
         public IGenericRepository<Bill> BillRepository { get; }
         public IGenericRepository<BillDetail> BillDetailRepository { get; }
         public IGenericRepository<Cashier> CashierRepository { get; }
@@ -36,6 +35,7 @@ namespace DataAcessLayer
         public UnitOfWork(HospitalAppointmentBookingContext dbContext,
             IGenericRepository<Account> accountRepository,
             IGenericRepository<Bill> billRepository,
+            IGenericRepository<Config> configRepository,
             IGenericRepository<BillDetail> billDetailRepository,
             IGenericRepository<Cashier> cashierRepository,
             IGenericRepository<CheckupRecord> checkupRecordRepository,
@@ -59,6 +59,7 @@ namespace DataAcessLayer
 
             AccountRepository = accountRepository;
             BillRepository = billRepository;
+            ConfigRepository = configRepository;
             BillDetailRepository = billDetailRepository;
             CashierRepository = cashierRepository;
             CheckupRecordRepository = checkupRecordRepository;

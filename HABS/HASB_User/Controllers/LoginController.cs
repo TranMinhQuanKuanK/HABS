@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Interfaces.Notification;
+﻿using BusinessLayer.Constants;
+using BusinessLayer.Interfaces.Notification;
 using BusinessLayer.Interfaces.User;
 using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.CreateModels;
@@ -26,7 +27,6 @@ namespace HASB_User.Controllers
 
         private readonly ILoginService _loginService;
         private readonly IFCMTokenService _fcmService;
-
 
         public LoginController(ILoginService service, IFCMTokenService fcmService)
         {
@@ -109,7 +109,7 @@ namespace HASB_User.Controllers
                     return Ok(new BaseLoginViewModel<UserLoginViewModel>()
                     {
                         Token = tokenString,
-                        User = user
+                        Information = user
                     });
                 }
                 else

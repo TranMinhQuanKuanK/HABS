@@ -22,6 +22,7 @@ namespace DataAccessLayer.Models
         public virtual DbSet<BillDetail> BillDetails { get; set; }
         public virtual DbSet<Cashier> Cashiers { get; set; }
         public virtual DbSet<CheckupRecord> CheckupRecords { get; set; }
+        public virtual DbSet<Config> Configs { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Doctor> Doctors { get; set; }
         public virtual DbSet<FcmTokenMobile> FcmTokenMobiles { get; set; }
@@ -163,6 +164,15 @@ namespace DataAccessLayer.Models
                     .WithMany(p => p.CheckupRecords)
                     .HasForeignKey(d => d.RoomId)
                     .HasConstraintName("FK__CheckupRe__RoomI__4E88ABD4");
+            });
+
+            modelBuilder.Entity<Config>(entity =>
+            {
+                entity.ToTable("Config");
+
+                entity.Property(e => e.Key).IsRequired();
+
+                entity.Property(e => e.Value).IsRequired();
             });
 
             modelBuilder.Entity<Department>(entity =>

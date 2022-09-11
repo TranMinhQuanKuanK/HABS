@@ -13,7 +13,6 @@
     <Folder Include="ResponseModels\ErrorModels\Doctor\" />
     <Folder Include="ResponseModels\ErrorModels\Screen\" />
     <Folder Include="ResponseModels\ErrorModels\User\" />
-    <Folder Include="ResponseModels\ViewModels\Admin\" />
     <Folder Include="ResponseModels\ViewModels\Payment\VnPay\" />
     <Folder Include="Services\Admin\" />
   </ItemGroup>

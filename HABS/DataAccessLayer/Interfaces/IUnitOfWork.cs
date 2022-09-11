@@ -11,6 +11,7 @@ namespace DataAcessLayer.Interfaces
     {
         IGenericRepository<Account> AccountRepository { get; }
         IGenericRepository<Bill> BillRepository { get; }
+        IGenericRepository<Config> ConfigRepository { get; }
         IGenericRepository<BillDetail> BillDetailRepository { get; }
         IGenericRepository<Cashier> CashierRepository { get; }
         IGenericRepository<CheckupRecord> CheckupRecordRepository { get; }
