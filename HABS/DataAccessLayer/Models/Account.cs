@@ -10,7 +10,8 @@ namespace DataAccessLayer.Models
         public enum UserStatus
         {
             BINH_THUONG,
-            DA_XOA
+            DA_XOA,
+            CHUA_XAC_THUC_OTP
         }
         public Account()
         {

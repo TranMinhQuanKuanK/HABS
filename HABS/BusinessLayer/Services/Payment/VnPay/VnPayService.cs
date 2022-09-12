@@ -35,10 +35,10 @@ namespace BusinessLayer.Services.Payment.VnPay
             }
             //xét status
 
-            string vnp_Returnurl = VnPayConfig.VnpReturnurl; //Redirect đến URL này sau khi giao dịch được thực hiện. Code một trang riêng để thông báo kết quả thanh toán cho bệnh nhân.
-            string vnp_Url = VnPayConfig.VnpUrl; //URL thanh toán của VNPAY.
-            string vnp_TmnCode = VnPayConfig.VnpTmnCode; //Mã website
-            string vnp_HashSecret = VnPayConfig.VnpHashSecret; //Key để hash
+            string vnp_Returnurl = _vnpayConfig.VnpReturnurl; //Redirect đến URL này sau khi giao dịch được thực hiện. Code một trang riêng để thông báo kết quả thanh toán cho bệnh nhân.
+            string vnp_Url = _vnpayConfig.VnpUrl; //URL thanh toán của VNPAY.
+            string vnp_TmnCode = _vnpayConfig.VnpTmnCode; //Mã website
+            string vnp_HashSecret = _vnpayConfig.VnpHashSecret; //Key để hash
 
             long ORDER_ID = billId; // Giả lập mã giao dịch merchant gửi cho VNPAY
             long AMOUNT = bill.Total; // Số tiền cần thanh toán
@@ -77,7 +77,7 @@ namespace BusinessLayer.Services.Payment.VnPay
         {
             var formContent = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("tmn_code", VnPayConfig.VnpTmnCode),
+                new KeyValuePair<string, string>("tmn_code", _vnpayConfig.VnpTmnCode),
             });
             HttpClient client = new HttpClient();
             var response = await client.PostAsync(
@@ -100,7 +100,7 @@ namespace BusinessLayer.Services.Payment.VnPay
                     vnpay.AddResponseData(s, requestNameValue[s]);
                 }
             }
-            bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, VnPayConfig.VnpHashSecret);
+            bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, _vnpayConfig.VnpHashSecret);
             if (checkSignature)
             {
                 long billId = long.Parse(vnp_txnRef);

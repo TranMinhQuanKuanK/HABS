@@ -74,16 +74,16 @@ namespace BusinessLayer.Services.Common
                 .ToList();
             return configList;
         }
-        public async Task EditConfigValue(string cfgKey, string value)
+        public async Task EditConfigValue(long id, string value)
         {
-            var config = _unitOfWork.ConfigRepository.Get().Where(x => x.Key == cfgKey).FirstOrDefault();
+            var config = _unitOfWork.ConfigRepository.Get().Where(x => x.Id == id).FirstOrDefault();
             if (config == null)
             {
                 throw new Exception("Config key doesn't exist");
             }
             config.Value = value;
             await _unitOfWork.SaveChangesAsync();
-            UpdateRedis_Config(cfgKey);
+            UpdateRedis_Config(config.Key);
         }
     }
 }

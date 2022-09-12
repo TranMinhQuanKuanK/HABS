@@ -20,16 +20,41 @@ namespace BusinessLayer.Constants
             {
                 return int.Parse(_cfgService.GetValueFromConfig("VNPAY_EXPIRE_TIME"));
             }
-            set
+        }
+        public string VnpUrl
+        {
+            get
             {
-                ExpireTime = value;
+                return _cfgService.GetValueFromConfig("VNPAY_URL");
             }
         }
-        public static string VnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        public static string Querydr = "http://sandbox.vnpayment.vn/merchant_webapi/merchant.html";
-        public static string VnpTmnCode = "XIYQEJD5";
-        public static string VnpHashSecret = "XUDKXJIVPEMSMPBEMUYSWLXBEYSQOFCI";
-        public static string VnpReturnurl = "https://fap.fpt.edu.vn/";
+        //public static string VnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+        public string VnpTmnCode
+        {
+            get
+            {
+                return _cfgService.GetValueFromConfig("VNPAY_TMN_CODE");
+            }
+        }
+        //public static string VnpTmnCode = "XIYQEJD5";
+
+        public string VnpHashSecret
+        {
+            get
+            {
+                return _cfgService.GetValueFromConfig("VNPAY_HASH_SECRET");
+            }
+        }
+        //public static string VnpHashSecret = "XUDKXJIVPEMSMPBEMUYSWLXBEYSQOFCI";
+
+        public string VnpReturnurl
+        {
+            get
+            {
+                return _cfgService.GetValueFromConfig("VNPAY_RETURN_URL");
+            }
+        }
+        //public static string VnpReturnurl = "https://fap.fpt.edu.vn/";
 
       
     }

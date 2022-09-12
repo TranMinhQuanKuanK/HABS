@@ -37,7 +37,12 @@ namespace BusinessLayer.Services.User
         private readonly IDepartmentService _departmentService;
         private readonly IOperationService _operationService;
         private readonly INumercialOrderService _numService;
-
+        //config 
+        private readonly WorkingShiftConfig _workingShiftConfig;
+        int BeginMorningShiftHour, BeginMorningShiftMinute, EndMorningShiftHour, EndMorningShiftMinute,
+            BeginEveningShiftHour, BeginEveningShiftMinute, EndEveningShiftHour, EndEveningShiftMinute,
+            BeginAfternoonShiftHour, BeginAfternoonShiftMinute, EndAfternoonShiftHour, EndAfternoonShiftMinute,
+            LoginTimeBeforeWorkingShift;
 
         private readonly RedisService _redisService;
         public CheckupRecordService(IUnitOfWork unitOfWork, IDistributedCache distributedCache,
@@ -45,9 +50,11 @@ namespace BusinessLayer.Services.User
             Interfaces.Doctor.IScheduleService scheduleServiceDoctor,
              IDepartmentService departmentService,
              IOperationService operationService,
-            INumercialOrderService numService
+            INumercialOrderService numService,
+            WorkingShiftConfig workingShiftConfig
             ) : base(unitOfWork)
         {
+            _workingShiftConfig = workingShiftConfig;
             _scheduleServiceDoctor = scheduleServiceDoctor;
             _numService = numService;
             _operationService = operationService;
@@ -55,6 +62,20 @@ namespace BusinessLayer.Services.User
             _redisService = new RedisService(_distributedCache);
             _scheduleService = scheduleService;
             _departmentService = departmentService;
+             //init config
+            BeginMorningShiftHour = _workingShiftConfig.BeginAfternoonShiftHour;
+            BeginMorningShiftMinute = _workingShiftConfig.BeginAfternoonShiftMinute;
+            EndMorningShiftHour = _workingShiftConfig.EndMorningShiftHour;
+            EndMorningShiftMinute = _workingShiftConfig.EndMorningShiftMinute;
+            BeginEveningShiftHour = _workingShiftConfig.BeginEveningShiftHour;
+            BeginEveningShiftMinute = _workingShiftConfig.BeginEveningShiftMinute;
+            EndEveningShiftHour = _workingShiftConfig.EndEveningShiftHour;
+            EndEveningShiftMinute = _workingShiftConfig.EndEveningShiftMinute;
+            BeginAfternoonShiftHour = _workingShiftConfig.BeginAfternoonShiftHour;
+            BeginAfternoonShiftMinute = _workingShiftConfig.BeginAfternoonShiftMinute;
+            EndAfternoonShiftHour = _workingShiftConfig.EndAfternoonShiftHour;
+            EndAfternoonShiftMinute = _workingShiftConfig.EndAfternoonShiftMinute;
+            LoginTimeBeforeWorkingShift = _workingShiftConfig.LoginTimeBeforeWorkingShift;
         }
         public List<PatientRecordMetadataResponseModel> GetCheckupRecordMetadata(long? patientId, DateTime? fromTime, DateTime? toTime,
             long? departmentId, long accountId)
@@ -555,19 +576,19 @@ namespace BusinessLayer.Services.User
         {
             SessionType? session = null;
             var beginMorningShift = new DateTime(time.Year, time.Month, time.Day,
-                WorkingShiftConfig.BeginMorningShiftHour, WorkingShiftConfig.BeginMorningShiftMinute, 0);
+                BeginMorningShiftHour, BeginMorningShiftMinute, 0);
             var endMorningShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConfig.EndMorningShiftHour, WorkingShiftConfig.EndMorningShiftMinute, 0);
+               EndMorningShiftHour, EndMorningShiftMinute, 0);
 
             var beginEveningShift = new DateTime(time.Year, time.Month, time.Day,
-                WorkingShiftConfig.BeginEveningShiftHour, WorkingShiftConfig.BeginEveningShiftMinute, 0);
+                BeginEveningShiftHour, BeginEveningShiftMinute, 0);
             var endEveningShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConfig.EndEveningShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
+               EndEveningShiftHour, EndAfternoonShiftMinute, 0);
 
             var beginAfternoonShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConfig.BeginAfternoonShiftHour, WorkingShiftConfig.BeginAfternoonShiftMinute, 0);
+               BeginAfternoonShiftHour, BeginAfternoonShiftMinute, 0);
             var endAfternoonShift = new DateTime(time.Year, time.Month, time.Day,
-               WorkingShiftConfig.EndAfternoonShiftHour, WorkingShiftConfig.EndAfternoonShiftMinute, 0);
+               EndAfternoonShiftHour, EndAfternoonShiftMinute, 0);
 
             if (time >= beginMorningShift && time <= endMorningShift)
             {

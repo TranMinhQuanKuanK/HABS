@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Interfaces.Cashier;
+using BusinessLayer.RequestModels.CreateModels.Admin;
 using BusinessLayer.RequestModels.SearchModels.Cashier;
 using BusinessLayer.Services.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -34,28 +35,14 @@ namespace HASB_Admin.Controllers
                 return BadRequest();
             }
         }
-        [SwaggerOperation(Summary = "Lấy config theo id")]
-        [HttpGet("{id}")]
-        public IActionResult GetConfigById(long Id)
-        {
-            try
-            {
-                //var data = _billService.GetBillById(Id);
-                //return Ok(data);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
 
         [SwaggerOperation(Summary = "Thay đổi config")]
-        [HttpPost()]
-        public async Task<IActionResult> EditConfig()
+        [HttpPost("{id}")]
+        public async Task<IActionResult> EditConfig([FromRoute] long Id, [FromBody] ConfigEditModel model)
         {
             try
             {
+                await _configService.EditConfigValue(Id, model.Value);
                 return Ok();
             }
             catch (Exception e)
