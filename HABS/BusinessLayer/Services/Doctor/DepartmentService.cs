@@ -52,7 +52,7 @@ namespace BusinessLayer.Services.Doctor
                }
                ).ToList();
 
-                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(departmentsData));
+                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(departmentsData), 5 * 60);
             }
             return departmentsData;
         }

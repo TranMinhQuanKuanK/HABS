@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Interfaces.Screen;
+﻿using BusinessLayer.Constants;
+using BusinessLayer.Interfaces.Screen;
 using BusinessLayer.RequestModels;
 using BusinessLayer.RequestModels.CreateModels.Screen;
 using BusinessLayer.ResponseModels.ViewModels;
@@ -6,6 +7,7 @@ using BusinessLayer.ResponseModels.ViewModels.Screen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
@@ -21,9 +23,12 @@ namespace HASB_Screen.Controllers
     {
 
         private readonly ILoginService _loginService;
+        private readonly IConfiguration _cfg;
 
-        public LoginController(ILoginService service)
+
+        public LoginController(ILoginService service, IConfiguration iConfig)
         {
+            _cfg = iConfig;
             _loginService = service;
         }
         [SwaggerOperation(Summary = "Đăng nhập bằng password và id phòng (MK: ABC123)")]
@@ -41,7 +46,7 @@ namespace HASB_Screen.Controllers
                 if (room != null)
                 {
                     //Lấy secret từ secret của ứng dụng
-                    string tokenString = CreateAuthenToken.GetToken(Role, room.Id, "Secretttttt@#$@#$@#$@#$23423423423$@#$@#$@#$");
+                    string tokenString = CreateAuthenToken.GetToken(Role, room.Id, _cfg["AppSecret:ScreenSecret"]);
                     return Ok(new BaseLoginViewModel<ScreenLoginViewModel>()
                     {
                         Token = tokenString,

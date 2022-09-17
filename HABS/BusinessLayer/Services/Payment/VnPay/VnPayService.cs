@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Constants;
+using BusinessLayer.Interfaces.Notification;
 using BusinessLayer.Interfaces.Payment;
 using BusinessLayer.ResponseModels.ViewModels.Payment;
 using DataAccessLayer.Models;
@@ -11,7 +12,6 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
 using static DataAccessLayer.Models.CheckupRecord;
 using static DataAccessLayer.Models.TestRecord;
@@ -20,10 +20,15 @@ namespace BusinessLayer.Services.Payment.VnPay
 {
     public class VnPayService : BaseService, IVnPayService
     {
-        private readonly VnPayConfig _vnpayConfig;
-        public VnPayService(IUnitOfWork unitOfWork, VnPayConfig vnpayConfig) : base(unitOfWork)
+        private readonly BaseConfig _baseConfig;
+        private readonly INotificationService _notiService;
+
+        public VnPayService(IUnitOfWork unitOfWork, BaseConfig baseConfig,
+              INotificationService notiService
+            ) : base(unitOfWork)
         {
-            _vnpayConfig = vnpayConfig;
+            _notiService = notiService;
+            _baseConfig = baseConfig;
         }
         public async Task<string> CreateVnPayRequest(long billId, long accountId, string remoteIpAddress)
         {
@@ -35,15 +40,15 @@ namespace BusinessLayer.Services.Payment.VnPay
             }
             //xét status
 
-            string vnp_Returnurl = _vnpayConfig.VnpReturnurl; //Redirect đến URL này sau khi giao dịch được thực hiện. Code một trang riêng để thông báo kết quả thanh toán cho bệnh nhân.
-            string vnp_Url = _vnpayConfig.VnpUrl; //URL thanh toán của VNPAY.
-            string vnp_TmnCode = _vnpayConfig.VnpTmnCode; //Mã website
-            string vnp_HashSecret = _vnpayConfig.VnpHashSecret; //Key để hash
+            string vnp_Returnurl = _baseConfig.VnpayConfig.VnpReturnurl; //Redirect đến URL này sau khi giao dịch được thực hiện. Code một trang riêng để thông báo kết quả thanh toán cho bệnh nhân.
+            string vnp_Url = _baseConfig.VnpayConfig.VnpUrl; //URL thanh toán của VNPAY.
+            string vnp_TmnCode = _baseConfig.VnpayConfig.VnpTmnCode; //Mã website
+            string vnp_HashSecret = _baseConfig.VnpayConfig.VnpHashSecret; //Key để hash
 
             long ORDER_ID = billId; // Giả lập mã giao dịch merchant gửi cho VNPAY
             long AMOUNT = bill.Total; // Số tiền cần thanh toán
             DateTime CREATED_DATE = DateTime.Now.AddHours(7); // Thời gian tạo hóa đơn
-            int EXPIRED_MIN = _vnpayConfig.ExpireTime; // Thời gian tối đa để thanh toán trước khi hết hạn.
+            int EXPIRED_MIN = _baseConfig.VnpayConfig.ExpireTime; // Thời gian tối đa để thanh toán trước khi hết hạn.
             string MOBILE = bill.PhoneNo; // SĐT bệnh nhân 
             string FULL_NAME = bill.PatientName; // Tên bệnh nhân
 
@@ -77,7 +82,7 @@ namespace BusinessLayer.Services.Payment.VnPay
         {
             var formContent = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("tmn_code", _vnpayConfig.VnpTmnCode),
+                new KeyValuePair<string, string>("tmn_code", _baseConfig.VnpayConfig.VnpTmnCode),
             });
             HttpClient client = new HttpClient();
             var response = await client.PostAsync(
@@ -100,7 +105,7 @@ namespace BusinessLayer.Services.Payment.VnPay
                     vnpay.AddResponseData(s, requestNameValue[s]);
                 }
             }
-            bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, _vnpayConfig.VnpHashSecret);
+            bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, _baseConfig.VnpayConfig.VnpHashSecret);
             if (checkSignature)
             {
                 long billId = long.Parse(vnp_txnRef);
@@ -130,12 +135,13 @@ namespace BusinessLayer.Services.Payment.VnPay
                 if (vnp_ResponseCode == "00")
                 {
                     bill.Status = Bill.BillStatus.DA_TT_EBANKING;
+                    CheckupRecord cr = null;
                     foreach (var bd in bill.BillDetails)
                     {
                         //nếu là CR
                         if (bd.TestRecordId == null && bd.CheckupRecordId != null)
                         {
-                            var cr = _unitOfWork.CheckupRecordRepository.Get()
+                            cr = _unitOfWork.CheckupRecordRepository.Get()
                                 .Include(x => x.TestRecords)
                                 .Include(x => x.Patient)
                                 .Where(x => x.Id == bd.CheckupRecordId).FirstOrDefault();
@@ -156,20 +162,21 @@ namespace BusinessLayer.Services.Payment.VnPay
                                 }
                             }
                             cr.Status = CheckupRecordStatus.DA_THANH_TOAN;
-                            
                             //bắn status cho mobile nếu có
+
                         }
                         //nếu là TR
                         else if (bd.TestRecordId != null && bd.CheckupRecordId == null)
                         {
                             var tr = _unitOfWork.TestRecordRepository.Get()
                                 .Where(x => x.Id == bd.TestRecordId).FirstOrDefault();
-                            var cr = _unitOfWork.CheckupRecordRepository.Get()
+                            cr = _unitOfWork.CheckupRecordRepository.Get()
                                  .Include(x => x.Patient)
                                 .Where(x => x.Id == tr.CheckupRecordId).FirstOrDefault();
                             cr.Status = CheckupRecordStatus.CHO_KQXN;
                             tr.Status = TestRecordStatus.DA_THANH_TOAN;
                         }
+                        await _notiService.SendUpdateCheckupInfoReminder(cr.Id, cr.Patient.AccountId);
                     }
                 }
                 else

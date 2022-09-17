@@ -8,6 +8,7 @@ using BusinessLayer.ResponseModels.ViewModels;
 using BusinessLayer.ResponseModels.ViewModels.User;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
@@ -20,16 +21,16 @@ namespace HASB_User.Controllers
 {
     [Route(UserRoute)]
     [ApiController]
-    //[ApiExplorerSettings(GroupName = Role)]
-    //[Authorize(Roles = "User")]
     public class LoginController : BaseUserController
     {
 
         private readonly ILoginService _loginService;
         private readonly IFCMTokenService _fcmService;
+        private readonly IConfiguration _cfg;
 
-        public LoginController(ILoginService service, IFCMTokenService fcmService)
+        public LoginController(ILoginService service, IFCMTokenService fcmService, IConfiguration iConfig)
         {
+            _cfg = iConfig;
             _loginService = service;
             _fcmService = fcmService;
         }
@@ -105,7 +106,7 @@ namespace HASB_User.Controllers
                 {
                     //Lấy secret từ secret của ứng dụng
 
-                    string tokenString = CreateAuthenToken.GetToken(Role, user.Id, "Secretttttt%123123123123!@#!@#");
+                    string tokenString = CreateAuthenToken.GetToken(Role, user.Id, _cfg["AppSecret:UserSecret"]);
                     return Ok(new BaseLoginViewModel<UserLoginViewModel>()
                     {
                         Token = tokenString,

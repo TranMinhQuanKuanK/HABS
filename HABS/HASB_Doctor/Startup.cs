@@ -1,3 +1,4 @@
+using BusinessLayer.Constants;
 using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.Interfaces.Notification;
@@ -124,7 +125,7 @@ namespace HASB_Doctor
                   ValidateIssuerSigningKey = true,
                   ValidIssuer = "http://localhost:2000",
                   ValidAudience = "http://localhost:2000",
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Secretttttt@#$@#$@#$@#$23423423423$@#$@#$@#$"))
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSecret:DoctorSecret"]))
               };
           });
 
@@ -136,6 +137,9 @@ namespace HASB_Doctor
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            //config 
+            services.AddSingleton<ConfigService, ConfigService>();
+            services.AddSingleton<BaseConfig, BaseConfig>();
             //doctor app
             services.AddTransient<IScheduleService, ScheduleService>();
             services.AddTransient<ICheckupRecordService, CheckupRecordService>();
@@ -171,6 +175,9 @@ namespace HASB_Doctor
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,ILoggerFactory loggerFactory)
         {
+            app.ApplicationServices.GetService<ConfigService>();
+            app.ApplicationServices.GetService<BaseConfig>();
+
             var path = Directory.GetCurrentDirectory();
             loggerFactory.AddFile($"{path}\\Logs\\Log.txt");
 

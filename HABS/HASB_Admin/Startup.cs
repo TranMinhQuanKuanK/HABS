@@ -1,3 +1,4 @@
+using BusinessLayer.Constants;
 using BusinessLayer.Interfaces.Cashier;
 using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Interfaces.Doctor;
@@ -130,7 +131,7 @@ namespace HASB_Admin
                   ValidateIssuerSigningKey = true,
                   ValidIssuer = "http://localhost:2000",
                   ValidAudience = "http://localhost:2000",
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Secretttttt%123123123123!@#!@#"))
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSecret:AdminSecret"]))
               };
           });
 
@@ -142,8 +143,9 @@ namespace HASB_Admin
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
-            services.AddTransient<ConfigService, ConfigService>();
+            //config
+            services.AddSingleton<ConfigService, ConfigService>();
+            services.AddSingleton<BaseConfig, BaseConfig>();
             //admin app
             services.AddTransient<BusinessLayer.Interfaces.User.ICheckupRecordService,
                 BusinessLayer.Services.User.CheckupRecordService>();
@@ -175,6 +177,9 @@ namespace HASB_Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.ApplicationServices.GetService<ConfigService>();
+            app.ApplicationServices.GetService<BaseConfig>();
+
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HASB_Admin v1"));
 

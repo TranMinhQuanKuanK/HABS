@@ -30,6 +30,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Utilities;
 using BusinessLayer.Interfaces.Screen;
+using BusinessLayer.Constants;
 
 namespace HASB_Screen
 {
@@ -116,7 +117,7 @@ namespace HASB_Screen
 
                 options.DocInclusionPredicate((name, api) => true);
             });
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme) 
           .AddJwtBearer(options =>
           {
               options.TokenValidationParameters = new TokenValidationParameters
@@ -127,7 +128,7 @@ namespace HASB_Screen
                   ValidateIssuerSigningKey = true,
                   ValidIssuer = "http://localhost:2000",
                   ValidAudience = "http://localhost:2000",
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Secretttttt@#$@#$@#$@#$23423423423$@#$@#$@#$"))
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSecret:ScreenSecret"]))
               };
           });
 
@@ -139,8 +140,11 @@ namespace HASB_Screen
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            //config
+            services.AddSingleton<ConfigService, ConfigService>();
+            services.AddSingleton<BaseConfig, BaseConfig>();
             //screen app
-            services.AddSingleton<ICheckupRecordService, CheckupRecordService>();
+            services.AddTransient<ICheckupRecordService, CheckupRecordService>();
             services.AddTransient<IDoctorService, DoctorService>();
             services.AddTransient<IPatientService, PatientService>();
             services.AddTransient<IScheduleService, ScheduleService>();
@@ -166,6 +170,9 @@ namespace HASB_Screen
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.ApplicationServices.GetService<ConfigService>();
+            app.ApplicationServices.GetService<BaseConfig>();
+
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HASB_Screen v1"));
 

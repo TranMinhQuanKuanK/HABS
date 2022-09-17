@@ -1,7 +1,9 @@
+using BusinessLayer.Constants;
 using BusinessLayer.Interfaces.Cashier;
 using BusinessLayer.Interfaces.Doctor;
 using BusinessLayer.Interfaces.Notification;
 using BusinessLayer.Services.Cashier;
+using BusinessLayer.Services.Common;
 using BusinessLayer.Services.Doctor;
 using BusinessLayer.Services.Notification;
 using DataAccessLayer.Models;
@@ -48,7 +50,6 @@ namespace HASB_Cashier
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddDistributedMemoryCache();
             services.AddStackExchangeRedisCache(options =>
             {
@@ -130,7 +131,7 @@ namespace HASB_Cashier
                   ValidateIssuerSigningKey = true,
                   ValidIssuer = "http://localhost:2000",
                   ValidAudience = "http://localhost:2000",
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Secretttttt@#$@#$@#$@#$23423423423$@#$@#$@#$"))
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSecret:CashierSecret"]))
               };
           });
 
@@ -142,6 +143,9 @@ namespace HASB_Cashier
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            //config
+            services.AddSingleton<ConfigService, ConfigService>();
+            services.AddSingleton<BaseConfig, BaseConfig>();
             //cashier app
             services.AddTransient<IBillService, BillService>();
             services.AddTransient<ILoginService, LoginService>();
@@ -163,6 +167,9 @@ namespace HASB_Cashier
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.ApplicationServices.GetService<ConfigService>();
+            app.ApplicationServices.GetService<BaseConfig>();
+
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HASB_Cashier v1"));
 

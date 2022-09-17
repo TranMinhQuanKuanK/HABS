@@ -14,39 +14,39 @@ namespace BusinessLayer.Constants
         {
             _cfgService = cfgService;
         }
-        public int SecretForCashierApp
+        public string SecretForCashierApp
         {
             get
             {
-                return int.Parse(_cfgService.GetValueFromConfig("CASHIER_SECRET "));
+                return _cfgService.GetValueFromConfig("CASHIER_SECRET ");
             }
         }
-        public int SecretForDoctorApp
+        public string SecretForDoctorApp
         {
             get
             {
-                return int.Parse(_cfgService.GetValueFromConfig("DOCTOR_SECRET "));
+                return  _cfgService.GetValueFromConfig("DOCTOR_SECRET ");
             }
         }
-        public int SecretForUserApp
+        public string SecretForUserApp
         {
             get
             {
-                return int.Parse(_cfgService.GetValueFromConfig("USER_SECRET"));
+                return  _cfgService.GetValueFromConfig("USER_SECRET");
             }
         }
-        public int SecretForScreenApp
+        public string SecretForScreenApp
         {
             get
             {
-                return int.Parse(_cfgService.GetValueFromConfig("SCREEN_SECRET"));
+                return  _cfgService.GetValueFromConfig("SCREEN_SECRET");
             }
         }
-        public int SecretForAdminApp
+        public string SecretForAdminApp
         {
             get
             {
-                return int.Parse(_cfgService.GetValueFromConfig("ADMIN_SECRET"));
+                return  _cfgService.GetValueFromConfig("ADMIN_SECRET");
             }
         }
         //public string SecretForCashierApp = "Secretttttt%123123123123!@#!@#";

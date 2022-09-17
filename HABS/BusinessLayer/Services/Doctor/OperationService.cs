@@ -58,7 +58,7 @@ namespace BusinessLayer.Services.Doctor
                    Type = (int)x.Type
                }
                ).ToList();
-                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(data));
+                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(data), 5 * 60);
 
             }
 
@@ -93,7 +93,7 @@ namespace BusinessLayer.Services.Doctor
               }
               ).FirstOrDefault();
 
-                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(op));
+                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(op), 5 * 60);
             }
             return op;
         }

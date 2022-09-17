@@ -71,7 +71,7 @@ namespace BusinessLayer.Services.Doctor
                    }
                    ).ToList();
 
-                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(data));
+                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(data), 5*60);
             }
             return data;
         }

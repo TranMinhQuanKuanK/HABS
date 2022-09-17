@@ -46,7 +46,7 @@ namespace BusinessLayer.Services.Doctor
 
             }).ToList();
             
-            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue));
+            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue), 5 * 60);
             return queue;
         }
         public List<CheckupAppointmentViewModel> UpdateRedis_TestingCheckupQueue(long RoomId)
@@ -73,7 +73,7 @@ namespace BusinessLayer.Services.Doctor
 
             }).ToList();
 
-            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue));
+            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue), 5*60);
             return queue;
         }
         public List<CheckupAppointmentViewModel> UpdateRedis_CheckupQueue(long RoomId)
@@ -116,7 +116,7 @@ namespace BusinessLayer.Services.Doctor
                 queue.Insert(0, checkingUpPatient);
             }
 
-            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue));
+            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue), 5 * 60);
             return queue;
         }
         public List<CheckupAppointmentViewModel> GetCheckupQueue(long RoomId)
@@ -212,7 +212,7 @@ namespace BusinessLayer.Services.Doctor
                 queue.Remove(testingPatient);
                 queue.Insert(0, testingPatient);
             }
-            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue));
+            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue), 5 * 60);
             return queue;
         }
         public List<TestRecordViewModel> UpdateRedis_FinishedTestQueue(long RoomId)
@@ -244,7 +244,7 @@ namespace BusinessLayer.Services.Doctor
                        RoomId =x.RoomId,
                        RoomNumber =x.RoomNumber
                    }).ToList();
-            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue));
+            _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue), 5 * 60);
             return queue;
         }
         public List<TestAppointmentViewModel> GetTestQueue(long RoomId, bool isWaitingForResult)

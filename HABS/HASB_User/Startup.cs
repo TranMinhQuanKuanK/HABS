@@ -126,7 +126,7 @@ namespace HASB_User
                   ValidateIssuerSigningKey = true,
                   ValidIssuer = "http://localhost:2000",
                   ValidAudience = "http://localhost:2000",
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Secretttttt%123123123123!@#!@#"))
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSecret:UserSecret"]))
               };
           });
 
@@ -139,8 +139,8 @@ namespace HASB_User
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             //config
-            services.AddTransient<VnPayConfig, VnPayConfig>();
-            services.AddTransient<ConfigService, ConfigService>();
+            services.AddSingleton<ConfigService, ConfigService>();
+            services.AddSingleton<BaseConfig, BaseConfig>();
             //user app
             services.AddTransient<ICheckupRecordService, CheckupRecordService>();
             services.AddTransient<IDoctorService, DoctorService>();
@@ -171,6 +171,9 @@ namespace HASB_User
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.ApplicationServices.GetService<ConfigService>();
+            app.ApplicationServices.GetService<BaseConfig>();
+
             var path = Directory.GetCurrentDirectory();
             loggerFactory.AddFile($"{path}\\Logs\\Log.txt");
 

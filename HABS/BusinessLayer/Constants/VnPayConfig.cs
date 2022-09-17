@@ -12,50 +12,81 @@ namespace BusinessLayer.Constants
         public VnPayConfig(ConfigService cfgService)
         {
             _cfgService = cfgService;
+            RefreshAll();
         }
         //public static int ExpireTime = 15;
-        public int ExpireTime
+        public void RefreshAll()
         {
-            get
+            RefreshExpireTime();
+            RefreshVnpUrl();
+            RefreshVnpTmnCode();
+            RefreshVnpHashSecret();
+            RefreshVnpReturnurl();
+        }
+        public void RefreshSpecific(string cfgKey)
+        {
+            switch (cfgKey)
             {
-                return int.Parse(_cfgService.GetValueFromConfig("VNPAY_EXPIRE_TIME"));
+                case "VNPAY_EXPIRE_TIME":
+                    ExpireTime = int.Parse(_cfgService.GetValueFromConfig("VNPAY_EXPIRE_TIME"));
+                    break;
+                case "VNPAY_URL":
+                    VnpUrl = _cfgService.GetValueFromConfig("VNPAY_URL");
+                    break;
+                case "VNPAY_TMN_CODE":
+                    VnpTmnCode = _cfgService.GetValueFromConfig("VNPAY_TMN_CODE");
+                    break;
+                case "VNPAY_HASH_SECRET":
+                    VnpHashSecret = _cfgService.GetValueFromConfig("VNPAY_HASH_SECRET");
+                    break;
+                case "VNPAY_RETURN_URL":
+                    VnpReturnurl = _cfgService.GetValueFromConfig("VNPAY_RETURN_URL");
+                    break;
             }
         }
-        public string VnpUrl
+        #region Refresh function
+        public int RefreshExpireTime()
         {
-            get
-            {
-                return _cfgService.GetValueFromConfig("VNPAY_URL");
-            }
+            RefreshSpecific("VNPAY_EXPIRE_TIME");
+            return ExpireTime;
         }
+        public string RefreshVnpUrl()
+        {
+            RefreshSpecific("VNPAY_URL");
+            return VnpUrl;
+        }
+        public string RefreshVnpTmnCode()
+        {
+            RefreshSpecific("VNPAY_TMN_CODE");
+            return VnpTmnCode;
+        }
+        public string RefreshVnpHashSecret()
+        {
+            RefreshSpecific("VNPAY_HASH_SECRET");
+            return VnpHashSecret;
+        }
+        public string RefreshVnpReturnurl()
+        {
+            RefreshSpecific("VNPAY_RETURN_URL");
+            return VnpReturnurl;
+        }
+        #endregion
+
+        #region Properties
+        public int ExpireTime { get; private set; }
+        public string VnpUrl { get; private set; }
+        public string VnpTmnCode { get; private set; }
+        public string VnpHashSecret { get; private set; }
+        public string VnpReturnurl { get; private set; }
+        #endregion
         //public static string VnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        public string VnpTmnCode
-        {
-            get
-            {
-                return _cfgService.GetValueFromConfig("VNPAY_TMN_CODE");
-            }
-        }
+
         //public static string VnpTmnCode = "XIYQEJD5";
 
-        public string VnpHashSecret
-        {
-            get
-            {
-                return _cfgService.GetValueFromConfig("VNPAY_HASH_SECRET");
-            }
-        }
         //public static string VnpHashSecret = "XUDKXJIVPEMSMPBEMUYSWLXBEYSQOFCI";
 
-        public string VnpReturnurl
-        {
-            get
-            {
-                return _cfgService.GetValueFromConfig("VNPAY_RETURN_URL");
-            }
-        }
         //public static string VnpReturnurl = "https://fap.fpt.edu.vn/";
 
-      
+
     }
 }

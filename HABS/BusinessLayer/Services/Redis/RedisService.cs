@@ -15,9 +15,9 @@ namespace BusinessLayer.Services.Redis
             _distributedCache = distributedCache;
         }
 
-        public void SetValueToKey(string key, string value)
+        public void SetValueToKey(string key, string value, int second)
         {
-           var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(60*10));
+           var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(second));
             _distributedCache.SetString(key, value, options);
         }
         public void RemoveValueToKey(string key)

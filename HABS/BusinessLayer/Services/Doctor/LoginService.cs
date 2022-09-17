@@ -28,30 +28,12 @@ namespace BusinessLayer.Services.Doctor
         private readonly IDistributedCache _distributedCache;
         private readonly RedisService _redisService;
         //config
-        private readonly WorkingShiftConfig _workingShiftConfig;
-        int BeginMorningShiftHour, BeginMorningShiftMinute, EndMorningShiftHour, EndMorningShiftMinute,
-            BeginEveningShiftHour, BeginEveningShiftMinute, EndEveningShiftHour, EndEveningShiftMinute,
-            BeginAfternoonShiftHour, BeginAfternoonShiftMinute, EndAfternoonShiftHour, EndAfternoonShiftMinute,
-            LoginTimeBeforeWorkingShift;
-        public LoginService(IUnitOfWork unitOfWork, IDistributedCache distributedCache, WorkingShiftConfig workingShiftConfig) : base(unitOfWork)
+        private readonly BaseConfig _baseConfig;
+        public LoginService(IUnitOfWork unitOfWork, IDistributedCache distributedCache, BaseConfig baseConfig) : base(unitOfWork)
         {
-            _workingShiftConfig = workingShiftConfig;
+            _baseConfig = baseConfig;
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
-            //init config
-            BeginMorningShiftHour = _workingShiftConfig.BeginAfternoonShiftHour;
-            BeginMorningShiftMinute = _workingShiftConfig.BeginAfternoonShiftMinute;
-            EndMorningShiftHour = _workingShiftConfig.EndMorningShiftHour;
-            EndMorningShiftMinute = _workingShiftConfig.EndMorningShiftMinute;
-            BeginEveningShiftHour = _workingShiftConfig.BeginEveningShiftHour;
-            BeginEveningShiftMinute = _workingShiftConfig.BeginEveningShiftMinute;
-            EndEveningShiftHour = _workingShiftConfig.EndEveningShiftHour;
-            EndEveningShiftMinute = _workingShiftConfig.EndEveningShiftMinute;
-            BeginAfternoonShiftHour = _workingShiftConfig.BeginAfternoonShiftHour;
-            BeginAfternoonShiftMinute = _workingShiftConfig.BeginAfternoonShiftMinute;
-            EndAfternoonShiftHour = _workingShiftConfig.EndAfternoonShiftHour;
-            EndAfternoonShiftMinute = _workingShiftConfig.EndAfternoonShiftMinute;
-            LoginTimeBeforeWorkingShift = _workingShiftConfig.LoginTimeBeforeWorkingShift;
         }
 
         private SessionType? getCurrentSession()
@@ -59,32 +41,32 @@ namespace BusinessLayer.Services.Doctor
             SessionType? session = null;
             var now = DateTime.Now.AddHours(7);
             var beginMorningShift = new DateTime(now.Year, now.Month, now.Day,
-                BeginMorningShiftHour, BeginMorningShiftMinute, 0);
+                _baseConfig.WorkingShiftConfig.BeginMorningShiftHour, _baseConfig.WorkingShiftConfig.BeginMorningShiftMinute, 0);
             var endMorningShift = new DateTime(now.Year, now.Month, now.Day,
-               EndMorningShiftHour, EndMorningShiftMinute, 0);
+               _baseConfig.WorkingShiftConfig.EndMorningShiftHour, _baseConfig.WorkingShiftConfig.EndMorningShiftMinute, 0);
 
             var beginEveningShift = new DateTime(now.Year, now.Month, now.Day,
-                BeginEveningShiftHour, BeginEveningShiftMinute, 0);
+                _baseConfig.WorkingShiftConfig.BeginEveningShiftHour, _baseConfig.WorkingShiftConfig.BeginEveningShiftMinute, 0);
             var endEveningShift = new DateTime(now.Year, now.Month, now.Day,
-               EndEveningShiftHour, EndEveningShiftMinute, 0);
+               _baseConfig.WorkingShiftConfig.EndEveningShiftHour, _baseConfig.WorkingShiftConfig.EndEveningShiftMinute, 0);
 
             var beginAfternoonShift = new DateTime(now.Year, now.Month, now.Day,
-               BeginAfternoonShiftHour, BeginAfternoonShiftMinute, 0);
+               _baseConfig.WorkingShiftConfig.BeginAfternoonShiftHour, _baseConfig.WorkingShiftConfig.BeginAfternoonShiftMinute, 0);
             var endAfternoonShift = new DateTime(now.Year, now.Month, now.Day,
-               EndAfternoonShiftHour, EndAfternoonShiftMinute, 0);
+               _baseConfig.WorkingShiftConfig.EndAfternoonShiftHour, _baseConfig.WorkingShiftConfig.EndAfternoonShiftMinute, 0);
 
             if (now >= beginMorningShift
-                .AddMinutes((-1) * LoginTimeBeforeWorkingShift) && now <= endMorningShift)
+                .AddMinutes((-1) * _baseConfig.WorkingShiftConfig.LoginTimeBeforeWorkingShift) && now <= endMorningShift)
             {
                 session = SessionType.SANG;
             }
             else if (now >= beginEveningShift
-                .AddMinutes((-1) * LoginTimeBeforeWorkingShift) && now <= endEveningShift)
+                .AddMinutes((-1) * _baseConfig.WorkingShiftConfig.LoginTimeBeforeWorkingShift) && now <= endEveningShift)
             {
                 session = SessionType.TOI;
             }
             else if (now >= beginAfternoonShift
-                .AddMinutes((-1) * LoginTimeBeforeWorkingShift) && now <= endAfternoonShift)
+                .AddMinutes((-1) * _baseConfig.WorkingShiftConfig.LoginTimeBeforeWorkingShift) && now <= endAfternoonShift)
             {
                 session = SessionType.CHIEU;
             }
