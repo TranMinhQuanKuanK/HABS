@@ -14,18 +14,31 @@ namespace BusinessLayer.Constants
         {
             _cfgService = cfgService;
         }
+        public string[] ConfigKeyList
+        {
+            get
+            {
+                return new string[] {
+            "CASHIER_SECRET",
+            "DOCTOR_SECRET",
+            "USER_SECRET",
+            "SCREEN_SECRET",
+            "ADMIN_SECRET",
+            };
+            }
+        }
         public string SecretForCashierApp
         {
             get
             {
-                return _cfgService.GetValueFromConfig("CASHIER_SECRET ");
+                return _cfgService.GetValueFromConfig("CASHIER_SECRET");
             }
         }
         public string SecretForDoctorApp
         {
             get
             {
-                return  _cfgService.GetValueFromConfig("DOCTOR_SECRET ");
+                return  _cfgService.GetValueFromConfig("DOCTOR_SECRET");
             }
         }
         public string SecretForUserApp

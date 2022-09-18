@@ -15,6 +15,25 @@ namespace BusinessLayer.Constants
             _cfgService = cfgService;
             RefreshAll();
         }
+        public string[] ConfigKeyList
+        {
+            get
+            {
+                return new string[] {
+            "LOGIN_TIME_BEFORE_WORKING_SHIFT",
+            "BEGIN_MORNING_HOUR",
+            "BEGIN_MORNING_MINUTE",
+            "END_MORNING_HOUR",
+            "END_MORNING_MINUTE",
+            "BEGIN_AFTERNOON_HOUR",
+            "BEGIN_AFTERNOON_MINUTE",
+            "END_AFTERNOON_HOUR",
+            "END_AFTERNOON_MINUTE",
+            "BEGIN_EVENING_HOUR",
+            "BEGIN_EVENING_MINUTE",
+            };
+            }
+        }
         public void RefreshAll()
         {
             RefreshLoginTimeBeforeWorkingShift();

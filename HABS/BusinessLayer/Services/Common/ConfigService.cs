@@ -42,7 +42,7 @@ namespace BusinessLayer.Services.Common
             _distributedCache = distributedCache;
             _cfg = configuration;
             _redisService = new RedisService(_distributedCache);
-            //Init a new db context here because we can't inject a scoped db context into a singletion configService
+            //We init a new db context here because we can't inject a scoped db context into a singletion configService
             var contextOptions = new DbContextOptionsBuilder<HospitalAppointmentBookingContext>()
             .UseSqlServer(_cfg.GetConnectionString("HospitalCloud"))
             .Options;
@@ -90,7 +90,7 @@ namespace BusinessLayer.Services.Common
                 .ToList();
             return configList;
         }
-        public async Task EditConfigValue(long id, string value)
+        public async Task<string> EditConfigValue(long id, string value)
         {
             var config = _genericRepo.Get().Where(x => x.Id == id).FirstOrDefault();
             if (config == null)
@@ -98,8 +98,11 @@ namespace BusinessLayer.Services.Common
                 throw new Exception("Config key doesn't exist");
             }
             config.Value = value;
+
             await _dbContext.SaveChangesAsync();
+            
             UpdateRedis_Config(config.Key);
+            return config.Key;
         }
     }
 }

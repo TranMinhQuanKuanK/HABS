@@ -20,5 +20,24 @@ namespace BusinessLayer.Constants
         public VnPayConfig VnpayConfig { get; }
         public WorkingShiftConfig WorkingShiftConfig { get; }
         public AppSecret AppSecret { get; }
+
+        public void RefreshOnMemoryConfig(string cfgKey) 
+        {
+            if (VnpayConfig.ConfigKeyList.Contains(cfgKey))
+            {
+                VnpayConfig.RefreshSpecific(cfgKey);
+            }
+            if (WorkingShiftConfig.ConfigKeyList.Contains(cfgKey))
+            {
+                WorkingShiftConfig.RefreshSpecific(cfgKey);
+            }
+            //We don't refresh AppSecret because its value is taken everytime
+        }
+        public void RefreshAllMemoryConfig()
+        {
+            VnpayConfig.RefreshAll();
+            WorkingShiftConfig.RefreshAll();
+            //We don't refresh AppSecret because its value is taken everytime
+        }
     }
 }

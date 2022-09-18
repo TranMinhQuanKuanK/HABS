@@ -14,6 +14,19 @@ namespace BusinessLayer.Constants
             _cfgService = cfgService;
             RefreshAll();
         }
+        public string[] ConfigKeyList
+        {
+            get
+            {
+                return new string[] {
+            "VNPAY_EXPIRE_TIME",
+            "VNPAY_URL",
+            "VNPAY_TMN_CODE",
+            "VNPAY_HASH_SECRET",
+            "VNPAY_RETURN_URL",
+            };
+            }
+        }
         //public static int ExpireTime = 15;
         public void RefreshAll()
         {

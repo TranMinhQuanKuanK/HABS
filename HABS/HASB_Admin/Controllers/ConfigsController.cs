@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Interfaces.Cashier;
+﻿using BusinessLayer.Constants;
+using BusinessLayer.Interfaces.Cashier;
 using BusinessLayer.RequestModels.CreateModels.Admin;
 using BusinessLayer.RequestModels.SearchModels.Cashier;
 using BusinessLayer.Services.Common;
@@ -16,8 +17,12 @@ namespace HASB_Admin.Controllers
     public class ConfigsController : BaseAdminController
     {
         private readonly ConfigService _configService;
-        public ConfigsController(ConfigService configService)
+        private readonly BaseConfig _baseConfig;
+
+        public ConfigsController(ConfigService configService,
+             BaseConfig baseConfig)
         {
+            _baseConfig = baseConfig;
             _configService = configService;
         }
         [SwaggerOperation(Summary = "Lấy danh sách config")]
@@ -42,7 +47,10 @@ namespace HASB_Admin.Controllers
         {
             try
             {
-                await _configService.EditConfigValue(Id, model.Value);
+                string key = await _configService.EditConfigValue(Id, model.Value);
+                //this solution for refreshing on memory config will fail when we have 2 or more
+                //instance of this app
+                _baseConfig.RefreshOnMemoryConfig(key);
                 return Ok();
             }
             catch (Exception e)
