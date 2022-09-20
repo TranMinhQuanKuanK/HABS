@@ -177,6 +177,7 @@ namespace BusinessLayer.Services.Doctor
                             Status = (int)tr.Status,
                             DoctorId = tr.DoctorId,
                             DoctorName = tr.DoctorName,
+                            ResultDescription = tr.ResultDescription,
                             QrCode = x.QrCode,
                         }).ToList(),
                     };

@@ -242,7 +242,8 @@ namespace BusinessLayer.Services.Doctor
                        DoctorName = x.DoctorName,
                        Floor =  x.Floor,
                        RoomId =x.RoomId,
-                       RoomNumber =x.RoomNumber
+                       RoomNumber =x.RoomNumber,
+                       ResultDescription = x.ResultDescription
                    }).ToList();
             _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue), 5 * 60);
             return queue;

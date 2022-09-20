@@ -104,6 +104,10 @@ namespace BusinessLayer.Services.Doctor
                 // gán link vào test record
                 tr.ResultFileLink = url;
             }
+            if (model.ResultDescription != null)
+            {
+                tr.ResultDescription = model.ResultDescription;
+            }
             var doctor = _unitOfWork.DoctorRepository.Get().Where(x => x.Id == doctorId).FirstOrDefault();
             if (doctor == null)
             {

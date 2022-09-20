@@ -24,6 +24,8 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
         public long? DoctorId { get; set; }
         public string DoctorName { get; set; }
         public string QrCode { get; set; }
+        public string ResultDescription { get; set; }
+
 
     }
 }

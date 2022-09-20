@@ -185,7 +185,8 @@ namespace BusinessLayer.Services.User
                             Status = (int)tr.Status,
                             DoctorId = tr.DoctorId,
                             DoctorName = tr.DoctorName,
-                            QrCode = tr.QrCode
+                            QrCode = tr.QrCode,
+                            ResultDescription = tr.ResultDescription
                         }).ToList(),
                         RoomId = (long)x.RoomId,
                         Floor = x.Floor,

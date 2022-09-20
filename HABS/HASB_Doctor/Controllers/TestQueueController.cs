@@ -92,7 +92,7 @@ namespace HASB_Doctor.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [SwaggerOperation(Summary = "Cập nhật trạng thái và file kết quả của test record, 4 là đã xn xong, 5 là đã có kq - kết thúc, ")]
+        [SwaggerOperation(Summary = "Cập nhật trạng thái và file kết quả của test record, 5 là đã xn xong, 6 là đã có kq - kết thúc, ")]
         [HttpPut()]
         public async Task<IActionResult> UpdateRecord([FromForm] TestRecordEditModel model)
         {
