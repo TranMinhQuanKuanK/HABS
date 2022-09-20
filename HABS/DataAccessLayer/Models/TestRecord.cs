@@ -41,7 +41,7 @@ namespace DataAccessLayer.Models
         public long? DoctorId { get; set; }
         public string DoctorName { get; set; }
         public string QrCode { get; set; }
-
+        public string ResultDescription { get; set; }
         public virtual CheckupRecord CheckupRecord { get; set; }
         public virtual Doctor Doctor { get; set; }
         public virtual Operation Operation { get; set; }

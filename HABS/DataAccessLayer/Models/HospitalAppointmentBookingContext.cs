@@ -55,7 +55,7 @@ namespace DataAccessLayer.Models
             {
                 entity.ToTable("Account");
 
-                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E386A59CCCD")
+                entity.HasIndex(e => e.PhoneNumber, "UQ__Account__85FB4E38F384E203")
                     .IsUnique();
 
                 entity.Property(e => e.Email).IsRequired();
@@ -347,6 +347,10 @@ namespace DataAccessLayer.Models
             modelBuilder.Entity<TestRecord>(entity =>
             {
                 entity.ToTable("TestRecord");
+
+                entity.HasIndex(e => e.Date, "DateTestRecordIndex");
+
+                entity.HasIndex(e => e.EstimatedDate, "EstimatedDateTestRecordIndex");
 
                 entity.Property(e => e.Date).HasColumnType("datetime");
 
