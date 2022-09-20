@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Constants;
 using BusinessLayer.Interfaces.Cashier;
 using BusinessLayer.RequestModels.CreateModels.Admin;
+using BusinessLayer.RequestModels.SearchModels.Admin;
 using BusinessLayer.RequestModels.SearchModels.Cashier;
 using BusinessLayer.Services.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +14,7 @@ namespace HASB_Admin.Controllers
 {
     [Route(AdminRoute)]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class ConfigsController : BaseAdminController
     {
         private readonly ConfigService _configService;
@@ -27,12 +28,11 @@ namespace HASB_Admin.Controllers
         }
         [SwaggerOperation(Summary = "Lấy danh sách config")]
         [HttpGet]
-        public IActionResult GetConfigs()
+        public IActionResult GetConfigs([FromQuery] ConfigSearchModel model)
         {
             try
             {
-                //kiểm tra paging và áp dụng paging
-                var data = _configService.GetConfigsList();
+                var data = _configService.GetConfigsList(model);
                 return Ok(data);
             }
             catch (Exception e)

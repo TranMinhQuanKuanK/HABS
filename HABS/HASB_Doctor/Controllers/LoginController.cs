@@ -41,7 +41,6 @@ namespace HASB_Doctor.Controllers
             var doc = _loginService.Login(model);
             if (doc != null)
             {
-                //Lấy secret từ secret của ứng dụng
                 string tokenString = CreateAuthenToken.GetToken(Role,doc.Id, _cfg["AppSecret:DoctorSecret"]);
                 return Ok(new BaseLoginViewModel<DoctorLoginViewModel>()
                 {

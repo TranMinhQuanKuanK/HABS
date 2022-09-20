@@ -146,6 +146,7 @@ namespace BusinessLayer.Services.User
                         RoomId = morningRoom.Id,
                         RoomNumber = morningRoom.RoomNumber,
                         Floor = morningRoom.Floor,
+                        Session = (int)SessionType.SANG
                     };
                     result.Add(slot);
                     _curSlot++;
@@ -176,6 +177,7 @@ namespace BusinessLayer.Services.User
                         RoomId = afternoonRoom.Id,
                         RoomNumber = afternoonRoom.RoomNumber,
                         Floor = afternoonRoom.Floor,
+                        Session = (int)SessionType.CHIEU
                     };
                     result.Add(slot);
                     _curSlot++;
@@ -205,6 +207,7 @@ namespace BusinessLayer.Services.User
                         RoomId = eveningRoom.Id,
                         RoomNumber = eveningRoom.RoomNumber,
                         Floor = eveningRoom.Floor,
+                        Session = (int)SessionType.TOI
                     };
                     result.Add(slot);
                     _curSlot++;

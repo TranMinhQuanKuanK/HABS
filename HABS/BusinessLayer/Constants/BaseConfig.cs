@@ -31,13 +31,11 @@ namespace BusinessLayer.Constants
             {
                 WorkingShiftConfig.RefreshSpecific(cfgKey);
             }
-            //We don't refresh AppSecret because its value is taken everytime
         }
         public void RefreshAllMemoryConfig()
         {
             VnpayConfig.RefreshAll();
             WorkingShiftConfig.RefreshAll();
-            //We don't refresh AppSecret because its value is taken everytime
         }
     }
 }

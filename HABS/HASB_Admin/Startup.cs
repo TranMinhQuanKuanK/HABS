@@ -155,7 +155,8 @@ namespace HASB_Admin
                 BusinessLayer.Services.Doctor.ScheduleService>();
             services.AddTransient<BusinessLayer.Interfaces.User.IScheduleService,
               BusinessLayer.Services.User.ScheduleService>();
-
+            services.AddTransient<BusinessLayer.Interfaces.Admin.ILoginService,
+            BusinessLayer.Services.Admin.LoginService>();
             //services.AddTransient<ILoginService, LoginService>();
             services.AddTransient<BusinessLayer.Interfaces.Doctor.IDepartmentService,
                 BusinessLayer.Services.Doctor.DepartmentService>();

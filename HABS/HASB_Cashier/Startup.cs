@@ -74,27 +74,6 @@ namespace HASB_Cashier
                 options.EnableAnnotations();
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "Cashier API - Hospital Appointment Booking", Version = "v1" });
                 options.DocumentFilter<KebabCaseDocumentFilter>();
-
-                options.TagActionsBy(api =>
-                {
-                    var controllerActionDescriptor = api.ActionDescriptor as ControllerActionDescriptor;
-                    string controllerName = controllerActionDescriptor.ControllerName;
-
-                    if (api.GroupName != null)
-                    {
-                        var name = api.GroupName + controllerName.Replace("Controller", "");
-                        name = Regex.Replace(name, "([a-z])([A-Z])", "$1 $2");
-                        return new[] { name };
-                    }
-
-                    if (controllerActionDescriptor != null)
-                    {
-                        controllerName = Regex.Replace(controllerName, "([a-z])([A-Z])", "$1 $2");
-                        return new[] { controllerName };
-                    }
-
-                    throw new InvalidOperationException("Unable to determine tag for endpoint.");
-                });
                 var jwtSecurityScheme = new OpenApiSecurityScheme
                 {
                     Scheme = "bearer",
@@ -129,8 +108,8 @@ namespace HASB_Cashier
                   ValidateAudience = true,
                   ValidateLifetime = true,
                   ValidateIssuerSigningKey = true,
-                  ValidIssuer = "http://localhost:2000",
-                  ValidAudience = "http://localhost:2000",
+                  ValidIssuer = "http://localhost:3000",
+                  ValidAudience = "http://localhost:3000",
                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSecret:CashierSecret"]))
               };
           });

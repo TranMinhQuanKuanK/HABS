@@ -14,52 +14,18 @@ namespace BusinessLayer.Constants
         {
             _cfgService = cfgService;
         }
-        public string[] ConfigKeyList
+        public string AdminUsername
         {
             get
             {
-                return new string[] {
-            "CASHIER_SECRET",
-            "DOCTOR_SECRET",
-            "USER_SECRET",
-            "SCREEN_SECRET",
-            "ADMIN_SECRET",
-            };
+                return _cfgService.GetValueFromConfig("ADMIN_USERNAME");
             }
         }
-        public string SecretForCashierApp
+        public string AdminPassword
         {
             get
             {
-                return _cfgService.GetValueFromConfig("CASHIER_SECRET");
-            }
-        }
-        public string SecretForDoctorApp
-        {
-            get
-            {
-                return  _cfgService.GetValueFromConfig("DOCTOR_SECRET");
-            }
-        }
-        public string SecretForUserApp
-        {
-            get
-            {
-                return  _cfgService.GetValueFromConfig("USER_SECRET");
-            }
-        }
-        public string SecretForScreenApp
-        {
-            get
-            {
-                return  _cfgService.GetValueFromConfig("SCREEN_SECRET");
-            }
-        }
-        public string SecretForAdminApp
-        {
-            get
-            {
-                return  _cfgService.GetValueFromConfig("ADMIN_SECRET");
+                return _cfgService.GetValueFromConfig("ADMIN_PASSWORD");
             }
         }
         //public string SecretForCashierApp = "Secretttttt%123123123123!@#!@#";

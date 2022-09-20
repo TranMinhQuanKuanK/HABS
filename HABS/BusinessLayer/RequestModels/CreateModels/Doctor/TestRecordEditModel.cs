@@ -12,5 +12,7 @@ namespace BusinessLayer.RequestModels.CreateModels.Doctor
         public long Id { get; set; }
         public int? Status { get; set; }
         public IFormFile ResultFile { get; set; }
+        public string ResultDescription { get; set; }
+
     }
 }

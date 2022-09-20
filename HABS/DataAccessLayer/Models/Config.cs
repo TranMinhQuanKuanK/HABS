@@ -9,8 +9,9 @@
         {
             public enum ConfigType
             {
-                DEVELOPER,
-                USER
+                DEVELOPER_CONFIG,
+                USER_CONFIG,
+                PASSWORD_CONFIG,
             }
             public long Id { get; set; }
             public string Name { get; set; }

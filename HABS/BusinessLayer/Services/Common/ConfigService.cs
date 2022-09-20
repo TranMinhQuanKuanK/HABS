@@ -8,22 +8,15 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using BusinessLayer.Services.Redis;
-using Newtonsoft.Json;
-using BusinessLayer.Interfaces.Doctor;
-using BusinessLayer.ResponseModels.ViewModels.Doctor;
-using static DataAccessLayer.Models.Operation;
-using BusinessLayer.RequestModels.SearchModels.Doctor;
 using DataAccessLayer.Models;
-using BusinessLayer.Interfaces.Common;
-using BusinessLayer.Constants;
 using BusinessLayer.ResponseModels.ViewModels.Admin;
 using DataAcessLayer;
 using Microsoft.Extensions.Configuration;
+using BusinessLayer.RequestModels.SearchModels.Admin;
+using Utilities;
 
 namespace BusinessLayer.Services.Common
 {
@@ -73,7 +66,7 @@ namespace BusinessLayer.Services.Common
 
             return resultValue;
         }
-        public List<ConfigViewModel> GetConfigsList()
+        public List<ConfigViewModel> GetConfigsList(ConfigSearchModel model)
         {
             //get config list
             var configList = _genericRepo
@@ -88,7 +81,16 @@ namespace BusinessLayer.Services.Common
                     Value = x.Value,
                 })
                 .ToList();
-            return configList;
+            var result = configList
+                .Where(x => (!string.IsNullOrEmpty(model.Name))? 
+                StringNormalizer.VietnameseNormalize(x.Name)
+                .Contains(StringNormalizer.VietnameseNormalize(model.Name)) 
+                : true)
+                .Where(x => !string.IsNullOrEmpty(model.Key) ? x.Key.Contains(model.Key) : true)
+                .Where(x => model.Id != null ? x.Id == model.Id : true)
+                .Where(x => model.Type != null ? (int)x.Type == model.Type : true)
+                .ToList();
+            return result;
         }
         public async Task<string> EditConfigValue(long id, string value)
         {
