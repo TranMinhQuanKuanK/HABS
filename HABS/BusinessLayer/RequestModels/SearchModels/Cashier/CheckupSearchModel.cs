@@ -16,6 +16,8 @@ namespace BusinessLayer.RequestModels.SearchModels.Cashier
         public string SearchTerm { get; set; }
         public DateTime? From { get; set; }
         public DateTime? To { get; set; }
+        public string QrCode { get; set; }
+
 
     }
 }

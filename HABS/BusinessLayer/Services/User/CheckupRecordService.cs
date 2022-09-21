@@ -243,7 +243,8 @@ namespace BusinessLayer.Services.User
                         CardType = x.CardType,
                         VnPayTranNo = x.VnPayTransactionNo,
                         PaymentMethod = x.PaymentMethod==null?0:(int)x.PaymentMethod,
-                        TransactionStatus = x.TransactionStatus 
+                        TransactionStatus = x.TransactionStatus ,
+                        QrCode = x.QrCode,
                     }).ToList();
                 data.Bill = bills;
             }
@@ -514,7 +515,8 @@ namespace BusinessLayer.Services.User
                 PatientId = patient.Id,
                 PhoneNo = patient.PhoneNumber,
                 AccountPhoneNo = patient.Account.PhoneNumber,
-                PaymentMethod = Bill.PaymentMethodEnum.TIEN_MAT
+                PaymentMethod = Bill.PaymentMethodEnum.TIEN_MAT,
+                QrCode = Guid.NewGuid().ToString()
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();

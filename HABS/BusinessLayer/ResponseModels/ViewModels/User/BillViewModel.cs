@@ -20,6 +20,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
         public long PatientId { get; set; }
         public int Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
+        public string QrCode { get; set; }
 
         //VnPay
         public int PaymentMethod { get; set; } //0 là tiền mặt, 1 là vnpay

@@ -31,7 +31,7 @@ namespace BusinessLayer.Services.Doctor
         private string[] permittedExtensions = { "pdf" };
         private long sizeLimit = 7 * 1048576;
 
-        private string GetFileName(long patientId, long trId)
+        private string GetTestResultFileName(long patientId, long trId)
         {
             return $"test-result/patient-{patientId}/result-{trId}-{((DateTimeOffset)DateTime.Now.AddHours(7)).ToUnixTimeMilliseconds()}.pdf";
         }
@@ -88,7 +88,7 @@ namespace BusinessLayer.Services.Doctor
                 Console.WriteLine($"Error: {ex.Message}");
             }
             //upload fireabse
-            string fileName = GetFileName(patientId, trId);
+            string fileName = GetTestResultFileName(patientId, trId);
             if (file.Length > 0)
             {
                 var memoStream = new MemoryStream();

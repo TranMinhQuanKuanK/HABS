@@ -108,8 +108,8 @@ namespace HASB_Cashier
                   ValidateAudience = true,
                   ValidateLifetime = true,
                   ValidateIssuerSigningKey = true,
-                  ValidIssuer = "http://localhost:3000",
-                  ValidAudience = "http://localhost:3000",
+                  ValidIssuer = "http://localhost:2000",
+                  ValidAudience = "http://localhost:2000",
                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSecret:CashierSecret"]))
               };
           });

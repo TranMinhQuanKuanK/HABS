@@ -47,9 +47,11 @@ namespace BusinessLayer.Services.Cashier
                 .Where(x => search.PatientId==null ? true : x.PatientId==search.PatientId)
                 .Where(x => string.IsNullOrEmpty(search.PatientName) ? true : x.PatientName.Contains(search.PatientName))
                 .Where(x => string.IsNullOrEmpty(search.PhoneNo) ? true : x.PhoneNo.Contains(search.PhoneNo))
-                .Where(x => string.IsNullOrEmpty(search.SearchTerm) ? true : x.PhoneNo.Contains(search.SearchTerm)
-                || x.PatientName.Contains(search.SearchTerm)
-                || x.AccountPhoneNo.Contains(search.SearchTerm))
+                .Where(x => string.IsNullOrEmpty(search.SearchTerm) ? true : 
+                        x.PhoneNo.Contains(search.SearchTerm)
+                        || x.PatientName.Contains(search.SearchTerm)
+                        || x.AccountPhoneNo.Contains(search.SearchTerm))
+                .Where(x => string.IsNullOrEmpty(search.QrCode) ? true : x.QrCode == search.QrCode)
                 .Where(x => search.From == null ? true : x.TimeCreated >= search.From)
                 .Where(x => search.To == null ? true : x.TimeCreated <= search.To)
                 .Where(x => search.Status==null ? true : x.Status == (BillStatus)search.Status)
@@ -71,6 +73,7 @@ namespace BusinessLayer.Services.Cashier
                     PatientId=(long)x.PatientId,
                     DateOfBirth = x.Patient.DateOfBirth,
                     Gender =(int) x.Patient.Gender,
+                    QrCode = x.QrCode,
                 })
                 .ToList();
             return bills;
@@ -94,6 +97,7 @@ namespace BusinessLayer.Services.Cashier
                     CashierId = x.CashierId,
                     CashierName = x.CashierName,
                     DateOfBirth = x.Patient.DateOfBirth,
+                    QrCode = x.QrCode,
                     Gender = (int)x.Patient.Gender,
                     PhoneNo = x.PhoneNo,
                     AccountPhoneNo = x.AccountPhoneNo,

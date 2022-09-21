@@ -46,7 +46,7 @@ namespace DataAccessLayer.Models
         public DateTime? PayDate { get; set; }
         public string VnPayTransactionNo { get; set; }
         public string TransactionStatus { get; set; }
-
+        public string QrCode { get; set; }
         public virtual Cashier Cashier { get; set; }
         public virtual Patient Patient { get; set; }
         public virtual ICollection<BillDetail> BillDetails { get; set; }

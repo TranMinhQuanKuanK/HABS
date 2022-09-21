@@ -20,6 +20,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.Cashier
         public long PatientId { get; set; }
         public int Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
+        public string QrCode { get; set; }
 
         public string CashierName { get; set; }
         public long? CashierId { get; set; }

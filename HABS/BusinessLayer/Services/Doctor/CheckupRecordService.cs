@@ -292,7 +292,8 @@ namespace BusinessLayer.Services.Doctor
                 PatientId = patient.Id,
                 PhoneNo = patient.PhoneNumber,
                 AccountPhoneNo = patient.AccountPhoneNo,
-                PaymentMethod= PaymentMethodEnum.TIEN_MAT
+                PaymentMethod= PaymentMethodEnum.TIEN_MAT,
+                QrCode = Guid.NewGuid().ToString()
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
@@ -402,7 +403,8 @@ namespace BusinessLayer.Services.Doctor
                 PatientId = patient.Id,
                 PhoneNo = patient.PhoneNumber,
                 AccountPhoneNo = patient.AccountPhoneNo,
-                PaymentMethod = PaymentMethodEnum.TIEN_MAT
+                PaymentMethod = PaymentMethodEnum.TIEN_MAT,
+                QrCode = Guid.NewGuid().ToString()
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
@@ -655,7 +657,8 @@ namespace BusinessLayer.Services.Doctor
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
                 AccountPhoneNo = patient.Account.PhoneNumber,
-                PaymentMethod = PaymentMethodEnum.TIEN_MAT
+                PaymentMethod = PaymentMethodEnum.TIEN_MAT,
+                QrCode = Guid.NewGuid().ToString()
             };
             await _unitOfWork.BillRepository.Add(bill);
             //tạo mới CR
