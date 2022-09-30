@@ -17,6 +17,7 @@ using DataAcessLayer;
 using Microsoft.Extensions.Configuration;
 using BusinessLayer.RequestModels.SearchModels.Admin;
 using Utilities;
+using BusinessLayer.RequestModels.CreateModels.Admin;
 
 namespace BusinessLayer.Services.Common
 {
@@ -82,11 +83,13 @@ namespace BusinessLayer.Services.Common
                 })
                 .ToList();
             var result = configList
-                .Where(x => (!string.IsNullOrEmpty(model.Name))? 
+                .Where(x => (!string.IsNullOrEmpty(model.SearchTerm))
+                ? 
                 StringNormalizer.VietnameseNormalize(x.Name)
-                .Contains(StringNormalizer.VietnameseNormalize(model.Name)) 
+                .Contains(StringNormalizer.VietnameseNormalize(model.SearchTerm)) || 
+                StringNormalizer.VietnameseNormalize(x.Key)
+                .Contains(StringNormalizer.VietnameseNormalize(model.SearchTerm)) 
                 : true)
-                .Where(x => !string.IsNullOrEmpty(model.Key) ? x.Key.Contains(model.Key) : true)
                 .Where(x => model.Id != null ? x.Id == model.Id : true)
                 .Where(x => model.Type != null ? (int)x.Type == model.Type : true)
                 .ToList();
@@ -105,6 +108,31 @@ namespace BusinessLayer.Services.Common
             
             UpdateRedis_Config(config.Key);
             return config.Key;
+        }
+        public async Task<List<string>> EditConfigListValue(ConfigListEditModel listValue)
+        {
+            var idList = listValue.List.Select(x => x.Id).ToList();
+            var configList = _genericRepo.Get().Where(x => idList.Contains(x.Id)).ToList();
+            if (configList.Count!=idList.Count)
+            {
+                throw new Exception("Invalid edit request");
+            }
+            var dict = new Dictionary<long, string>();
+            foreach (var item in listValue.List) {
+                dict.Add(item.Id, item.Value);
+            }
+            foreach (var item in configList)
+            {
+                item.Value = dict[item.Id];
+            }
+            await _dbContext.SaveChangesAsync();
+            var result = new List<string>();
+            foreach (var item in configList)
+            {
+                UpdateRedis_Config(item.Key);
+                result.Add(item.Key);
+            }
+            return result;
         }
     }
 }

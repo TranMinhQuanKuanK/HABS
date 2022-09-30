@@ -38,8 +38,8 @@ namespace BusinessLayer.Services.Payment.VnPay
             {
                 throw new Exception("Bill doesn't exist");
             }
-            //xét status
 
+            //xét status
             string vnp_Returnurl = _baseConfig.VnpayConfig.VnpReturnurl; //Redirect đến URL này sau khi giao dịch được thực hiện. Code một trang riêng để thông báo kết quả thanh toán cho bệnh nhân.
             string vnp_Url = _baseConfig.VnpayConfig.VnpUrl; //URL thanh toán của VNPAY.
             string vnp_TmnCode = _baseConfig.VnpayConfig.VnpTmnCode; //Mã website
@@ -141,6 +141,7 @@ namespace BusinessLayer.Services.Payment.VnPay
                         //nếu là CR
                         if (bd.TestRecordId == null && bd.CheckupRecordId != null)
                         {
+                            //lấy CheckupRecord
                             cr = _unitOfWork.CheckupRecordRepository.Get()
                                 .Include(x => x.TestRecords)
                                 .Include(x => x.Patient)
@@ -163,7 +164,6 @@ namespace BusinessLayer.Services.Payment.VnPay
                             }
                             cr.Status = CheckupRecordStatus.DA_THANH_TOAN;
                             //bắn status cho mobile nếu có
-
                         }
                         //nếu là TR
                         else if (bd.TestRecordId != null && bd.CheckupRecordId == null)
@@ -173,6 +173,7 @@ namespace BusinessLayer.Services.Payment.VnPay
                             cr = _unitOfWork.CheckupRecordRepository.Get()
                                  .Include(x => x.Patient)
                                 .Where(x => x.Id == tr.CheckupRecordId).FirstOrDefault();
+                            //khi có TR trong bill thì đều đổi CR status thành chờ KQXN
                             cr.Status = CheckupRecordStatus.CHO_KQXN;
                             tr.Status = TestRecordStatus.DA_THANH_TOAN;
                         }

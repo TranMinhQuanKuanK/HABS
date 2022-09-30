@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.ResponseModels.ViewModels.Doctor
 {
-    public class CheckupAppointmentViewModel
+    public class TestingCheckupRecordViewModel
     {
         public long Id { get; set; }
         public int Status { get; set; }
@@ -15,5 +15,6 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public string PatientName { get; set; }
         public long? PatientId { get; set; }
         public bool IsReExam { get; set; }
+        public List<string> OperationList { get; set; }
     }
 }

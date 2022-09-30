@@ -250,7 +250,8 @@ namespace BusinessLayer.Services.User
             }
             return data;
         }
-        public async Task<AppointmenAfterBookingResponseModel> CreatReExamAppointment(long patientId, long previousCrId, DateTime date,
+        public async Task<AppointmenAfterBookingResponseModel> CreatReExamAppointment(
+            long patientId, long previousCrId, DateTime date,
             long doctorId, int? numericalOrder, string clinicalSymptom,long accountId)
         {
             //kiểm tra ngày có hợp lệ, có thuộc phiên làm việc chính thức ko
@@ -353,13 +354,20 @@ namespace BusinessLayer.Services.User
                 }
                 //gán thời gian bắt đầu cho hợp lí (không lấy date của client)
             }
-            //chuyển status về đã đặt lịch thay vì tạo mới
-            prevCr.Status = CheckupRecordStatus.DA_DAT_LICH;
-            //đặt lịch cho các TR
+            //lấy danh sách các xét nghiệm liên quan của CR này
             var prevCrTRList = _unitOfWork.TestRecordRepository
                 .Get()
                 .Where(x => x.CheckupRecordId == prevCr.Id)
                 .ToList();
+            //chuyển status CR về đã đặt lịch, nếu có XN trước thì thành Chờ thanh toán phí XN
+            if (prevCrTRList.Count==0)
+            {
+                prevCr.Status = CheckupRecordStatus.CHO_THANH_TOAN_PHI_XN;
+            } else
+            {
+                prevCr.Status = CheckupRecordStatus.DA_DAT_LICH;
+            }
+            //đặt lịch cho các TR liên quan của CR
             foreach (var _tr in prevCrTRList)
             {
                 var room = _numService.GetAppropriateRoomForOperation(_tr.Operation,true);
@@ -368,6 +376,7 @@ namespace BusinessLayer.Services.User
                     throw new Exception("Rooms for this operation haven't been configured");
                 }
                 var numOrd = _numService.GetNumOrderForAutoIncreaseRoom(room, date);
+
                 _tr.RoomId = room.Id;
                 _tr.RoomNumber = room.RoomNumber;
                 _tr.Floor = room.Floor;
@@ -378,7 +387,7 @@ namespace BusinessLayer.Services.User
             await _unitOfWork.SaveChangesAsync();
             return new AppointmenAfterBookingResponseModel()
             {
-                DepartmentName = prevCr.RoomNumber,
+                DepartmentName = prevCr.DepartmentName,
                 DoctorName = doctor.Name,
                 Date = (DateTime)prevCr.Date,
                 Floor = prevCr.Floor,

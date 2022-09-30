@@ -22,7 +22,7 @@ namespace BusinessLayer.Services.Doctor
             _distributedCache = distributedCache;
             _redisService = new RedisService(_distributedCache);
         }
-        public List<CheckupAppointmentViewModel> UpdateRedis_FinishedCheckupQueue(long RoomId)
+        public List<FinishedCheckupRecordViewModel> UpdateRedis_FinishedCheckupQueue(long RoomId)
         {
             string redisKey = $"finished-checkup-queue-for-room-{RoomId}";
 
@@ -34,7 +34,7 @@ namespace BusinessLayer.Services.Doctor
             )
             .Where(x => ((DateTime)x.EstimatedDate).Date == DateTime.Now.AddHours(7).Date)
             .OrderBy(x => ((DateTime)x.EstimatedStartTime).TimeOfDay)
-            .Select(x => new CheckupAppointmentViewModel()
+            .Select(x => new FinishedCheckupRecordViewModel()
             {
                 Id = x.Id,
                 EstimatedStartTime = x.EstimatedStartTime,
@@ -49,11 +49,12 @@ namespace BusinessLayer.Services.Doctor
             _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue), 5 * 60);
             return queue;
         }
-        public List<CheckupAppointmentViewModel> UpdateRedis_TestingCheckupQueue(long RoomId)
+        public List<TestingCheckupRecordViewModel> UpdateRedis_TestingCheckupQueue(long RoomId)
         {
             string redisKey = $"testing-checkup-queue-for-room-{RoomId}";
 
             var queue = _unitOfWork.CheckupRecordRepository.Get()
+                .Include(x => x.TestRecords)
             .Where(x => x.RoomId == RoomId)
             .Where(x => x.Status == CheckupRecordStatus.CHO_THANH_TOAN_PHI_XN
             || x.Status == CheckupRecordStatus.CHO_KQXN
@@ -61,7 +62,7 @@ namespace BusinessLayer.Services.Doctor
             )
             .Where(x => ((DateTime)x.EstimatedDate).Date == DateTime.Now.AddHours(7).Date)
             .OrderBy(x => ((DateTime)x.EstimatedStartTime).TimeOfDay)
-            .Select(x => new CheckupAppointmentViewModel()
+            .Select(x => new TestingCheckupRecordViewModel()
             {
                 Id = x.Id,
                 EstimatedStartTime = x.EstimatedStartTime,
@@ -70,7 +71,7 @@ namespace BusinessLayer.Services.Doctor
                 NumericalOrder = x.NumericalOrder,
                 Status = (int)x.Status,
                 IsReExam = (bool)x.IsReExam,
-
+                OperationList = x.TestRecords.Select(x => x.OperationName).ToList()
             }).ToList();
 
             _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(queue), 5*60);
@@ -136,15 +137,15 @@ namespace BusinessLayer.Services.Doctor
 
             return queue;
         }
-        public List<CheckupAppointmentViewModel> GetFinishedCheckupQueue(long RoomId)
+        public List<FinishedCheckupRecordViewModel> GetFinishedCheckupQueue(long RoomId)
         {
-            List<CheckupAppointmentViewModel> queue = null;
+            List<FinishedCheckupRecordViewModel> queue = null;
 
             string redisKey = $"finished-checkup-queue-for-room-{RoomId}";
             string dataFromRedis = _redisService.GetValueFromKey(redisKey);
             if (!String.IsNullOrEmpty(dataFromRedis))
             {
-                queue = JsonConvert.DeserializeObject<List<CheckupAppointmentViewModel>>(dataFromRedis);
+                queue = JsonConvert.DeserializeObject<List<FinishedCheckupRecordViewModel>>(dataFromRedis);
             }
             else
             {
@@ -153,15 +154,15 @@ namespace BusinessLayer.Services.Doctor
 
             return queue;
         }
-        public List<CheckupAppointmentViewModel> GetTestingCheckupQueue(long RoomId)
+        public List<TestingCheckupRecordViewModel> GetTestingCheckupQueue(long RoomId)
         {
-            List<CheckupAppointmentViewModel> queue = null;
+            List<TestingCheckupRecordViewModel> queue = null;
 
             string redisKey = $"testing-checkup-queue-for-room-{RoomId}";
             string dataFromRedis = _redisService.GetValueFromKey(redisKey);
             if (!String.IsNullOrEmpty(dataFromRedis))
             {
-                queue = JsonConvert.DeserializeObject<List<CheckupAppointmentViewModel>>(dataFromRedis);
+                queue = JsonConvert.DeserializeObject<List<TestingCheckupRecordViewModel>>(dataFromRedis);
             }
             else
             {

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HASB_Admin.Controllers
@@ -41,7 +42,7 @@ namespace HASB_Admin.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Thay đổi config")]
+        [SwaggerOperation(Summary = "Thay đổi giá trị một config")]
         [HttpPost("{id}")]
         public async Task<IActionResult> EditConfig([FromRoute] long Id, [FromBody] ConfigEditModel model)
         {
@@ -51,6 +52,26 @@ namespace HASB_Admin.Controllers
                 //this solution for refreshing on memory config will fail when we have 2 or more
                 //instance of this app
                 _baseConfig.RefreshOnMemoryConfig(key);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [SwaggerOperation(Summary = "Thay đổi giá trị danh sách config")]
+        [HttpPost()]
+        public async Task<IActionResult> EditConfigList([FromBody] ConfigListEditModel model)
+        {
+            try
+            {
+                List<string> keyList = await _configService.EditConfigListValue(model);
+                //this solution for refreshing on memory config will fail when we have 2 or more
+                //instance of this app
+                foreach (var item in keyList)
+                {
+                    _baseConfig.RefreshOnMemoryConfig(item);
+                }
                 return Ok();
             }
             catch (Exception e)

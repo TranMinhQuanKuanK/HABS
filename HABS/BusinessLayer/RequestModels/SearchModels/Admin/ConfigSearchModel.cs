@@ -9,8 +9,7 @@ namespace BusinessLayer.RequestModels.SearchModels.Admin
 {
     public class ConfigSearchModel
     {
-        public string Name { get; set; }
-        public string Key { get; set; }
+        public string SearchTerm { get; set; }
         public int? Type { get; set; }
         public long? Id { get; set; }
     }

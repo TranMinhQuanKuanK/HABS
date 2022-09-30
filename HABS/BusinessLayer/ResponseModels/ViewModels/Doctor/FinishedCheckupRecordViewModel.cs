@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.ResponseModels.ViewModels.Doctor
 {
-    public class CheckupAppointmentViewModel
+    public class FinishedCheckupRecordViewModel
     {
         public long Id { get; set; }
         public int Status { get; set; }
