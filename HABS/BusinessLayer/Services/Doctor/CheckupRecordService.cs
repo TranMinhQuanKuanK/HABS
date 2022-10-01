@@ -619,7 +619,7 @@ namespace BusinessLayer.Services.Doctor
             {
                 throw new Exception("Previous Checkup record doesn't exist");
             }
-            //kiểm tra các operation
+            //lấy operation và kiểm tra các operation đủ ko
             var listOp = _unitOfWork.OperationRepository.Get()
                 .Where(x => model.RequiredTest.ExamOperationIds.Contains(x.Id)).ToList();
             if (listOp.Count != model.RequiredTest.ExamOperationIds.Count)
@@ -632,8 +632,8 @@ namespace BusinessLayer.Services.Doctor
             {
                 throw new Exception("Department doesn't exist");
             }
-            //Thêm note vào CR cũ
-            preCr.DoctorAdvice = preCr.DoctorAdvice + $"\\n Hẹn tái khám vào ngày {model.ReExamDate.Date}, các xét nghiệm cần thực hiện trước khi tái khám: ";
+            //Thêm note vào CR cũ (need review)
+            preCr.DoctorAdvice = preCr.DoctorAdvice + $" Hẹn tái khám vào ngày {model.ReExamDate.Date}, các xét nghiệm cần thực hiện trước khi tái khám: ";
             for (int i = 0; i < listOp.Count; i++)
             {
                 preCr.DoctorAdvice = preCr.DoctorAdvice + listOp[i].Name;
@@ -690,6 +690,8 @@ namespace BusinessLayer.Services.Doctor
                     PatientId = model.PatientId,
                     PatientName = patient.Name,
                     Status = TestRecord.TestRecordStatus.CHUA_DAT_LICH,
+                    QrCode = Guid.NewGuid().ToString(),
+                    //RoomId = op.sdfslkfjsldfkj
                 };
                 await _unitOfWork.TestRecordRepository.Add(testRecor);
                 await _unitOfWork.SaveChangesAsync();

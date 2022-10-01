@@ -45,7 +45,8 @@ namespace BusinessLayer.Services.User
                                 && x.Status != CheckupRecordStatus.DA_HUY
                                 && x.Status != CheckupRecordStatus.DA_XOA
                                 && x.Status != CheckupRecordStatus.NHAP_VIEN
-                                && x.Status != CheckupRecordStatus.KET_THUC)
+                                && x.Status != CheckupRecordStatus.KET_THUC
+                                && x.Status != CheckupRecordStatus.CHO_TAI_KHAM)
                             )
                             .Select(x => new CheckupAppointmentResponseModel()
                             {

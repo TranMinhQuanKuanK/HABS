@@ -97,52 +97,7 @@ namespace BusinessLayer.Services.Doctor
             {
                 throw new Exception("Room invalid");
             }
-            if (room.RoomTypeId != IdConfig.ID_ROOMTYPE_PHONG_KHAM)
-            {
-                if (doctor.Type == (int)DoctorType.BS_XET_NGHIEM)
-                {
-                    return doctor;
-                }
-            }
-            if (room.RoomTypeId == IdConfig.ID_ROOMTYPE_PHONG_KHAM && room.DepartmentId != null)
-            {
-                if (doctor.Type == (int)DoctorType.BS_CHUYEN_KHOA)
-                {
-                    return doctor;
-                }
-            }
-            #region Sau này xóa
-            if (login.Username == "doctor" && login.Password == "123")
-            {
-                if (room != null)
-                {
-                    doctor.Room = new RoomViewModel()
-                    {
-                        Id = room.Id,
-                        DepartmentId = room.DepartmentId == null ? null : room.DepartmentId,
-                        DepartmentName = room.Department == null ? null : room.Department.Name,
-                        Floor = room.Floor,
-                        IsGeneralRoom = room.DepartmentId == null ?false: room.DepartmentId == IdConfig.ID_DEPARTMENT_DA_KHOA,
-                        RoomTypeId = (long)room.RoomTypeId,
-                        RoomNumber = room.RoomNumber,
-                        Note = room.Note,
-                        RoomTypeName = room.RoomType.Name,
-                    };
-                }
-                return doctor;
-            }
-            #endregion Sau này xóa
 
-            var currSess = getCurrentSession();
-            if (currSess == null)
-            {
-                return null;
-            }
-            var now = DateTime.Now.AddHours(7);
-            var schedule = _unitOfWork.ScheduleRepository.Get().
-                Where(x => x.DoctorId == doctor.Id && x.RoomId == login.RoomId && x.Weekday == now.DayOfWeek
-                && x.Session == (SessionType)currSess).FirstOrDefault();
-            if (schedule == null) { return null; }
             doctor.Room = new RoomViewModel()
             {
                 Id = room.Id,
@@ -155,6 +110,49 @@ namespace BusinessLayer.Services.Doctor
                 Note = room.Note,
                 RoomTypeName = room.RoomType.Name,
             };
+            #region AccountFor
+            if (login.Username == "doctor" && login.Password == "123")
+            {
+                if (room != null)
+                {
+                    doctor.Room = new RoomViewModel()
+                    {
+                        Id = room.Id,
+                        DepartmentId = room.DepartmentId == null ? null : room.DepartmentId,
+                        DepartmentName = room.Department == null ? null : room.Department.Name,
+                        Floor = room.Floor,
+                        IsGeneralRoom = room.DepartmentId == null ? false : room.DepartmentId == IdConfig.ID_DEPARTMENT_DA_KHOA,
+                        RoomTypeId = (long)room.RoomTypeId,
+                        RoomNumber = room.RoomNumber,
+                        Note = room.Note,
+                        RoomTypeName = room.RoomType.Name,
+                    };
+                }
+                return doctor;
+            }
+            #endregion AccountForDevelopingPurpose
+            //bác sĩ xét nghiệm hoặc bác sĩ chuyên khoa thì bỏ qua check session
+            bool isTestDoctor = room.RoomTypeId != IdConfig.ID_ROOMTYPE_PHONG_KHAM &&
+               doctor.Type == (int)DoctorType.BS_XET_NGHIEM;
+            bool isSpecificDoctor = room.RoomTypeId == IdConfig.ID_ROOMTYPE_PHONG_KHAM &&
+                room.DepartmentId != null &&
+                doctor.Type == (int)DoctorType.BS_CHUYEN_KHOA;
+            if (isTestDoctor|| isSpecificDoctor)
+            {
+                return doctor;
+            }
+           
+            SessionType? currSess = null;
+            currSess = getCurrentSession();
+            if (currSess == null)
+            {
+                return null;
+            }
+            var now = DateTime.Now.AddHours(7);
+            var schedule = _unitOfWork.ScheduleRepository.Get().
+                Where(x => x.DoctorId == doctor.Id && x.RoomId == login.RoomId && x.Weekday == now.DayOfWeek
+                && x.Session == (SessionType)currSess).FirstOrDefault();
+            if (schedule == null) { return null; }
             return doctor;
         }
     }

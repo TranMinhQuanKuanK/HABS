@@ -42,18 +42,15 @@ namespace HASB_User.Controllers
                 {
                     accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                var data = _checkupRecordService.GetCheckupRecordMetadata(null, searchModel.FromTime, 
+                var data = _checkupRecordService.GetCheckupRecordMetadata(null, searchModel.FromTime,
                     searchModel.ToTime, searchModel.DepartmentId, accountId);
 
                 int totalItem = data.Count;
-                if (totalItem == 0)
+                if (totalItem != 0)
                 {
-                    return NoContent();
+                    data = data.Skip((paging.PageIndex - 1) * paging.PageSize)
+                 .Take(paging.PageSize).ToList();
                 }
-
-                data = data.Skip((paging.PageIndex - 1) * paging.PageSize)
-                    .Take(paging.PageSize).ToList();
-
                 var result = new BasePagingViewModel<PatientRecordMetadataResponseModel>()
                 {
                     PageIndex = paging.PageIndex,
@@ -81,7 +78,7 @@ namespace HASB_User.Controllers
                 {
                     accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                var data = _checkupRecordService.GetCheckupRecordFullData(id, accountId,true);
+                var data = _checkupRecordService.GetCheckupRecordFullData(id, accountId, true);
                 if (data == null)
                 {
                     return NoContent();

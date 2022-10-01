@@ -54,7 +54,6 @@ namespace BusinessLayer.Services.Screen
                 if (cr.Status == CheckupRecordStatus.DA_THANH_TOAN)
                 {
                     cr.Status = CheckupRecordStatus.CHECKED_IN;
-
                 }
                 else if (cr.Status == CheckupRecordStatus.DA_CO_KQXN)
                 {
@@ -78,7 +77,13 @@ namespace BusinessLayer.Services.Screen
             {
                 //Checkin phòng xét nghiệm
                 //đổi status
-                tr.Status = TestRecordStatus.CHECKED_IN;
+                if (tr.Status == TestRecordStatus.DA_THANH_TOAN)
+                {
+                    tr.Status = TestRecordStatus.CHECKED_IN;
+                } else
+                {
+                    return;
+                }
                 //cập nhật queue
                 await _unitOfWork.SaveChangesAsync();
                 if (tr.RoomId != null)

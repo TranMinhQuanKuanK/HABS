@@ -118,11 +118,6 @@ namespace BusinessLayer.Services.Cashier
 
         public async Task PayABill(long billId, long cashierId)
         {
-            long tempRoomForCheckup = 0;
-            List<long> tempRoomForTest = new List<long>();
-            bool doUpdateTestQueue = false;
-            bool doUpdateCheckupQueue = false;
-
             var cashier = _unitOfWork.CashierRepository
                 .Get().Where(x => x.Id == cashierId).FirstOrDefault();
             if (cashier == null)
@@ -144,6 +139,7 @@ namespace BusinessLayer.Services.Cashier
                 //nếu là CR
                 if (bd.TestRecordId == null && bd.CheckupRecordId != null)
                 {
+                    //lấy CheckupRecord
                     cr = _unitOfWork.CheckupRecordRepository.Get()
                         .Include(x=>x.TestRecords)
                         .Include(x=>x.Patient)
@@ -153,24 +149,19 @@ namespace BusinessLayer.Services.Cashier
                     {
                         throw new Exception("No schedule for this checkup record");
                     }
-                    //nếu là đã tái khám thì 
-                    if ((bool)cr.IsReExam)
+                    //thay đổi status cho CR, nếu là tái khám có XN thì là Chờ KQXN (đồng thời đổi status của các TestRecord,
+                    //nếu là tái khám thường và khám thường thì là Đã thanh toán
+                    if ((bool)cr.IsReExam && cr.TestRecords.Count>0)
                     {
-                        if (cr.TestRecords.Count>0)
+                        foreach (var tr in cr.TestRecords)
                         {
-                            foreach(var tr in cr.TestRecords)
-                            {
-                                tr.Status = TestRecordStatus.DA_THANH_TOAN;
-                            }
+                            tr.Status = TestRecordStatus.DA_THANH_TOAN;
                         }
-                    }
-                    cr.Status = CheckupRecordStatus.DA_THANH_TOAN;
-                    if (((DateTime)cr.EstimatedDate).Date==DateTime.Now.AddHours(7).Date)
+                        cr.Status = CheckupRecordStatus.CHO_KQXN;
+                    } else
                     {
-                        doUpdateCheckupQueue = true;
-                        tempRoomForCheckup = (long)cr.RoomId;
+                        cr.Status = CheckupRecordStatus.DA_THANH_TOAN;
                     }
-                    //bắn status cho mobile nếu có
                 }
                 //nếu là TR
                 else if (bd.TestRecordId != null && bd.CheckupRecordId == null)
@@ -180,10 +171,9 @@ namespace BusinessLayer.Services.Cashier
                     cr = _unitOfWork.CheckupRecordRepository.Get()
                          .Include(x => x.Patient)
                         .Where(x => x.Id == tr.CheckupRecordId).FirstOrDefault();
+                    //khi có TR trong bill thì đều đổi CR status thành chờ KQXN
                     cr.Status = CheckupRecordStatus.CHO_KQXN;
                     tr.Status = TestRecordStatus.DA_THANH_TOAN;
-                    doUpdateTestQueue = true;
-                    tempRoomForTest.Add((long)tr.RoomId);
                 }
             }
             bill.Status = DataAccessLayer.Models.Bill.BillStatus.DA_TT_TIEN_MAT;
@@ -191,17 +181,7 @@ namespace BusinessLayer.Services.Cashier
             bill.CashierName = cashier.Name;
 
             await _unitOfWork.SaveChangesAsync();
-            //if (doUpdateCheckupQueue)
-            //{
-            //    _scheduleService.UpdateRedis_CheckupQueue(tempRoomForCheckup);
-            //}
-            //if (doUpdateTestQueue)
-            //{
-            //    foreach(var id in tempRoomForTest)
-            //    {
-            //        _scheduleService.UpdateRedis_TestQueue(id, false);
-            //    }
-            //}
+            //bắn noti cho mobile
             await _notiService.SendUpdateCheckupInfoReminder(cr.Id,cr.Patient.AccountId);
         }
         public async Task CancelABill(long billId, long cashierId)

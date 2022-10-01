@@ -151,19 +151,20 @@ namespace BusinessLayer.Services.Payment.VnPay
                             {
                                 throw new Exception("No schedule for this checkup record");
                             }
-                            //nếu là đã tái khám thì 
-                            if ((bool)cr.IsReExam)
+                            //thay đổi status cho CR, nếu là tái khám có XN thì là Chờ KQXN (đồng thời đổi status của các TestRecord,
+                            //nếu là tái khám thường và khám thường thì là Đã thanh toán
+                            if ((bool)cr.IsReExam && cr.TestRecords.Count > 0)
                             {
-                                if (cr.TestRecords.Count > 0)
+                                foreach (var tr in cr.TestRecords)
                                 {
-                                    foreach (var tr in cr.TestRecords)
-                                    {
-                                        tr.Status = TestRecordStatus.DA_THANH_TOAN;
-                                    }
+                                    tr.Status = TestRecordStatus.DA_THANH_TOAN;
                                 }
+                                cr.Status = CheckupRecordStatus.CHO_KQXN;
                             }
-                            cr.Status = CheckupRecordStatus.DA_THANH_TOAN;
-                            //bắn status cho mobile nếu có
+                            else
+                            {
+                                cr.Status = CheckupRecordStatus.DA_THANH_TOAN;
+                            }
                         }
                         //nếu là TR
                         else if (bd.TestRecordId != null && bd.CheckupRecordId == null)

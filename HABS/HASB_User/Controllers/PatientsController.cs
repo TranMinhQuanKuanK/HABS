@@ -36,10 +36,6 @@ namespace HASB_User.Controllers
                     accountId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
                 var result = _patientService.GetPatients(accountId);
-                if (result.Count==0)
-                {
-                    return NoContent();
-                }
                 return Ok(result);
             }
             catch (Exception e)
@@ -55,10 +51,6 @@ namespace HASB_User.Controllers
             {
                 //Kiểm tra patient có thuộc user hay không?
                 var result = _patientService.GetPatientById(id);
-                if (result == null)
-                {
-                    return NoContent();
-                }
                 return Ok(result);
             }
             catch (Exception)

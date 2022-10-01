@@ -362,10 +362,10 @@ namespace BusinessLayer.Services.User
             //chuyển status CR về đã đặt lịch, nếu có XN trước thì thành Chờ thanh toán phí XN
             if (prevCrTRList.Count==0)
             {
-                prevCr.Status = CheckupRecordStatus.CHO_THANH_TOAN_PHI_XN;
+                prevCr.Status = CheckupRecordStatus.DA_DAT_LICH;
             } else
             {
-                prevCr.Status = CheckupRecordStatus.DA_DAT_LICH;
+                prevCr.Status = CheckupRecordStatus.CHO_THANH_TOAN_PHI_XN;
             }
             //đặt lịch cho các TR liên quan của CR
             foreach (var _tr in prevCrTRList)
