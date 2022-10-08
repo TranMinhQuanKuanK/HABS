@@ -118,18 +118,22 @@ namespace BusinessLayer.Services.Doctor
             await _unitOfWork.SaveChangesAsync();
             if (model.Status != null)
             {
-                if (model.Status == (int)TestRecordStatus.HOAN_THANH ||
-                model.Status == (int)TestRecordStatus.CHO_KET_QUA)
+                if (model.Status == (int)TestRecordStatus.HOAN_THANH && model.ResultFile != null)
+                {
+                    throw new Exception("Can't complete test record without test result");
+
+                }
+                else if (model.Status == (int)TestRecordStatus.HOAN_THANH || model.Status == (int)TestRecordStatus.CHO_KET_QUA)
                 {
                     await _notiService.SendUpdateCheckupInfoReminder(cr.Id, cr.Patient.AccountId);
                 }
-                //cập nhật cache
-                _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, false);
-                _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, true);
-                if (model.Status == (int)TestRecordStatus.HOAN_THANH)
-                {
-                    _scheduleService.UpdateRedis_FinishedTestQueue((long)tr.RoomId);
-                }
+            }
+            //cập nhật cache
+            _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, false);
+            _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, true);
+            if (model.Status == (int)TestRecordStatus.HOAN_THANH)
+            {
+                _scheduleService.UpdateRedis_FinishedTestQueue((long)tr.RoomId);
             }
         }
         public async Task ConfirmTest(long doctorId, long tId)
