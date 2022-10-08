@@ -691,7 +691,6 @@ namespace BusinessLayer.Services.Doctor
                     PatientName = patient.Name,
                     Status = TestRecord.TestRecordStatus.CHUA_DAT_LICH,
                     QrCode = Guid.NewGuid().ToString(),
-                    //RoomId = op.sdfslkfjsldfkj
                 };
                 await _unitOfWork.TestRecordRepository.Add(testRecor);
                 await _unitOfWork.SaveChangesAsync();

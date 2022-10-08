@@ -55,7 +55,8 @@ namespace BusinessLayer.Services.Screen
                     DepartmentId = x.DepartmentId,
                     Floor =x.Floor,
                     Note= x.Note,
-                    RoomTypeId = x.RoomTypeId
+                    RoomTypeId = x.RoomTypeId,
+                    IsCheckupRoom = x.RoomTypeId == IdConfig.ID_ROOMTYPE_PHONG_KHAM
                 })
                 .FirstOrDefault();
             if (room == null)

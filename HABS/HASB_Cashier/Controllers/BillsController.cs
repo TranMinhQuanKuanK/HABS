@@ -38,11 +38,25 @@ namespace HASB_Cashier.Controllers
         }
         [SwaggerOperation(Summary = "Lấy thông tin hóa đơn theo id hóa đơn")]
         [HttpGet("{id}")]
-        public IActionResult GetBill0ById(long Id)
+        public IActionResult GetBillById(long Id)
         {
             try
             {
                 var data = _billService.GetBillById(Id);
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [SwaggerOperation(Summary = "Lấy thông tin hóa đơn bằng QR")]
+        [HttpGet("qr/{qr}")]
+        public IActionResult GetBillByQr(string Qr)
+        {
+            try
+            {
+                var data = _billService.GetBillByQr(Qr);
                 return Ok(data);
             }
             catch (Exception e)

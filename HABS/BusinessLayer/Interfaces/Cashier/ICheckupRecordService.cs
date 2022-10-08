@@ -16,5 +16,6 @@ namespace BusinessLayer.Interfaces.Cashier
         BillViewModel GetBillById(long id);
         Task PayABill(long billId, long cashierId);
         Task CancelABill(long billId, long cashierId);
+        BillViewModel GetBillByQr(string qrCode);
     }
 }

@@ -142,13 +142,16 @@ namespace HASB_User
             services.AddSingleton<ConfigService, ConfigService>();
             services.AddSingleton<BaseConfig, BaseConfig>();
             //user app
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.ICheckupRecordService,
+                BusinessLayer.Services.Doctor.CheckupRecordService>();
             services.AddTransient<ICheckupRecordService, CheckupRecordService>();
+
             services.AddTransient<IDoctorService, DoctorService>();
             services.AddTransient<IPatientService, PatientService>();
             services.AddTransient<IScheduleService, ScheduleService>();
 
             services.AddTransient<ILoginService, LoginService>();
-            services.AddTransient<BusinessLayer.Interfaces.Doctor.IDepartmentService, 
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.IDepartmentService,
                 BusinessLayer.Services.Doctor.DepartmentService>();
             services.AddTransient<BusinessLayer.Interfaces.Doctor.IOperationService,
                BusinessLayer.Services.Doctor.OperationService>();
@@ -161,7 +164,7 @@ namespace HASB_User
             //Firebase messaging
             services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<IUserService, UserService>();
-            services.AddTransient<BusinessLayer.Interfaces.Doctor.IScheduleService, 
+            services.AddTransient<BusinessLayer.Interfaces.Doctor.IScheduleService,
                 BusinessLayer.Services.Doctor.ScheduleService>();
 
             services.AddTransient<BusinessLayer.Interfaces.Notification.IFCMTokenService,

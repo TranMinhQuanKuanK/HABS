@@ -8,6 +8,7 @@ namespace BusinessLayer.RequestModels.CreateModels.Screen
 {
     public class CheckinModel
     {
+        public bool IsCheckupRecord { get; set; }
         public string QrCode { get; set; }
     }
 }

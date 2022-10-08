@@ -9,6 +9,8 @@ namespace BusinessLayer.Interfaces.Doctor
 {
     public interface IScheduleService
     {
+        int GetCurrentNumberCheckupRoom(long roomId);
+        int GetCurrentNumberTestRoom(long roomId);
         List<CheckupAppointmentViewModel> UpdateRedis_CheckupQueue(long RoomId);
         List<TestAppointmentViewModel> UpdateRedis_TestQueue(long RoomId, bool isWaitingForResult);
         List<CheckupAppointmentViewModel> GetCheckupQueue(long RoomId);

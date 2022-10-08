@@ -10,6 +10,7 @@ namespace BusinessLayer.Interfaces.Screen
 {
     public interface ICheckinService
     {
-        Task Checkin(string qrCode,long roomId);
+        Task<List<CheckupAppointmentViewModel>> CheckinForCheckupRecord(string qrCode, long roomId);
+        Task<List<TestAppointmentViewModel>> CheckinForTestRecord(string qrCode, long roomId);
     }
 }

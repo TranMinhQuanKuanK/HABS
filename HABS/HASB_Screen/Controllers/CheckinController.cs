@@ -27,11 +27,10 @@ namespace HASB_Screen.Controllers
         {
             _checkinService = service;
         }
-        [SwaggerOperation(Summary = "Checkin phòng khám hoặc phòng xét nghiệ (giả)")]
+        [SwaggerOperation(Summary = "Checkin phòng khám hoặc phòng xét nghiệm")]
         [HttpPost]
         public async Task<IActionResult> CheckinCheckupRoom([FromBody] CheckinModel model)
         {
-            //sau enable lên lại
             try
             {
                 long roomId = 0;
@@ -44,7 +43,13 @@ namespace HASB_Screen.Controllers
                 {
                     return BadRequest();
                 }
-                await _checkinService.Checkin(model.QrCode, roomId);
+                if (model.IsCheckupRecord)
+                {
+                    await _checkinService.CheckinForCheckupRecord(model.QrCode, roomId);
+                } else
+                {
+                    await _checkinService.CheckinForTestRecord(model.QrCode, roomId);
+                }
                 return Ok();
             } catch (Exception e)
             {

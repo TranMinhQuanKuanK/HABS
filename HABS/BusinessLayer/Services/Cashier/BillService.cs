@@ -44,9 +44,6 @@ namespace BusinessLayer.Services.Cashier
         {
             var bills = _unitOfWork.BillRepository.Get()
                 .Include(x=>x.Patient)
-                .Where(x => search.PatientId==null ? true : x.PatientId==search.PatientId)
-                .Where(x => string.IsNullOrEmpty(search.PatientName) ? true : x.PatientName.Contains(search.PatientName))
-                .Where(x => string.IsNullOrEmpty(search.PhoneNo) ? true : x.PhoneNo.Contains(search.PhoneNo))
                 .Where(x => string.IsNullOrEmpty(search.SearchTerm) ? true : 
                         x.PhoneNo.Contains(search.SearchTerm)
                         || x.PatientName.Contains(search.SearchTerm)
@@ -102,6 +99,42 @@ namespace BusinessLayer.Services.Cashier
                     PhoneNo = x.PhoneNo,
                     AccountPhoneNo = x.AccountPhoneNo,
                     Details = x.BillDetails.Select(d=>new BillDetailViewModel()
+                    {
+                        Id = d.Id,
+                        InsuranceStatus = (int)d.InsuranceStatus,
+                        OperationId = d.OperationId,
+                        OperationName = d.OperationName,
+                        Price = d.Price,
+                        Quantity = d.Quantity,
+                        SubTotal = d.SubTotal,
+                    }).ToList()
+                })
+                .FirstOrDefault();
+            return bill;
+        }
+        public BillViewModel GetBillByQr(string qrCode)
+        {
+            var bill = _unitOfWork.BillRepository.Get()
+                .Where(x => x.QrCode == qrCode)
+                .Include(x => x.BillDetails)
+                .Select(x => new BillViewModel()
+                {
+                    Id = x.Id,
+                    PatientName = x.PatientName,
+                    PatientId = (long)x.PatientId,
+                    Content = x.Content,
+                    TimeCreated = x.TimeCreated,
+                    Status = (int)x.Status,
+                    Total = x.Total,
+                    TotalInWord = x.TotalInWord,
+                    CashierId = x.CashierId,
+                    CashierName = x.CashierName,
+                    DateOfBirth = x.Patient.DateOfBirth,
+                    QrCode = x.QrCode,
+                    Gender = (int)x.Patient.Gender,
+                    PhoneNo = x.PhoneNo,
+                    AccountPhoneNo = x.AccountPhoneNo,
+                    Details = x.BillDetails.Select(d => new BillDetailViewModel()
                     {
                         Id = d.Id,
                         InsuranceStatus = (int)d.InsuranceStatus,

@@ -17,5 +17,6 @@ namespace BusinessLayer.ResponseModels.ViewModels.Screen
         public long? RoomTypeId { get; set; }
         public string Department { get; set; }
         public string RoomType { get; set; }
+        public bool IsCheckupRoom { get; set; }
     }
 }

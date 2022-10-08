@@ -31,16 +31,16 @@ namespace BusinessLayer.Services.User
             _redisService = new RedisService(_distributedCache);
         }
         public List<CheckupAppointmentResponseModel> GetCheckupAppointment(CheckupAppointmentSearchModel searchModel,
-            long accountId)
+        long accountId)
         {
             var result = _unitOfWork.CheckupRecordRepository.Get()
-                            .Include(x=>x.Room).ThenInclude(x=>x.RoomType)
+                            .Include(x => x.Room).ThenInclude(x => x.RoomType)
                             .Where(x => searchModel.FromTime == null || ((DateTime)x.EstimatedDate).Date >= ((DateTime)searchModel.FromTime).Date)
                             .Where(x => searchModel.ToTime == null || ((DateTime)x.EstimatedDate).Date <= ((DateTime)searchModel.ToTime).Date)
                             .Where(x => searchModel.DepartmentId == null || x.DepartmentId == searchModel.DepartmentId)
                             .Where(x => searchModel.PatientId == null || x.PatientId == searchModel.PatientId)
                             .Where(x => x.Patient.AccountId == accountId)
-                            .Where(x => searchModel.IsFutureReExam ? x.Status == CheckupRecordStatus.CHO_TAI_KHAM 
+                            .Where(x => searchModel.IsFutureReExam ? x.Status == CheckupRecordStatus.CHO_TAI_KHAM
                                 : (x.Status != CheckupRecordStatus.CHUYEN_KHOA
                                 && x.Status != CheckupRecordStatus.DA_HUY
                                 && x.Status != CheckupRecordStatus.DA_XOA
@@ -66,7 +66,7 @@ namespace BusinessLayer.Services.User
                                 RoomId = x.RoomId,
                                 Floor = x.Floor,
                                 RoomType = x.Room.RoomType.Name,
-                                QrCode =x.QrCode
+                                QrCode = x.QrCode
                             }).ToList();
             return result;
         }
@@ -158,7 +158,7 @@ namespace BusinessLayer.Services.User
             //thêm lịch buổi chiều
             if (afternoonRoom != null)
             {
-               int _curSlot = 1;
+                int _curSlot = 1;
                 var start = new DateTime(searchDate.Year, searchDate.Month, searchDate.Day,
                     _baseConfig.WorkingShiftConfig.BeginAfternoonShiftHour,
                     _baseConfig.WorkingShiftConfig.BeginAfternoonShiftMinute,

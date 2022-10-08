@@ -174,6 +174,7 @@ namespace BusinessLayer.Services.Test
                 CashierId = 10001,
                 CashierName = "Nhân viên test",
                 PatientId = patient.Id,
+                QrCode = Guid.NewGuid().ToString()
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
@@ -286,6 +287,7 @@ namespace BusinessLayer.Services.Test
                 CashierId = 10001,
                 CashierName = "Nhân viên test",
                 PatientId = patient.Id,
+                QrCode = Guid.NewGuid().ToString()
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
@@ -800,6 +802,7 @@ namespace BusinessLayer.Services.Test
                 CashierId = 10001,
                 CashierName = "Nhân viên test",
                 PatientId = patient.Id,
+                QrCode = Guid.NewGuid().ToString()
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();

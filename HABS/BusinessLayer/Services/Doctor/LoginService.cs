@@ -84,7 +84,7 @@ namespace BusinessLayer.Services.Doctor
                     Name = _doc.Name,
                     PhoneNo = _doc.PhoneNo,
                     Username = _doc.Username,
-                    Type = (int)_doc.Type
+                    Type = (int)_doc.Type,
                 })
                 .FirstOrDefault();
             if (doctor == null) return null;
