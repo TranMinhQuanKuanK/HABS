@@ -118,10 +118,9 @@ namespace BusinessLayer.Services.Doctor
             await _unitOfWork.SaveChangesAsync();
             if (model.Status != null)
             {
-                if (model.Status == (int)TestRecordStatus.HOAN_THANH && model.ResultFile != null)
+                if (model.Status == (int)TestRecordStatus.HOAN_THANH && model.ResultFile == null)
                 {
                     throw new Exception("Can't complete test record without test result");
-
                 }
                 else if (model.Status == (int)TestRecordStatus.HOAN_THANH || model.Status == (int)TestRecordStatus.CHO_KET_QUA)
                 {

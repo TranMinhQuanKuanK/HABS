@@ -393,6 +393,8 @@ namespace BusinessLayer.Services.User
                 Floor = prevCr.Floor,
                 NumericalOrder = (int)prevCr.NumericalOrder,
                 RoomNumber = prevCr.RoomNumber,
+                ClinicalSymptom =clinicalSymptom,
+                PatientName = patient.Name,
             };
         }
         public async Task<AppointmenAfterBookingResponseModel> CreatNewAppointment(long patientId, DateTime date, long doctorId, int? numericalOrder, string clinicalSymptom, long accountId)
@@ -403,8 +405,8 @@ namespace BusinessLayer.Services.User
                 Console.WriteLine("Hello");
                 scope.Complete();
             }
-                //kiểm tra ngày có hợp lệ, có thuộc phiên làm việc chính thức ko
-                var reqSession = getSession(date);
+            //kiểm tra thời gian có thuộc thời gian làm việc không
+            var reqSession = getSession(date);
             if (reqSession == null)
             {
                 throw new Exception("Invalid time");
@@ -442,6 +444,7 @@ namespace BusinessLayer.Services.User
                 throw new Exception("No working schedule for doctor");
             }
             //nếu số thứ tự null thì lấy số nhỏ nhất có thể trong ngày hôm đó
+            //TODO: schedule service gọi lặp lại CR + doctor => tối ưu
             var avaiSlot = _scheduleService.GetAvailableSlots(new RequestModels.SearchModels.User.SlotSearchModel()
             {
                 DoctorId = doctorId,
@@ -487,9 +490,8 @@ namespace BusinessLayer.Services.User
                 }
                 //gán thời gian bắt đầu cho hợp lí (không lấy date của client)
             }
-            //nếu lịch available thì 1 checkup record mới
-            var dakhoaDep = _departmentService.GetDepartmentById(IdConfig.ID_DEPARTMENT_DA_KHOA);
-            var dakhoaOp = _operationService.GetOperationForDepartment(dakhoaDep.Id);
+            //nếu lịch available thì thêm 1 checkup record mới
+            var dakhoaOperation = _operationService.GetOperationForDepartment(IdConfig.ID_DEPARTMENT_DA_KHOA);
             var cr = new CheckupRecord()
             {
                 IsReExam = false,
@@ -504,7 +506,7 @@ namespace BusinessLayer.Services.User
                 EstimatedStartTime = estimatedStartTime,
                 Date = estimatedStartTime,
                 DepartmentId = IdConfig.ID_DEPARTMENT_DA_KHOA,
-                DepartmentName = dakhoaDep.Name,
+                DepartmentName = dakhoaOperation.Department,
                 DoctorId = doctorId,
                 DoctorName = doctor.Name,
                 ClinicalSymptom = clinicalSymptom,
@@ -515,12 +517,12 @@ namespace BusinessLayer.Services.User
             //tạo một bill detail và 1 bill tương ứng
             Bill bill = new Bill()
             {
-                Content = "Thanh toán viện phí khám tổng quát đa khoa cho bệnh nhân "+patient.Name,
-                Total = dakhoaOp.Price,
+                Content = $"Thanh toán viện phí khám tổng quát đa khoa cho bệnh nhân \"{patient.Name}\"",
+                Total = dakhoaOperation.Price,
                 Status = Bill.BillStatus.CHUA_TT,
                 TimeCreated = DateTime.Now.AddHours(7),
                 PatientName = patient.Name,
-                TotalInWord = MoneyHelper.NumberToText(dakhoaOp.Price),
+                TotalInWord = MoneyHelper.NumberToText(dakhoaOperation.Price),
                 PatientId = patient.Id,
                 PhoneNo = patient.PhoneNumber,
                 AccountPhoneNo = patient.Account.PhoneNumber,
@@ -529,19 +531,20 @@ namespace BusinessLayer.Services.User
             };
             await _unitOfWork.BillRepository.Add(bill);
             await _unitOfWork.SaveChangesAsync();
-            BillDetail bd = new BillDetail()
+            BillDetail bd = new()
             {
-                Price = dakhoaOp.Price,
-                OperationId = dakhoaOp.Id,
-                InsuranceStatus = (InsuranceSupportStatus)dakhoaOp.InsuranceStatus,
-                OperationName = dakhoaOp.Name,
+                Price = dakhoaOperation.Price,
+                OperationId = dakhoaOperation.Id,
+                InsuranceStatus = (InsuranceSupportStatus)dakhoaOperation.InsuranceStatus,
+                OperationName = dakhoaOperation.Name,
                 Quantity = 1,
-                SubTotal = dakhoaOp.Price,
+                SubTotal = dakhoaOperation.Price,
                 CheckupRecordId = cr.Id,
                 BillId = bill.Id
             };
             await _unitOfWork.BillDetailRepository.Add(bd);
             await _unitOfWork.SaveChangesAsync();
+
             if (((DateTime)cr.EstimatedDate).Date==DateTime.Now.AddHours(7).Date)
             {
                 _scheduleServiceDoctor.UpdateRedis_CheckupQueue((long)cr.RoomId);
@@ -554,6 +557,8 @@ namespace BusinessLayer.Services.User
                 NumericalOrder = (int)cr.NumericalOrder,
                 Date = (DateTime)cr.EstimatedStartTime,
                 RoomNumber = cr.RoomNumber,
+                PatientName = patient.Name,
+                ClinicalSymptom = clinicalSymptom,
             };
         }
         private SessionType? getSession(DateTime time)

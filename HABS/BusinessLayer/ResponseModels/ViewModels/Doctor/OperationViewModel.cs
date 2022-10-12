@@ -17,5 +17,6 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public string Note { get; set; }
         public long? RoomTypeId { get; set; }
         public long? DepartmentId { get; set; }
+        public string Department { get; set; }
     }
 }

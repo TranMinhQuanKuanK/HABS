@@ -78,7 +78,8 @@ namespace BusinessLayer.Services.Doctor
             {
                 op = _unitOfWork.OperationRepository.Get()
                .Where(x => x.DepartmentId == depId)
-           .Select
+               .Include(x => x.Department)
+                .Select
               (x => new OperationViewModel()
               {
                   Id = x.Id,
@@ -89,11 +90,11 @@ namespace BusinessLayer.Services.Doctor
                   RoomTypeId = x.RoomTypeId,
                   Note = x.Note,
                   Type = (int)x.Type,
-                  Status = (int)x.Status
+                  Status = (int)x.Status,
+                  Department = x.Department.Name
               }
               ).FirstOrDefault();
-
-                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(op), 5 * 60);
+                _redisService.SetValueToKey(redisKey, JsonConvert.SerializeObject(op), 1 * 60 * 60);
             }
             return op;
         }

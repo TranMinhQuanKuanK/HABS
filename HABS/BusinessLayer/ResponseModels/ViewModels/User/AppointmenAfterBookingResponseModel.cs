@@ -14,5 +14,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
         public string RoomNumber { get; set; }
         public string DepartmentName { get; set; }
         public DateTime Date { get; set; }
+        public string PatientName { get; set; }
+        public string ClinicalSymptom { get; set; }
     }
 }
