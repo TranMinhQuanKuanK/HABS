@@ -101,16 +101,16 @@ namespace BusinessLayer.Services.Doctor
                 IsReExam = (bool)x.IsReExam,
 
             }).ToList();
-            //lấy những đứa vừa có kết quả xét nghiệm bỏ lên đầu
-            var gotResultPatients = queue.Where(x => x.Status == (int)CheckupRecordStatus.CHECKED_IN_SAU_XN).OrderBy(x => x.NumericalOrder);
-            if (gotResultPatients.Count() > 0)
-            {
-                foreach (var item in gotResultPatients)
-                {
-                    queue.Remove(item);
-                    queue.Insert(0, item);
-                }
-            }
+            //Logic cũ là các bệnh nhân vừa có kết quả xét nghiệm sẽ nổi lên đầu
+            //var gotResultPatients = queue.Where(x => x.Status == (int)CheckupRecordStatus.CHECKED_IN_SAU_XN).OrderBy(x => x.NumericalOrder);
+            //if (gotResultPatients.Count() > 0)
+            //{
+            //    foreach (var item in gotResultPatients)
+            //    {
+            //        queue.Remove(item);
+            //        queue.Insert(0, item);
+            //    }
+            //}
             var checkingUpPatient = queue.FirstOrDefault(x => x.Status == (int)CheckupRecordStatus.DANG_KHAM);
             if (checkingUpPatient != null)
             {
@@ -344,6 +344,8 @@ namespace BusinessLayer.Services.Doctor
                         OperationId = (long)x.OperationId,
                         OperationName = x.OperationName,
                         Date = x.Date,
+                        Doctor=x.DoctorName,
+                        ResultFileLink = x.ResultFileLink,
                         Patient = new PatientViewModel()
                         {
                             Address = x.Patient.Address,
