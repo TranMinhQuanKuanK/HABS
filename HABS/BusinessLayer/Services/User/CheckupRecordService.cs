@@ -509,7 +509,9 @@ namespace BusinessLayer.Services.User
                 DoctorId = doctorId,
                 DoctorName = doctor.Name,
                 ClinicalSymptom = clinicalSymptom,
-                QrCode = Guid.NewGuid().ToString()
+                QrCode = Guid.NewGuid().ToString(),
+                ReExamTreeCode = Guid.NewGuid().ToString(),
+                HasReExam = false 
             };
             await _unitOfWork.CheckupRecordRepository.Add(cr);
             await _unitOfWork.SaveChangesAsync();

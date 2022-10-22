@@ -140,6 +140,8 @@ namespace DataAccessLayer.Models
 
                 entity.Property(e => e.IcdDiseaseCode).HasMaxLength(20);
 
+                entity.Property(e => e.ParentRecordId).HasColumnName("ParentRecordID");
+
                 entity.HasOne(d => d.Department)
                     .WithMany(p => p.CheckupRecords)
                     .HasForeignKey(d => d.DepartmentId)

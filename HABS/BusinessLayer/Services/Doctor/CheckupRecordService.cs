@@ -253,10 +253,10 @@ namespace BusinessLayer.Services.Doctor
         public async Task<List<RedirectViewModel>> RedirectPatient(RedirectCreateModel model, long recordId)
         {
             List<RedirectViewModel> result = new List<RedirectViewModel>();
-            var cr = _unitOfWork.CheckupRecordRepository.Get()
+            var previousCR = _unitOfWork.CheckupRecordRepository.Get()
               .Where(x => x.Id == recordId).FirstOrDefault();
             //kiểm tra patient
-            var patient = _patientService.GetPatientById((int)cr.PatientId);
+            var patient = _patientService.GetPatientById((int)previousCR.PatientId);
             if (patient == null)
             {
                 throw new Exception("Patient invalid");
@@ -326,16 +326,15 @@ namespace BusinessLayer.Services.Doctor
                     Floor = room.Floor,
                     RoomNumber = room.RoomNumber,
                     RoomId = room.Id,
-                    PatientId = cr.PatientId,
+                    PatientId = previousCR.PatientId,
                     EstimatedDate = DateTime.Now.AddHours(7),
                     PatientName = patient.Name,
                     NumericalOrder = numOrd,
                     ClinicalSymptom = "Chuyển khoa từ đa khoa, triệu chứng báo cáo từ bác sĩ đa khoa: \"" + symptom + "\".",
                     DepartmentName = dep.Name,
                     QrCode = Guid.NewGuid().ToString(),
-                    //NHỚ BỔ SUNG
-                    //DoctorId = null,
-                    //DoctorName = "Nhớ nhắc Quân bổ sung DoctorName trong trường hợp tụi mày vẫn thấy cái này",
+                    ReExamTreeCode = previousCR.ReExamTreeCode,
+                    ParentRecordId = previousCR.Id,
                 };
                 await _unitOfWork.CheckupRecordRepository.Add(_cr);
                 await _unitOfWork.SaveChangesAsync();
@@ -374,12 +373,12 @@ namespace BusinessLayer.Services.Doctor
                     NumericalOrder = numOrd
                 });
             }
-            cr.Status = CheckupRecordStatus.CHUYEN_KHOA;
+            previousCR.Status = CheckupRecordStatus.CHUYEN_KHOA;
             bill.TotalInWord = MoneyHelper.NumberToText((double)bill.Total, false);
             await _unitOfWork.SaveChangesAsync();
 
-            _scheduleService.UpdateRedis_FinishedCheckupQueue((long)cr.RoomId);
-            _scheduleService.UpdateRedis_CheckupQueue((long)cr.RoomId);
+            _scheduleService.UpdateRedis_FinishedCheckupQueue((long)previousCR.RoomId);
+            _scheduleService.UpdateRedis_CheckupQueue((long)previousCR.RoomId);
             await _notiService.SendDepartmentChangeNoti(listDepartmentResp, patient.AccountId);
             return result;
         }
@@ -633,7 +632,7 @@ namespace BusinessLayer.Services.Doctor
                 throw new Exception("Department doesn't exist");
             }
             //Thêm note vào CR cũ (need improve)
-            preCr.DoctorAdvice = preCr.DoctorAdvice + $" Hẹn tái khám vào ngày {model.ReExamDate.Date}, các xét nghiệm cần thực hiện trước khi tái khám: ";
+            var reExamNote = $" Hẹn tái khám vào ngày {model.ReExamDate.Date}, các xét nghiệm cần thực hiện trước khi tái khám: ";
             for (int i = 0; i < listOp.Count; i++)
             {
                 preCr.DoctorAdvice = preCr.DoctorAdvice + listOp[i].Name;
@@ -646,7 +645,10 @@ namespace BusinessLayer.Services.Doctor
                     preCr.DoctorAdvice = preCr.DoctorAdvice + ", ";
                 }
             }
-            preCr.DoctorAdvice = preCr.DoctorAdvice + "Gặp bác sĩ " + doc.Name + ", SĐT: " + doc.PhoneNo + ".";
+            reExamNote = reExamNote + "Gặp bác sĩ " + doc.Name + ", SĐT: " + doc.PhoneNo + ".";
+
+            //logic mới reExamTree
+            preCr.HasReExam = true;
             //tạo mới bill
             var bill = new Bill()
             {
@@ -674,7 +676,10 @@ namespace BusinessLayer.Services.Doctor
                 PatientId = model.PatientId,
                 PatientName = patient.Name,
                 TestRecords = new List<TestRecord>(),
-                QrCode = Guid.NewGuid().ToString()
+                QrCode = Guid.NewGuid().ToString(),
+                ReExamTreeCode = preCr.ReExamTreeCode,
+                HasReExam = false,
+                ReExamNote = reExamNote,
             };
             await _unitOfWork.CheckupRecordRepository.Add(cr);
             await _unitOfWork.SaveChangesAsync();

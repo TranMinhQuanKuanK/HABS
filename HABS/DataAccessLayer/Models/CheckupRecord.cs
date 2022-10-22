@@ -57,6 +57,10 @@ namespace DataAccessLayer.Models
         public string RoomNumber { get; set; }
         public string Floor { get; set; }
         public string QrCode { get; set; }
+        public bool? HasReExam { get; set; }
+        public long? ParentRecordId { get; set; }
+        public string ReExamTreeCode { get; set; }
+        public string ReExamNote { get; set; }
 
         public virtual Department Department { get; set; }
         public virtual Doctor Doctor { get; set; }
