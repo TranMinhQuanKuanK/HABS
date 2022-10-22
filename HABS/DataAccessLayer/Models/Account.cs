@@ -25,6 +25,7 @@ namespace DataAccessLayer.Models
         public string Email { get; set; }
         public string Name { get; set; }
         public UserStatus? Status { get; set; }
+        public bool? IsTestUser { get; set; }
 
         public virtual ICollection<FcmTokenMobile> FcmTokenMobiles { get; set; }
         public virtual ICollection<Patient> Patients { get; set; }

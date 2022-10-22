@@ -15,5 +15,8 @@ namespace BusinessLayer.ResponseModels.SearchModels.User
         public string RoomNumber { get; set; }
         public string Floor { get; set; }
         public int Session { get; set; }
+        public string Doctor { get; set; }
+        public long DoctorId { get; set; }
+
     }
 }

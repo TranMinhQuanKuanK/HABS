@@ -122,11 +122,8 @@ namespace BusinessLayer.Services.Doctor
                 {
                     throw new Exception("Can't complete test record without test result");
                 }
-                else if (model.Status == (int)TestRecordStatus.HOAN_THANH || model.Status == (int)TestRecordStatus.CHO_KET_QUA)
-                {
-                    await _notiService.SendUpdateCheckupInfoReminder(cr.Id, cr.Patient.AccountId);
-                }
             }
+            await _notiService.SendUpdateCheckupInfoReminder(cr.Id, cr.Patient.AccountId);
             //cập nhật cache
             _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, false);
             _scheduleService.UpdateRedis_TestQueue((long)tr.RoomId, true);

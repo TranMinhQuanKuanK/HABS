@@ -34,6 +34,7 @@ namespace DataAccessLayer.Models
         public string Bhyt { get; set; }
         public long AccountId { get; set; }
         public PatientStatus? Status { get; set; }
+        public bool? IsTestPatient { get; set; }
 
         public virtual Account Account { get; set; }
         public virtual ICollection<Bill> Bills { get; set; }

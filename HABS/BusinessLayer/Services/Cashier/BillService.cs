@@ -52,7 +52,9 @@ namespace BusinessLayer.Services.Cashier
                 .Where(x => search.From == null ? true : x.TimeCreated >= search.From)
                 .Where(x => search.To == null ? true : x.TimeCreated <= search.To)
                 .Where(x => search.Status==null ? true : x.Status == (BillStatus)search.Status)
-                .Where(x => x.Status!= DataAccessLayer.Models.Bill.BillStatus.HUY)
+                .Where(x => x.Status!= DataAccessLayer.Models.Bill.BillStatus.HUY &&
+                 x.Status != DataAccessLayer.Models.Bill.BillStatus.DA_TT_EBANKING &&
+                  x.Status != DataAccessLayer.Models.Bill.BillStatus.DA_TT_TIEN_MAT)
                 .OrderByDescending(x=>x.TimeCreated)
                 .Select(x => new BillViewModel()
                 {
@@ -116,6 +118,8 @@ namespace BusinessLayer.Services.Cashier
         {
             var bill = _unitOfWork.BillRepository.Get()
                 .Where(x => x.QrCode == qrCode)
+                .Where(x=>x.Status!=BillStatus.DA_TT_EBANKING 
+                && x.Status != BillStatus.DA_TT_TIEN_MAT)
                 .Include(x => x.BillDetails)
                 .Select(x => new BillViewModel()
                 {
@@ -213,9 +217,9 @@ namespace BusinessLayer.Services.Cashier
             bill.CashierId = cashierId;
             bill.CashierName = cashier.Name;
 
+            await _notiService.SendUpdateCheckupInfoReminder(cr.Id, cr.Patient.AccountId);
             await _unitOfWork.SaveChangesAsync();
             //bắn noti cho mobile
-            await _notiService.SendUpdateCheckupInfoReminder(cr.Id,cr.Patient.AccountId);
         }
         public async Task CancelABill(long billId, long cashierId)
         {

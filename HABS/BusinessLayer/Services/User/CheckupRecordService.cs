@@ -287,7 +287,6 @@ namespace BusinessLayer.Services.User
             if (prevCr == null)
             {
                 throw new Exception("Previous checkup record doesn't exist");
-
             }
             //kiểm tra xem thời điểm đó bs có làm việc ko
             var schedule = _unitOfWork.ScheduleRepository.Get()

@@ -102,6 +102,7 @@ namespace BusinessLayer.Services.Doctor
 
             }).ToList();
             //Logic cũ là các bệnh nhân vừa có kết quả xét nghiệm sẽ nổi lên đầu
+
             //var gotResultPatients = queue.Where(x => x.Status == (int)CheckupRecordStatus.CHECKED_IN_SAU_XN).OrderBy(x => x.NumericalOrder);
             //if (gotResultPatients.Count() > 0)
             //{

@@ -44,7 +44,7 @@ namespace BusinessLayer.Services.Notification
                 Data = cr,
                 Type = GeneralFirebaseNotificationModel<PatientRecordFullDataResponseModel>.NotiType.CheckupStatusChangeReminder
             };
-            await sendNotification(data, "","Trạng thái khám thay đổi","Trạng thái khám đã thay đổi.", accountId);
+            await sendNotification(data, "",$"Trạng thái đổi thành: {cr.Status.ToString()}", $"Trạng thái đổi thành: {cr.Status}, record {cr.Id}, BN: {cr.PatientName}, BS: {cr.DoctorName}", accountId);
         }
         public async Task SendDepartmentChangeNoti(List<DepartmentChangeNoti> listDepartment, long accountId)
         {
@@ -80,11 +80,10 @@ namespace BusinessLayer.Services.Notification
                 }));
                 var response = await FirebaseMessaging.DefaultInstance.SendAllAsync(messageList);
                 // Response is a message ID string.
-                Console.WriteLine("Successfully sent message: " + response.ToString());
             }
             catch (Exception e)
             {
-                Console.WriteLine("Debug exception: " + e.Message);
+                Console.WriteLine("Send notification: "+e.Message);
             }
         }
 

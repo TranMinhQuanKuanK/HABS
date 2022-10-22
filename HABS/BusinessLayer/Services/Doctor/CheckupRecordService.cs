@@ -632,7 +632,7 @@ namespace BusinessLayer.Services.Doctor
             {
                 throw new Exception("Department doesn't exist");
             }
-            //Thêm note vào CR cũ (need review)
+            //Thêm note vào CR cũ (need improve)
             preCr.DoctorAdvice = preCr.DoctorAdvice + $" Hẹn tái khám vào ngày {model.ReExamDate.Date}, các xét nghiệm cần thực hiện trước khi tái khám: ";
             for (int i = 0; i < listOp.Count; i++)
             {
@@ -679,6 +679,7 @@ namespace BusinessLayer.Services.Doctor
             await _unitOfWork.CheckupRecordRepository.Add(cr);
             await _unitOfWork.SaveChangesAsync();
             //add bill detail and test record for TR
+            var testRecorList = new List<TestRecord>();
             foreach (var op in listOp)
             {
                 var testRecor = new TestRecord()
@@ -693,19 +694,24 @@ namespace BusinessLayer.Services.Doctor
                     QrCode = Guid.NewGuid().ToString(),
                 };
                 await _unitOfWork.TestRecordRepository.Add(testRecor);
+                testRecorList.Add(testRecor);
+            }
                 await _unitOfWork.SaveChangesAsync();
+            foreach (var testRecord in testRecorList) 
+            {
+                var opInList = listOp.Where(x => x.Id == testRecord.OperationId).FirstOrDefault();
                 var bdTR = new BillDetail()
                 {
                     BillId = bill.Id,
-                    InsuranceStatus = op.InsuranceStatus,
-                    TestRecordId = testRecor.Id,
-                    OperationId = op.Id,
-                    Price = op.Price,
+                    InsuranceStatus = opInList.InsuranceStatus,
+                    TestRecordId = testRecord.Id,
+                    OperationId = opInList.Id,
+                    Price = opInList.Price,
                     Quantity = 1,
-                    SubTotal = op.Price,
-                    OperationName = op.Name,
+                    SubTotal = opInList.Price,
+                    OperationName = opInList.Name,
                 };
-                bill.Total += op.Price;
+                bill.Total += opInList.Price;
                 await _unitOfWork.BillDetailRepository.Add(bdTR);
             }
             await _unitOfWork.SaveChangesAsync();

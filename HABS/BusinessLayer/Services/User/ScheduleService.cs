@@ -67,7 +67,9 @@ namespace BusinessLayer.Services.User
                                 Floor = x.Floor,
                                 RoomType = x.Room.RoomType.Name,
                                 QrCode = x.QrCode
-                            }).ToList();
+                            })
+                            .OrderByDescending(x=>x.EstimatedStartTime)
+                            .ToList();
             return result;
         }
         //có thể những slot này thuộc những phòng khác nhau

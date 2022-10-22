@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Constants;
 using BusinessLayer.Interfaces.Common;
 using BusinessLayer.Interfaces.Doctor;
+using BusinessLayer.ResponseModels.SearchModels.User;
 using BusinessLayer.Services.Redis;
 using DataAccessLayer.Models;
 using DataAcessLayer.Interfaces;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Utilities;
@@ -80,8 +82,314 @@ namespace BusinessLayer.Services.Test
             }
             return session;
         }
+        public async Task CreatALotOfNewAppointments(int excludeAtTop, int examPending, int checkupFinished)
+        {
+            var roomDaKhoaList = new List<long> { 10001, 10002 };
+            var scheduleForRoomList = new List<Schedule>();
+            foreach (var room in roomDaKhoaList)
+            {
+                var now = DateTime.Now.Date;
+                //tối ưu thành một câu query
+                var scheduleForRoom = _unitOfWork.ScheduleRepository
+                    .Get()
+                     .Where(x => x.RoomId == room)
+                     .Where(x => x.Session == SessionType.SANG || x.Session == SessionType.CHIEU || x.Session == SessionType.TOI)
+                     .Where(x => x.Weekday == now.DayOfWeek)
+                     .Include(x => x.Room)
+                     .Include(x => x.Doctor)
+                     .FirstOrDefault();
+                scheduleForRoomList.Add(scheduleForRoom);
+            }
+            //Slot trống mỗi phòng
+            var avaiSlotsList = new List<CheckupSlotResponseModel>();
+            var slotsForExamPendingList = new List<CheckupSlotResponseModel>();
+            var slotsForExamFinishedList = new List<CheckupSlotResponseModel>();
+
+            foreach (var scheduleForRoom in scheduleForRoomList)
+            {
+                var avaiSlots = _scheduleService.GetAvailableSlots(new RequestModels.SearchModels.User.SlotSearchModel()
+                {
+                    DoctorId = scheduleForRoom.DoctorId,
+                    Date = DateTime.Now
+                });
+                //skip bệnh nhân ở đầu để chừa ra khám
+                avaiSlots = avaiSlots.Skip(excludeAtTop).ToList();
+                //thêm doctor (script purpose only)
+                foreach (var slot in avaiSlots)
+                {
+                    slot.Doctor = scheduleForRoom.Doctor.Name;
+                    slot.DoctorId = scheduleForRoom.Doctor.Id;
+                }
+
+                avaiSlotsList.AddRange(avaiSlots.SkipLast(examPending + checkupFinished));
+                slotsForExamPendingList.AddRange(avaiSlots.TakeLast(examPending + checkupFinished).Take(examPending));
+                slotsForExamFinishedList.AddRange(avaiSlots.TakeLast(checkupFinished));
+            }
+
+            //Lấy hết bệnh nhân test
+            var patienList = _unitOfWork.PatientRepository.Get().Where(x => x.IsTestPatient == true).ToList();
+            var currentPatientIndex = 0;
+            foreach (var slot in avaiSlotsList)
+            {
+                //tạo CR tương ứng
+                var patient = patienList[currentPatientIndex++];
+                var cr = new CheckupRecord()
+                {
+                    IsReExam = false,
+                    PatientId = patient.Id,
+                    PatientName = patient.Name,
+                    RoomId = slot.RoomId,
+                    RoomNumber = slot.RoomNumber,
+                    Floor = slot.Floor,
+                    //đã thanh toán và checked in
+                    Status = CheckupRecordStatus.CHECKED_IN,
+                    NumericalOrder = slot.NumericalOrder,
+                    EstimatedDate = slot.EstimatedStartTime?.Date,
+                    EstimatedStartTime = slot.EstimatedStartTime,
+                    DepartmentId = IdConfig.ID_DEPARTMENT_DA_KHOA,
+                    DepartmentName = "Đa khoa",
+                    DoctorId = slot.DoctorId,
+                    ClinicalSymptom = "Triệu chứng được tạo tự động cho bệnh nhân " + patient.Name,
+                    DoctorName = slot.Doctor,
+                    QrCode = Guid.NewGuid().ToString(),
+                };
+                await _unitOfWork.CheckupRecordRepository.Add(cr);
+                var examPendingCR = new List<CheckupRecord>();
+            }
+            var examPendingCRs = new List<CheckupRecord>();
+            foreach (var slot in slotsForExamPendingList)
+            {
+                var patient = patienList[currentPatientIndex++];
+                var cr = new CheckupRecord()
+                {
+                    IsReExam = false,
+                    PatientId = patient.Id,
+                    PatientName = patient.Name,
+                    RoomId = slot.RoomId,
+                    RoomNumber = slot.RoomNumber,
+                    Floor = slot.Floor,
+                    //đã thanh toán và checked in
+                    Status = CheckupRecordStatus.CHO_KQXN,
+                    NumericalOrder = slot.NumericalOrder,
+                    EstimatedDate = slot.EstimatedStartTime?.Date,
+                    EstimatedStartTime = slot.EstimatedStartTime,
+                    DepartmentId = IdConfig.ID_DEPARTMENT_DA_KHOA,
+                    DepartmentName = "Đa khoa",
+                    DoctorId = slot.DoctorId,
+                    ClinicalSymptom = "Triệu chứng được tạo tự động cho bệnh nhân " + patient.Name,
+                    DoctorName = slot.Doctor,
+                    QrCode = Guid.NewGuid().ToString(),
+                };
+
+                await _unitOfWork.CheckupRecordRepository.Add(cr);
+                examPendingCRs.Add(cr);
+            }
+            var examFinishedCR = new List<CheckupRecord>();
+            foreach (var slot in slotsForExamFinishedList)
+            {
+                var patient = patienList[currentPatientIndex++];
+                var cr = new CheckupRecord()
+                {
+                    IsReExam = false,
+                    PatientId = patient.Id,
+                    PatientName = patient.Name,
+                    RoomId = slot.RoomId,
+                    RoomNumber = slot.RoomNumber,
+                    Floor = slot.Floor,
+                    Status = CheckupRecordStatus.KET_THUC,
+                    NumericalOrder = slot.NumericalOrder,
+                    EstimatedDate = slot.EstimatedStartTime?.Date,
+                    EstimatedStartTime = slot.EstimatedStartTime,
+                    DepartmentId = IdConfig.ID_DEPARTMENT_DA_KHOA,
+                    DepartmentName = "Đa khoa",
+                    DoctorId = slot.DoctorId,
+                    ClinicalSymptom = "Triệu chứng được tạo tự động cho bệnh nhân " + patient.Name,
+                    DoctorName = slot.Doctor,
+                    QrCode = Guid.NewGuid().ToString(),
+                    Pulse = 133,
+                    Diagnosis = "Chẩn đoán từ bác sĩ (tạo tự động)",
+                    BloodPressure = 45,
+                    Temperature = 35,
+                    DoctorAdvice = "Lời khuyên từ bác sĩ (tạo tự động)",
+                    IcdDiseaseCode = "M06",
+                    IcdDiseaseId = 10034,
+                    IcdDiseaseName = "Viêm khớp dạng thấp khác",
+                };
+                await _unitOfWork.CheckupRecordRepository.Add(cr);
+                examFinishedCR.Add(cr);
+            }
+            await _unitOfWork.SaveChangesAsync();
+            //tạo test record cho nhóm exam pending
+
+            //Khám sơ sinh sanh non
+            //Xét nghiệm máu
+            //Mổ ruột thừa
+            //Chụp X - quang phổi
+            var operationIdList = new List<long>() { 10010, 10011, 10016, 10013 };
+            var operationList = _unitOfWork.OperationRepository.Get().Where(x => operationIdList.Contains(x.Id)).ToList();
+            var roomTypeIdList = new List<long>();
+            foreach (var op in operationList)
+            {
+                if (!roomTypeIdList.Contains((long)op.RoomTypeId))
+                {
+                    roomTypeIdList.Add((long)op.RoomTypeId);
+                }
+            }
+            var roomList = _unitOfWork.RoomRepository
+                   .Get()
+                   .Include(x => x.TestRecords)
+                   .Where(x => x.RoomTypeId != null && roomTypeIdList.Contains((long)x.RoomTypeId))
+                   .ToList();
+            var roomDictionary = new Dictionary<long, List<Room>>();//map roomTypeId and roomList
+            foreach (var room in roomList)
+            {
+                List<Room> listRoom;
+                var key = (long)room.RoomTypeId;
+                if (!roomDictionary.TryGetValue(key, out listRoom))
+                {
+                    listRoom = new List<Room>() { room };
+                    roomDictionary.Add(key, listRoom);
+                }
+                else
+                {
+                    listRoom.Add(room);
+                }
+            }
+            foreach (var cr in examPendingCRs)
+            {
+                foreach (var op in operationList)
+                {
+                    roomDictionary.TryGetValue((long)op.RoomTypeId, out var roomListForThisOp);
+                    var roomWithLeastRecord = roomListForThisOp.
+                    //    .Select(x => new
+                    //{
+                    //    Room = x,
+                    //    Count = x.TestRecords
+                    //    .Where(x => x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH ||
+                    //    x.Status == TestRecord.TestRecordStatus.DANG_TIEN_HANH ||
+                    //    x.Status == TestRecord.TestRecordStatus.CHECKED_IN
+                    //    ).Where(x => x.EstimatedDate?.Date == DateTime.Now.Date).Count()
+                    //}).OrderBy(x => x.Count).Select(x=> x.Room).First();
+                        OrderBy<Room, int>(x =>
+                        {
+                            return x.TestRecords
+                             .Where(tr => tr.Status == TestRecord.TestRecordStatus.DA_DAT_LICH ||
+                                         tr.Status == TestRecord.TestRecordStatus.DANG_TIEN_HANH ||
+                                         tr.Status == TestRecord.TestRecordStatus.CHECKED_IN
+                             ).Where(tr => tr.EstimatedDate?.Date == DateTime.Now.Date).Count();
+                        }).First();
+                    var tr = new TestRecord()
+                    {
+                        Date = DateTime.Now.AddHours(7),
+                        EstimatedDate = DateTime.Now.AddHours(7),
+                        Floor = roomWithLeastRecord.Floor,
+                        RoomId = roomWithLeastRecord.Id,
+                        RoomNumber = roomWithLeastRecord.RoomNumber,
+                        OperationId = op.Id,
+                        OperationName = op.Name,
+                        PatientId = cr.PatientId,
+                        PatientName = cr.PatientName,
+                        QrCode = Guid.NewGuid().ToString(),
+                        Status = TestRecord.TestRecordStatus.CHECKED_IN,
+                        CheckupRecordId = cr.Id,
+                        NumericalOrder = roomWithLeastRecord.TestRecords
+                             .Where(x => x.Status == TestRecord.TestRecordStatus.DA_DAT_LICH ||
+                                         x.Status == TestRecord.TestRecordStatus.DANG_TIEN_HANH ||
+                                         x.Status == TestRecord.TestRecordStatus.CHECKED_IN
+                             ).Where(x => x.EstimatedDate?.Date == DateTime.Now.Date).Count() + 1,
+                    };
+                    roomWithLeastRecord.TestRecords.Add(tr);//just for on-memory calculation
+                    await _unitOfWork.TestRecordRepository.Add(tr);
+                }
+            }
+            //tạo testrecord đã hoàn thành cho nhóm finished
+            foreach (var cr in examFinishedCR)
+            {
+                var tr = new TestRecord()
+                {
+                    DoctorId = 10020,
+                    DoctorName = "Hảo Nguyên Dương",
+                    QrCode = Guid.NewGuid().ToString(),
+                    CheckupRecordId = cr.Id,
+                    Date = DateTime.Now.AddHours(7),
+                    EstimatedDate = DateTime.Now.AddHours(7),
+                    NumericalOrder = 99,
+                    OperationId = 10013,
+                    OperationName = "Mổ ruột thừa",
+                    PatientId = cr.PatientId,
+                    PatientName = cr.PatientName,
+                    ResultFileLink = "https://firebasestorage.googleapis.com/v0/b/hospitalmanagement-42da9.appspot.com/o/test-result%2Fpatient-10000%2Fresult-10034-1656324975418.pdf?alt=media&token=ac9092ba-174f-40e0-b3f1-3bbeaa5eb723",
+                    ResultDescription = "Kết quả tổng quát (được tạo tự động)",
+                    RoomId = 10006,
+                    RoomNumber = "113",
+                    Floor = "3",
+                };
+                await _unitOfWork.TestRecordRepository.Add(tr);
+            }
+            //tạo prescription cho nhóm finished
+            var prescriptionDictionary = new Dictionary<long, Prescription>();
+            foreach (var cr in examFinishedCR)
+            {
+                var pr = new Prescription()
+                {
+                    CheckupRecordId = cr.Id,
+                    Note = "Ghi chú cho đon thuốc (được tạo tự động)",
+                    TimeCreated = DateTime.Now.AddHours(7),
+                };
+                prescriptionDictionary.Add(cr.Id, pr);
+                await _unitOfWork.PrescriptionRepository.Add(pr);
+            }
+            await _unitOfWork.SaveChangesAsync();
+            foreach (var keyvalue in prescriptionDictionary)
+            {
+                //tạo thuốc
+                var pd = new PrescriptionDetail()
+                {
+                    PrescriptionId = keyvalue.Value?.Id,
+                    MedicineId = 10004,
+                    MedicineName = "Promethazine",
+                    MiddayDose = 5,
+                    MorningDose = 5,
+                    EveningDose = 6,
+                    NightDose = 4,
+                    Quantity = 12,
+                    Unit = "Chai",
+                    Usage = "Uống không cần mở nắp",
+                };
+                var pd2 = new PrescriptionDetail()
+                {
+                    PrescriptionId = keyvalue.Value?.Id,
+                    MedicineId = 10005,
+                    MedicineName = "Loratadine",
+                    MiddayDose = 5,
+                    MorningDose = 5,
+                    EveningDose = 6,
+                    NightDose = 4,
+                    Quantity = 12,
+                    Unit = "Hộp",
+                    Usage = "Uống không cần mở nắp",
+                };
+                var pd3 = new PrescriptionDetail()
+                {
+                    PrescriptionId = keyvalue.Value?.Id,
+                    MedicineId = 10009,
+                    MedicineName = "Paracetamol",
+                    MiddayDose = 5,
+                    MorningDose = 5,
+                    EveningDose = 6,
+                    NightDose = 4,
+                    Quantity = 12,
+                    Unit = "Lọ",
+                    Usage = "Uống phải mở nắp 3 lần",
+                };
+                await _unitOfWork.PrescriptionDetailRepository.Add(pd);
+                await _unitOfWork.PrescriptionDetailRepository.Add(pd2); await _unitOfWork.PrescriptionDetailRepository.Add(pd);
+                await _unitOfWork.PrescriptionDetailRepository.Add(pd3);
+            }
+            await _unitOfWork.SaveChangesAsync();
+        }
         public async Task<string> CreatNewAppointment(long patientId, DateTime date,
-            long doctorId, int? numericalOrder, string clinicalSymptom)
+        long doctorId, int? numericalOrder, string clinicalSymptom)
         {
             _logger.LogDebug($"Toi debug from create an appointment for patient {patientId}");
             var reqSession = SessionType.SANG;

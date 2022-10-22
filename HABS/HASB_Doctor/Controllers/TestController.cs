@@ -98,7 +98,21 @@ namespace HASB_Doctor.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [SwaggerOperation(Summary = "Tạo 5 bệnh nhân chuẩn bị xét nghiệm, đã checkin, phòng xét nghiệm 115 tầng 3")]
+        [SwaggerOperation(Summary = "Tạo dữ liệu test (nhiều)")]
+        [HttpGet("alot")]
+        public async Task<IActionResult> CreateAlot()
+        {
+            try
+            {
+                await ts.CreatALotOfNewAppointments(6,5,5);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+            [SwaggerOperation(Summary = "Tạo 5 bệnh nhân chuẩn bị xét nghiệm, đã checkin, phòng xét nghiệm 115 tầng 3")]
         [HttpGet("test-book-5")]
         public async Task<IActionResult> CreateTwoPatientsIntoExamRoom()
         {
