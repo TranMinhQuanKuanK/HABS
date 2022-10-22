@@ -1,6 +1,5 @@
 ﻿using BusinessLayer.RequestModels.CreateModels.Doctor;
 using BusinessLayer.RequestModels.SearchModels.Doctor;
-using BusinessLayer.ResponseModels.ViewModels.Common;
 using BusinessLayer.ResponseModels.ViewModels.Doctor;
 using DataAccessLayer.Models;
 using System;
@@ -11,8 +10,9 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Interfaces.Common
 {
-    public interface IReExamTreeService
+    public interface INumercialOrderService
     {
-        ReExamTreeResponseModel GetReExamTree(string reExamTreeId);
+        Room GetAppropriateRoomForOperation(Operation op, bool isTestRoom);
+        int GetNumOrderForAutoIncreaseRoom(Room room, DateTime date);
     }
 }

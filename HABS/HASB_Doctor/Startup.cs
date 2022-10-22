@@ -159,7 +159,7 @@ namespace HASB_Doctor
             services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<BusinessLayer.Interfaces.User.ICheckupRecordService, 
                 BusinessLayer.Services.User.CheckupRecordService>();
-
+            services.AddTransient<IReExamTreeService, ReExamTreeService>();
 
             services.AddLogging();
 
