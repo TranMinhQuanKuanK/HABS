@@ -19,6 +19,5 @@ namespace BusinessLayer.ResponseModels.ViewModels.Common
     {
         public DateTime? Date { get; set; }
         public List<ReExamTreeCheckupRecordItemResponseModel> CheckupRecords { get; set; }
-
     }
 }

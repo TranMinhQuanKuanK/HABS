@@ -157,6 +157,11 @@ namespace DataAccessLayer.Models
                     .HasForeignKey(d => d.IcdDiseaseId)
                     .HasConstraintName("FK__CheckupRe__IcdDi__4F7CD00D");
 
+                entity.HasOne(d => d.ParentRecord)
+                    .WithMany(p => p.ChildrenRecords)
+                    .HasForeignKey(d => d.ParentRecordId)
+                    .HasConstraintName("FK__CheckupRe__Paren__6E01572D");
+
                 entity.HasOne(d => d.Patient)
                     .WithMany(p => p.CheckupRecords)
                     .HasForeignKey(d => d.PatientId)

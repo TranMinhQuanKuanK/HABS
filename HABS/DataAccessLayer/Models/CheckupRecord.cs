@@ -27,6 +27,7 @@ namespace DataAccessLayer.Models
         public CheckupRecord()
         {
             BillDetails = new HashSet<BillDetail>();
+            ChildrenRecords = new HashSet<CheckupRecord>();
             Prescriptions = new HashSet<Prescription>();
             TestRecords = new HashSet<TestRecord>();
         }
@@ -65,9 +66,11 @@ namespace DataAccessLayer.Models
         public virtual Department Department { get; set; }
         public virtual Doctor Doctor { get; set; }
         public virtual IcdDisease IcdDisease { get; set; }
+        public virtual CheckupRecord ParentRecord { get; set; }
         public virtual Patient Patient { get; set; }
         public virtual Room Room { get; set; }
         public virtual ICollection<BillDetail> BillDetails { get; set; }
+        public virtual ICollection<CheckupRecord> ChildrenRecords { get; set; }
         public virtual ICollection<Prescription> Prescriptions { get; set; }
         public virtual ICollection<TestRecord> TestRecords { get; set; }
     }
