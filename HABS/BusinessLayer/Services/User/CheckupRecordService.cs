@@ -192,7 +192,9 @@ namespace BusinessLayer.Services.User
                         Floor = x.Floor,
                         RoomNumber = x.RoomNumber,
                         RoomType = x.Room.RoomType.Name,
-                        QrCode = x.QrCode
+                        QrCode = x.QrCode,
+                        HasReExam = (bool)x.HasReExam,
+                        ReExamNote = x.ReExamNote
                     };
                 }).FirstOrDefault();
 
@@ -383,6 +385,7 @@ namespace BusinessLayer.Services.User
                 _tr.Status = TestRecord.TestRecordStatus.DA_DAT_LICH;
                 _tr.Date = date.Date;
             }
+
             await _unitOfWork.SaveChangesAsync();
             return new AppointmenAfterBookingResponseModel()
             {

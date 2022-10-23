@@ -8,6 +8,11 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
 {
     public class DepartmentChangeNoti
     {
+        public long PreviousRecordId { get; set; }
+        public List<DepartmentChangeInfoNoti> Departments { get; set; }
+    }
+    public class DepartmentChangeInfoNoti
+    {
         public long DepartmentId { get; set; }
         public string DepartmentName { get; set; }
         public long RoomId { get; set; }

@@ -11,6 +11,6 @@ namespace BusinessLayer.Interfaces.Notification
     public interface INotificationService
     {
         Task SendUpdateCheckupInfoReminder(long recordId, long accountId);
-        Task SendDepartmentChangeNoti(List<DepartmentChangeNoti> listDepartment, long accountId);
+        Task SendDepartmentChangeNoti(List<DepartmentChangeInfoNoti> listDepartment, long previousRecordId, long accountId);
     }
 }

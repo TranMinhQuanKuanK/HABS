@@ -46,16 +46,22 @@ namespace BusinessLayer.Services.Notification
             };
             await sendNotification(data, "",$"Trạng thái đổi thành: {cr.Status.ToString()}", $"Trạng thái đổi thành: {cr.Status}, record {cr.Id}, BN: {cr.PatientName}, BS: {cr.DoctorName}", accountId);
         }
-        public async Task SendDepartmentChangeNoti(List<DepartmentChangeNoti> listDepartment, long accountId)
+        public async Task SendDepartmentChangeNoti(List<DepartmentChangeInfoNoti> listDepartment, long previousRecordId, long accountId)
         {
-            GeneralFirebaseNotificationModel<List<DepartmentChangeNoti>> data = 
-                new GeneralFirebaseNotificationModel<List<DepartmentChangeNoti>>()
+
+            GeneralFirebaseNotificationModel<DepartmentChangeNoti> data = 
+                new GeneralFirebaseNotificationModel<DepartmentChangeNoti>()
             {
-                Data = listDepartment,
-                Type = GeneralFirebaseNotificationModel<List<DepartmentChangeNoti>>
+                Data = new DepartmentChangeNoti()
+                {
+                    PreviousRecordId = previousRecordId,
+                    Departments = listDepartment
+                },
+                Type = GeneralFirebaseNotificationModel<DepartmentChangeNoti>
                         .NotiType.DepartmentChangeReminder
             };
-            await sendNotification(data, "", "Thông báo chuyển khoa", "Thông báo chuyển khoa.", accountId);
+            await sendNotification(data, "", $"Thông báo chuyển khoa cho record {previousRecordId}, số lượng khoa: {listDepartment.Count}",
+                $"Thông báo chuyển khoa {previousRecordId}, số lượng khoa: {listDepartment.Count}.", accountId);
         }
         private async Task sendNotification(object data, string topic, string title, string body, long accountId)
         {

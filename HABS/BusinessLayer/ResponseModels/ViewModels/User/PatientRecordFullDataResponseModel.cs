@@ -40,6 +40,7 @@ namespace BusinessLayer.ResponseModels.ViewModels.User
         public string Floor { get; set; }
         public string RoomType { get; set; }
         public string QrCode { get; set; }
-
+        public bool HasReExam { get; set; }
+        public string ReExamNote { get; set; }
     }
 }

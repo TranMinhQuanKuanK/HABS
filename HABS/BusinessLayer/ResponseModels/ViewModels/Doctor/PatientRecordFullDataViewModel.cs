@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.ResponseModels.ViewModels.Doctor
 {
+    public class ReExamBookResponseModel
+    {
+        public DateTime? Date { get; set; }
+        public List<long> OperationIds { get; set; }
+        public string Note { get; set; }
+    }
     public class PatientRecordFullDataViewModel
     {
         public PatientViewModel PatientData { get; set; }
@@ -36,6 +42,8 @@ namespace BusinessLayer.ResponseModels.ViewModels.Doctor
         public string IcdCode { get; set; }
         public bool IsReExam { get; set; }
         public string QrCode { get; set; }
-
+        public bool HasReExam { get; set; }
+        public string ReExamNote { get; set; }
+        public ReExamBookResponseModel ReExam { get; set; }
     }
 }
