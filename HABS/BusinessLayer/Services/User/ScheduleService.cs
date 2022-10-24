@@ -81,7 +81,7 @@ namespace BusinessLayer.Services.User
 
             if (search.Date.Date < DateTime.Now.Date)
             {
-                throw new Exception("Invalid time");
+                return new List<CheckupSlotResponseModel>();
             }
             var doctor = _unitOfWork.DoctorRepository.Get()
                 .Where(x => x.Id == search.DoctorId)

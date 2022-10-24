@@ -31,7 +31,7 @@ namespace HASB_User.Controllers
         {
             try
             {
-               var data=  _scheduleService.GetAvailableSlots(model);
+               var data =  _scheduleService.GetAvailableSlots(model);
                 return Ok(data);
             }
             catch (Exception e)
